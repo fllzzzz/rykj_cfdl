@@ -13,7 +13,7 @@ import java.util.Map;
  * @author whx
  * @date 2023/3/27
  */
-@FeignClient(url = "" + "/gaiawork", name = "GatewayGaiaWorkFeign", configuration = GaiaWorkClientConfiguration.class)
+@FeignClient(url = "${gateway.url}" + "/gaiawork", name = "GatewayGaiaWorkFeign", configuration = GaiaWorkClientConfiguration.class)
 public interface GatewayGaiaWorkFeign {
 
 	/**

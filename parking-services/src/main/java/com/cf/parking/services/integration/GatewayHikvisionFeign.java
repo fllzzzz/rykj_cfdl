@@ -15,7 +15,7 @@ import java.util.Map;
  * @Date 9:16 2022/7/25
  * @Version 1.0
  **/
-@FeignClient(url = "" + "/hikvision", name = "gatewayHikvisionFeign", configuration = ClientConfiguration.class)
+@FeignClient(url = "${gateway.url}" + "/hikvision", name = "gatewayHikvisionFeign", configuration = ClientConfiguration.class)
 public interface GatewayHikvisionFeign {
 
     /**
