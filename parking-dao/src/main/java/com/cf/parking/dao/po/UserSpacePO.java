@@ -1,0 +1,67 @@
+package com.cf.parking.dao.po;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Data;
+import lombok.experimental.Accessors;
+
+import java.util.Date;
+
+/**
+ * @author lpy
+ * @date 2023-03-27 16:56:05
+ * @description 用户车位表
+ */
+@Data
+@TableName("user_space")
+@Accessors(chain = true)
+public class UserSpacePO {
+
+
+    /**
+     * 创建时间
+     */
+    private Date createTm;
+
+    /**
+     * 结束时间
+     */
+    private Date endDate;
+
+    /**
+     * 工号
+     */
+    private String jobNumber;
+
+    /**
+     * 姓名
+     */
+    private String name;
+
+    /**
+     * 所属车场名(多个逗号分割)
+     */
+    private String parkingLot;
+
+    /**
+     * 车牌号
+     */
+    private String plateNo;
+
+    /**
+     * 开始时间
+     */
+    private Date startDate;
+
+    /**
+     * 更新时间
+     */
+    private Date updateTm;
+
+    /**
+     * 车位管理ID
+     */
+    @TableId(value = "user_space_id", type = IdType.INPUT)
+    private Long userSpaceId;
+}

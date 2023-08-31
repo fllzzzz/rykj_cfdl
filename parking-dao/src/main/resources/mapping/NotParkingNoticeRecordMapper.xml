@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cf.parking.dao.mapper.NotParkingNoticeRecordMapper">
+
+    <resultMap id="notParkingNoticeRecordMap" type="com.cf.parking.dao.po.NotParkingNoticeRecordPO">
+            <result column="create_tm" property="createTm"/>
+            <result column="is_delete" property="isDelete"/>
+            <result column="job_number" property="jobNumber"/>
+            <result column="not_parking_notice_record_id" property="notParkingNoticeRecordId"/>
+            <result column="notice_number" property="noticeNumber"/>
+            <result column="update_tm" property="updateTm"/>
+    </resultMap>
+</mapper>
+

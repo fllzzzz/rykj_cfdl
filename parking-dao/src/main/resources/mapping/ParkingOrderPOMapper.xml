@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cf.parking.dao.mapper.ParkingOrderPOMapper">
+    <resultMap id="BaseResultMap" type="com.cf.parking.dao.po.ParkingOrderPO">
+        <id column="parking_order_id" jdbcType="BIGINT" property="parkingOrderId"/>
+        <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="job_number" jdbcType="VARCHAR" property="jobNumber"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="start_province" jdbcType="VARCHAR" property="startProvince"/>
+        <result column="start_city" jdbcType="VARCHAR" property="startCity"/>
+        <result column="start_county" jdbcType="VARCHAR" property="startCounty"/>
+        <result column="start_address" jdbcType="VARCHAR" property="startAddress"/>
+        <result column="dest_province" jdbcType="VARCHAR" property="destProvince"/>
+        <result column="dest_city" jdbcType="VARCHAR" property="destCity"/>
+        <result column="dest_county" jdbcType="VARCHAR" property="destCounty"/>
+        <result column="dest_address" jdbcType="VARCHAR" property="destAddress"/>
+        <result column="order_time" jdbcType="TIMESTAMP" property="orderTime"/>
+        <result column="passenger_num" jdbcType="INTEGER" property="passengerNum"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+        <result column="noticed" jdbcType="INTEGER" property="noticed"/>
+        <result column="order_state" jdbcType="INTEGER" property="orderState"/>
+        <result column="start_longitude" jdbcType="DECIMAL" property="startLongitude"/>
+        <result column="start_latitude" jdbcType="DECIMAL" property="startLatitude"/>
+        <result column="dest_longitude" jdbcType="DECIMAL" property="destLongitude"/>
+        <result column="dest_latitude" jdbcType="DECIMAL" property="destLatitude"/>
+        <result column="distance" jdbcType="DECIMAL" property="distance"/>
+        <result column="create_tm" jdbcType="TIMESTAMP" property="createTm"/>
+        <result column="update_tm" jdbcType="TIMESTAMP" property="updateTm"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        parking_order_id, user_id, job_number, name, start_province, start_city, start_county, start_address,
+        dest_province, dest_city, dest_county, dest_address, order_time, passenger_num, remark, noticed, order_state,
+        start_longitude, start_latitude, dest_longitude, dest_latitude, distance, create_tm, update_tm
+    </sql>
+    <select id="getOrderPage" resultType="com.cf.parking.dao.po.ParkingOrderPO">
+        select
+        <include refid="Base_Column_List"></include>
+
+        <if test="item.passengerStartLongitude!=0 and item.passengerStartLatitude!=0">
+            , (st_distance(point(start_longitude,start_latitude),point
+            (#{item.passengerStartLongitude,jdbcType=DECIMAL},#{item.passengerStartLatitude,jdbcType=DECIMAL}))*111195)
+            AS startDistance
+        </if>
+        <if test="item.passengerDestLongitude!=0 and item.passengerDestLatitude!=0">
+            , (st_distance(point(dest_longitude,dest_latitude),point
+            (#{item.passengerDestLongitude,jdbcType=DECIMAL},#{item.passengerDestLatitude,jdbcType=DECIMAL}))*111195) AS
+            destDistance
+        </if>
+        from parking_order
+        <where>
+            order_time>now() and order_state = #{item.orderState}
+        </where>
+        <choose>
+            <when test="item.passengerStartLongitude!=0 and item.passengerStartLatitude!=0 and item.passengerDestLongitude!=0 and item.passengerDestLatitude!=0">
+                order by startDistance asc,destDistance asc
+            </when>
+            <when test="item.passengerStartLongitude!=0 and item.passengerStartLatitude!=0">
+                order by startDistance asc
+            </when>
+            <when test="item.passengerDestLongitude!=0 and item.passengerDestLatitude!=0">
+                order by destDistance asc
+            </when>
+            <otherwise>
+                order by order_time asc
+            </otherwise>
+        </choose>
+    </select>
+    <insert id="insert" parameterType="com.cf.parking.dao.po.ParkingOrderPO">
+        insert into parking_order (parking_order_id, user_id, job_number,
+        name, start_province, start_city, start_county, start_address,
+        dest_province, dest_city, dest_county, dest_address,
+        order_time, passenger_num, remark, noticed, order_state,
+        start_longitude, start_latitude, dest_longitude, dest_latitude,distance)
+        values (#{parkingOrderId,jdbcType=BIGINT}, #{userId,jdbcType=BIGINT}, #{jobNumber,jdbcType=VARCHAR},
+        #{name,jdbcType=VARCHAR}, #{startProvince,jdbcType=VARCHAR}, #{startCity,jdbcType=VARCHAR},
+        #{startCounty,jdbcType=VARCHAR}, #{startAddress,jdbcType=VARCHAR}, #{destProvince,jdbcType=VARCHAR},
+        #{destCity,jdbcType=VARCHAR}, #{destCounty,jdbcType=VARCHAR}, #{destAddress,jdbcType=VARCHAR},
+        #{orderTime,jdbcType=TIMESTAMP}, #{passengerNum,jdbcType=INTEGER}, #{remark,jdbcType=VARCHAR},
+        #{noticed,jdbcType=INTEGER}, #{orderState,jdbcType=INTEGER},#{startLongitude,jdbcType=DECIMAL},
+        #{startLatitude,jdbcType=DECIMAL},#{destLongitude,jdbcType=DECIMAL},#{destLatitude,jdbcType=DECIMAL},
+        #{distance,jdbcType=DECIMAL})
+    </insert>
+    <select id="getValidCount" resultType="com.cf.parking.dao.po.ValidCountPO">
+        select
+        user_id,name,job_number,count(parking_order_id) as count
+        from parking_order
+        where order_state =#{status} and order_time BETWEEN #{beforeData} and #{afterData}
+        group by user_id,name,job_number
+    </select>
+</mapper>

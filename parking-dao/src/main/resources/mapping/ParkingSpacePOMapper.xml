@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cf.parking.dao.mapper.ParkingSpacePOMapper">
+  <resultMap id="BaseResultMap" type="com.cf.parking.dao.po.ParkingSpacePO">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="space_no" jdbcType="VARCHAR" property="spaceNo" />
+    <result column="plate_no" jdbcType="VARCHAR" property="plateNo" />
+    <result column="park_flag" jdbcType="INTEGER" property="parkFlag" />
+    <result column="person_name" jdbcType="VARCHAR" property="personName" />
+    <result column="person_id" jdbcType="VARCHAR" property="personId" />
+    <result column="state" jdbcType="INTEGER" property="state" />
+    <result column="park_time" jdbcType="VARCHAR" property="parkTime" />
+    <result column="in_time" jdbcType="TIMESTAMP" property="inTime" />
+    <result column="create_tm" jdbcType="TIMESTAMP" property="createTm" />
+    <result column="update_tm" jdbcType="TIMESTAMP" property="updateTm" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, space_no, plate_no, park_flag, person_name, person_id, state, park_time, in_time, 
+    create_tm, update_tm
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from parking_space
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from parking_space
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insertSelective" parameterType="com.cf.parking.dao.po.ParkingSpacePO">
+    insert into parking_space
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="spaceNo != null">
+        space_no,
+      </if>
+      <if test="plateNo != null">
+        plate_no,
+      </if>
+      <if test="parkFlag != null">
+        park_flag,
+      </if>
+      <if test="personName != null">
+        person_name,
+      </if>
+      <if test="personId != null">
+        person_id,
+      </if>
+      <if test="state != null">
+        state,
+      </if>
+      <if test="parkTime != null">
+        park_time,
+      </if>
+      <if test="inTime != null">
+        in_time,
+      </if>
+      <if test="createTm != null">
+        create_tm,
+      </if>
+      <if test="updateTm != null">
+        update_tm,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="spaceNo != null">
+        #{spaceNo,jdbcType=VARCHAR},
+      </if>
+      <if test="plateNo != null">
+        #{plateNo,jdbcType=VARCHAR},
+      </if>
+      <if test="parkFlag != null">
+        #{parkFlag,jdbcType=INTEGER},
+      </if>
+      <if test="personName != null">
+        #{personName,jdbcType=VARCHAR},
+      </if>
+      <if test="personId != null">
+        #{personId,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null">
+        #{state,jdbcType=INTEGER},
+      </if>
+      <if test="parkTime != null">
+        #{parkTime,jdbcType=VARCHAR},
+      </if>
+      <if test="inTime != null">
+        #{inTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTm != null">
+        #{createTm,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTm != null">
+        #{updateTm,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cf.parking.dao.po.ParkingSpacePO">
+    update parking_space
+    <set>
+      <if test="spaceNo != null">
+        space_no = #{spaceNo,jdbcType=VARCHAR},
+      </if>
+      <if test="plateNo != null">
+        plate_no = #{plateNo,jdbcType=VARCHAR},
+      </if>
+      <if test="parkFlag != null">
+        park_flag = #{parkFlag,jdbcType=INTEGER},
+      </if>
+      <if test="personName != null">
+        person_name = #{personName,jdbcType=VARCHAR},
+      </if>
+      <if test="personId != null">
+        person_id = #{personId,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null">
+        state = #{state,jdbcType=INTEGER},
+      </if>
+      <if test="parkTime != null">
+        park_time = #{parkTime,jdbcType=VARCHAR},
+      </if>
+      <if test="inTime != null">
+        in_time = #{inTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTm != null">
+        create_tm = #{createTm,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTm != null">
+        update_tm = #{updateTm,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.cf.parking.dao.po.ParkingSpacePO">
+    update parking_space
+    set space_no = #{spaceNo,jdbcType=VARCHAR},
+      plate_no = #{plateNo,jdbcType=VARCHAR},
+      park_flag = #{parkFlag,jdbcType=INTEGER},
+      person_name = #{personName,jdbcType=VARCHAR},
+      person_id = #{personId,jdbcType=VARCHAR},
+      state = #{state,jdbcType=INTEGER},
+      park_time = #{parkTime,jdbcType=VARCHAR},
+      in_time = #{inTime,jdbcType=TIMESTAMP},
+      create_tm = #{createTm,jdbcType=TIMESTAMP},
+      update_tm = #{updateTm,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="getAllTempCarInRecords" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    from parking_space
+  </select>
+  <select id="getTempCarInRecords" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    from parking_space
+    <where>
+      <if test="item.spaceNo!=null">
+        and space_no = #{item.spaceNo}
+      </if>
+      <if test="item.plateNo!=null">
+        and plate_no like concat('%',#{item.plateNo},'%')
+      </if>
+      <if test="item.parkFlag!=null">
+        and park_flag = #{item.parkFlag}
+      </if>
+      <if test="item.personName!=null">
+        and person_name = #{item.personName}
+      </if>
+      <if test="item.personId!=null">
+        and person_id = #{item.personId}
+      </if>
+      <if test="item.state!=null">
+        and state = #{item.state}
+      </if>
+    </where>
+  </select>
+  <update id="updateByPersonIdSelective" parameterType="java.util.List">
+      <foreach collection="list" item="item" separator=";"  index="index">
+      update parking_space
+      <set>
+        <if test="item.plateNo != null">
+          plate_no = #{item.plateNo,jdbcType=VARCHAR},
+        </if>
+      </set>
+      where person_id = #{item.personId}
+      </foreach>
+  </update>
+  <update id="updateByPlateNoSelective" parameterType="java.util.List">
+    <foreach collection="stateList" item="item" separator=";"  index="index">
+    update parking_space
+      <set>
+        <if test="item.state != null">
+          state = #{item.state,jdbcType=INTEGER},
+        </if>
+        <if test="item.parkTime != null">
+          park_time = #{item.parkTime,jdbcType=VARCHAR},
+        </if>
+        <if test="item.inTime != null">
+          in_time = #{item.inTime},
+        </if>
+      </set>
+      where plate_no = #{item.plateNo}
+    </foreach>
+  </update>
+
+  <update id="clearAll" >
+    update parking_space
+    set state = 0,
+      park_time = '',
+      in_time = null
+    where state = 1
+  </update>
+</mapper>

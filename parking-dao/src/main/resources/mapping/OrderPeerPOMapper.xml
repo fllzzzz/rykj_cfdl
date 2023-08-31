@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cf.parking.dao.mapper.OrderPeerPOMapper">
+    <resultMap id="BaseResultMap" type="com.cf.parking.dao.po.OrderPeerPO">
+        <id column="order_peer_id" jdbcType="BIGINT" property="orderPeerId"/>
+        <result column="parking_order_id" jdbcType="BIGINT" property="parkingOrderId"/>
+        <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="job_number" jdbcType="VARCHAR" property="jobNumber"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="order_time" jdbcType="TIMESTAMP" property="orderTime"/>
+        <result column="passenger_start_longitude" jdbcType="REAL" property="passengerStartLongitude"/>
+        <result column="passenger_start_latitude" jdbcType="REAL" property="passengerStartLatitude"/>
+        <result column="passenger_dest_longitude" jdbcType="REAL" property="passengerDestLongitude"/>
+        <result column="passenger_dest_latitude" jdbcType="REAL" property="passengerDestLatitude"/>
+        <result column="start_dest_distance" jdbcType="DECIMAL" property="startDestDistance"/>
+        <result column="start_distance" jdbcType="DECIMAL" property="startDistance"/>
+        <result column="dest_distance" jdbcType="DECIMAL" property="destDistance"/>
+        <result column="record_state" jdbcType="INTEGER" property="recordState"/>
+        <result column="create_tm" jdbcType="TIMESTAMP" property="createTm"/>
+        <result column="update_tm" jdbcType="TIMESTAMP" property="updateTm"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        order_peer_id, parking_order_id, user_id, job_number, name, order_time, passenger_start_longitude,
+        passenger_start_latitude, passenger_dest_longitude, passenger_dest_latitude, start_dest_distance,
+        start_distance, dest_distance, record_state, create_tm, update_tm
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from order_peer
+        where order_peer_id = #{orderPeerId,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from order_peer
+        where order_peer_id = #{orderPeerId,jdbcType=BIGINT}
+    </delete>
+
+    <insert id="insertSelective" parameterType="com.cf.parking.dao.po.OrderPeerPO">
+        insert into order_peer
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="orderPeerId != null">
+                order_peer_id,
+            </if>
+            <if test="parkingOrderId != null">
+                parking_order_id,
+            </if>
+            <if test="userId != null">
+                user_id,
+            </if>
+            <if test="jobNumber != null">
+                job_number,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="orderTime != null">
+                order_time,
+            </if>
+            <if test="passengerStartLongitude != null">
+                passenger_start_longitude,
+            </if>
+            <if test="passengerStartLatitude != null">
+                passenger_start_latitude,
+            </if>
+            <if test="passengerDestLongitude != null">
+                passenger_dest_longitude,
+            </if>
+            <if test="passengerDestLatitude != null">
+                passenger_dest_latitude,
+            </if>
+            <if test="startDestDistance != null">
+                start_dest_distance,
+            </if>
+            <if test="startDistance != null">
+                start_distance,
+            </if>
+            <if test="destDistance != null">
+                dest_distance,
+            </if>
+            <if test="recordState != null">
+                record_state,
+            </if>
+            <if test="createTm != null">
+                create_tm,
+            </if>
+            <if test="updateTm != null">
+                update_tm,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="orderPeerId != null">
+                #{orderPeerId,jdbcType=BIGINT},
+            </if>
+            <if test="parkingOrderId != null">
+                #{parkingOrderId,jdbcType=BIGINT},
+            </if>
+            <if test="userId != null">
+                #{userId,jdbcType=BIGINT},
+            </if>
+            <if test="jobNumber != null">
+                #{jobNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="orderTime != null">
+                #{orderTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="passengerStartLongitude != null">
+                #{passengerStartLongitude,jdbcType=REAL},
+            </if>
+            <if test="passengerStartLatitude != null">
+                #{passengerStartLatitude,jdbcType=REAL},
+            </if>
+            <if test="passengerDestLongitude != null">
+                #{passengerDestLongitude,jdbcType=REAL},
+            </if>
+            <if test="passengerDestLatitude != null">
+                #{passengerDestLatitude,jdbcType=REAL},
+            </if>
+            <if test="startDestDistance != null">
+                #{startDestDistance,jdbcType=DECIMAL},
+            </if>
+            <if test="startDistance != null">
+                #{startDistance,jdbcType=DECIMAL},
+            </if>
+            <if test="destDistance != null">
+                #{destDistance,jdbcType=DECIMAL},
+            </if>
+            <if test="recordState != null">
+                #{recordState,jdbcType=INTEGER},
+            </if>
+            <if test="createTm != null">
+                #{createTm,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTm != null">
+                #{updateTm,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.cf.parking.dao.po.OrderPeerPO">
+        update order_peer
+        <set>
+            <if test="parkingOrderId != null">
+                parking_order_id = #{parkingOrderId,jdbcType=BIGINT},
+            </if>
+            <if test="userId != null">
+                user_id = #{userId,jdbcType=BIGINT},
+            </if>
+            <if test="jobNumber != null">
+                job_number = #{jobNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="orderTime != null">
+                order_time = #{orderTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="passengerStartLongitude != null">
+                passenger_start_longitude = #{passengerStartLongitude,jdbcType=REAL},
+            </if>
+            <if test="passengerStartLatitude != null">
+                passenger_start_latitude = #{passengerStartLatitude,jdbcType=REAL},
+            </if>
+            <if test="passengerDestLongitude != null">
+                passenger_dest_longitude = #{passengerDestLongitude,jdbcType=REAL},
+            </if>
+            <if test="passengerDestLatitude != null">
+                passenger_dest_latitude = #{passengerDestLatitude,jdbcType=REAL},
+            </if>
+            <if test="startDestDistance != null">
+                start_dest_distance = #{startDestDistance,jdbcType=DECIMAL},
+            </if>
+            <if test="startDistance != null">
+                start_distance = #{startDistance,jdbcType=DECIMAL},
+            </if>
+            <if test="destDistance != null">
+                dest_distance = #{destDistance,jdbcType=DECIMAL},
+            </if>
+            <if test="recordState != null">
+                record_state = #{recordState,jdbcType=INTEGER},
+            </if>
+            <if test="createTm != null">
+                create_tm = #{createTm,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTm != null">
+                update_tm = #{updateTm,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where order_peer_id = #{orderPeerId,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.cf.parking.dao.po.OrderPeerPO">
+        update order_peer
+        set parking_order_id = #{parkingOrderId,jdbcType=BIGINT},
+        user_id = #{userId,jdbcType=BIGINT},
+        job_number = #{jobNumber,jdbcType=VARCHAR},
+        name = #{name,jdbcType=VARCHAR},
+        order_time = #{orderTime,jdbcType=TIMESTAMP},
+        passenger_start_longitude = #{passengerStartLongitude,jdbcType=REAL},
+        passenger_start_latitude = #{passengerStartLatitude,jdbcType=REAL},
+        passenger_dest_longitude = #{passengerDestLongitude,jdbcType=REAL},
+        passenger_dest_latitude = #{passengerDestLatitude,jdbcType=REAL},
+        start_dest_distance = #{startDestDistance,jdbcType=DECIMAL},
+        start_distance = #{startDistance,jdbcType=DECIMAL},
+        dest_distance = #{destDistance,jdbcType=DECIMAL},
+        record_state = #{recordState,jdbcType=INTEGER},
+        create_tm = #{createTm,jdbcType=TIMESTAMP},
+        update_tm = #{updateTm,jdbcType=TIMESTAMP}
+        where order_peer_id = #{orderPeerId,jdbcType=BIGINT}
+    </update>
+
+    <select id="getValidCount" resultType="com.cf.parking.dao.po.ValidCountPO">
+        select
+        user_id,name,job_number,count(parking_order_id) as count
+        from order_peer
+        where record_state =#{status} and order_time BETWEEN #{beforeData} and #{afterData}
+        group by user_id,name,job_number
+    </select>
+</mapper>

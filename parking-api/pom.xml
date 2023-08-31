@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <artifactId>parking</artifactId>
+    <groupId>com.cf</groupId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+
+  <groupId>com.cf</groupId>
+  <artifactId>parking-api</artifactId>
+  <version>1.0-SNAPSHOT</version>
+
+  <name>parking-api</name>
+
+  <packaging>jar</packaging>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.cf</groupId>
+      <artifactId>parking-services</artifactId>
+      <version>${parent.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-redis</artifactId>
+        <exclusions>
+                <exclusion>
+                    <groupId>io.lettuce</groupId>
+                    <artifactId>lettuce-core</artifactId>
+                </exclusion>
+            </exclusions>
+    </dependency>
+    
+    <!--切面-->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-aspects</artifactId>
+    </dependency>
+
+    <!--validation start-->
+    <dependency>
+      <groupId>javax.validation</groupId>
+      <artifactId>validation-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.hibernate.validator</groupId>
+      <artifactId>hibernate-validator</artifactId>
+    </dependency>
+    <!--validation end-->
+    <!--    <dependency>-->
+    <!--      <groupId>net.logstash.logback</groupId>-->
+    <!--      <artifactId>logstash-logback-encoder</artifactId>-->
+    <!--    </dependency>-->
+
+    <dependency>
+      <groupId>net.logstash.logback</groupId>
+      <artifactId>logstash-logback-encoder</artifactId>
+      <version>4.11</version>
+    </dependency>
+
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>1.2.3</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.github.danielwegener</groupId>
+      <artifactId>logback-kafka-appender</artifactId>
+      <version>0.2.0-RC1</version>
+      <scope>runtime</scope>
+    </dependency>
+
+  </dependencies>
+
+
+
+  <profiles>
+    <profile>
+      <id>dev</id>
+      <properties>
+        <profileActive>dev</profileActive>
+      </properties>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+    </profile>
+    <profile>
+      <id>test</id>
+      <properties>
+        <profileActive>test</profileActive>
+      </properties>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+    </profile>
+    <profile>
+      <id>prod</id>
+      <properties>
+        <profileActive>prod</profileActive>
+      </properties>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+    </profile>
+  </profiles>
+
+  <build>
+    <finalName>parking-api</finalName>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <configuration>
+          <executable>true</executable>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+      </plugin>
+    </plugins>
+
+  </build>
+</project>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cf.parking.dao.mapper.CommonMarkPOMapper">
+    <resultMap id="BaseResultMap" type="com.cf.parking.dao.po.CommonMarkPO">
+        <id column="common_mark_id" jdbcType="BIGINT" property="commonMarkId"/>
+        <result column="source_type" jdbcType="INTEGER" property="sourceType"/>
+        <result column="source_code" jdbcType="VARCHAR" property="sourceCode"/>
+        <result column="state" jdbcType="INTEGER" property="state"/>
+        <result column="create_tm" jdbcType="TIMESTAMP" property="createTm"/>
+        <result column="update_tm" jdbcType="TIMESTAMP" property="updateTm"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    common_mark_id, source_type, source_code, state, create_tm, update_tm
+  </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from common_mark
+        where common_mark_id = #{commonMarkId,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from common_mark
+    where common_mark_id = #{commonMarkId,jdbcType=BIGINT}
+  </delete>
+    <insert id="insertSelective" parameterType="com.cf.parking.dao.po.CommonMarkPO">
+        insert into common_mark
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="commonMarkId != null">
+                common_mark_id,
+            </if>
+            <if test="sourceType != null">
+                source_type,
+            </if>
+            <if test="sourceCode != null">
+                source_code,
+            </if>
+            <if test="state != null">
+                state,
+            </if>
+            <if test="createTm != null">
+                create_tm,
+            </if>
+            <if test="updateTm != null">
+                update_tm,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="commonMarkId != null">
+                #{commonMarkId,jdbcType=BIGINT},
+            </if>
+            <if test="sourceType != null">
+                #{sourceType,jdbcType=INTEGER},
+            </if>
+            <if test="sourceCode != null">
+                #{sourceCode,jdbcType=VARCHAR},
+            </if>
+            <if test="state != null">
+                #{state,jdbcType=INTEGER},
+            </if>
+            <if test="createTm != null">
+                #{createTm,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTm != null">
+                #{updateTm,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.cf.parking.dao.po.CommonMarkPO">
+        update common_mark
+        <set>
+            <if test="sourceType != null">
+                source_type = #{sourceType,jdbcType=INTEGER},
+            </if>
+            <if test="sourceCode != null">
+                source_code = #{sourceCode,jdbcType=VARCHAR},
+            </if>
+            <if test="state != null">
+                state = #{state,jdbcType=INTEGER},
+            </if>
+            <if test="createTm != null">
+                create_tm = #{createTm,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTm != null">
+                update_tm = #{updateTm,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where common_mark_id = #{commonMarkId,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.cf.parking.dao.po.CommonMarkPO">
+    update common_mark
+    set source_type = #{sourceType,jdbcType=INTEGER},
+      source_code = #{sourceCode,jdbcType=VARCHAR},
+      state = #{state,jdbcType=INTEGER},
+      create_tm = #{createTm,jdbcType=TIMESTAMP},
+      update_tm = #{updateTm,jdbcType=TIMESTAMP}
+    where common_mark_id = #{commonMarkId,jdbcType=BIGINT}
+  </update>
+</mapper>

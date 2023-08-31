@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cf.parking.dao.mapper.ParkingEvaluatePOMapper">
+  <resultMap id="BaseResultMap" type="com.cf.parking.dao.po.ParkingEvaluatePO">
+    <id column="parking_evaluate_id" jdbcType="BIGINT" property="parkingEvaluateId" />
+    <result column="user_id" jdbcType="BIGINT" property="userId" />
+    <result column="parking_order_id" jdbcType="BIGINT" property="parkingOrderId"/>
+    <result column="level" jdbcType="INTEGER" property="level" />
+    <result column="evaluate_desc" jdbcType="VARCHAR" property="evaluateDesc" />
+    <result column="evaluate_type" jdbcType="INTEGER" property="evaluateType" />
+    <result column="evaluate_user_id" jdbcType="BIGINT" property="evaluateUserId" />
+    <result column="evaluate_auto" jdbcType="INTEGER" property="evaluateAuto" />
+    <result column="create_tm" jdbcType="TIMESTAMP" property="createTm" />
+    <result column="update_tm" jdbcType="TIMESTAMP" property="updateTm" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    parking_evaluate_id, user_id, parking_order_id, level, evaluate_desc, evaluate_type, evaluate_user_id,
+    evaluate_auto, create_tm, update_tm
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from parking_evaluate
+    where parking_evaluate_id = #{parkingEvaluateId,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from parking_evaluate
+    where parking_evaluate_id = #{parkingEvaluateId,jdbcType=BIGINT}
+  </delete>
+
+  <insert id="insertSelective" parameterType="com.cf.parking.dao.po.ParkingEvaluatePO">
+    insert into parking_evaluate
+      <trim prefix="(" suffix=")" suffixOverrides=",">
+          <if test="parkingEvaluateId != null">
+              parking_evaluate_id,
+          </if>
+          <if test="userId != null">
+              user_id,
+          </if>
+          <if test="parkingOrderId != null">
+              parking_order_id,
+          </if>
+          <if test="level != null">
+              level,
+          </if>
+          <if test="evaluateDesc != null">
+              evaluate_desc,
+          </if>
+          <if test="evaluateType != null">
+              evaluate_type,
+          </if>
+          <if test="evaluateUserId != null">
+              evaluate_user_id,
+          </if>
+          <if test="evaluateAuto != null">
+              evaluate_auto,
+          </if>
+          <if test="createTm != null">
+              create_tm,
+          </if>
+          <if test="updateTm != null">
+              update_tm,
+          </if>
+      </trim>
+      <trim prefix="values (" suffix=")" suffixOverrides=",">
+          <if test="parkingEvaluateId != null">
+              #{parkingEvaluateId,jdbcType=BIGINT},
+          </if>
+          <if test="userId != null">
+              #{userId,jdbcType=BIGINT},
+          </if>
+          <if test="parkingOrderId != null">
+              #{parkingOrderId,jdbcType=BIGINT},
+          </if>
+          <if test="level != null">
+              #{level,jdbcType=INTEGER},
+          </if>
+          <if test="evaluateDesc != null">
+              #{evaluateDesc,jdbcType=VARCHAR},
+          </if>
+          <if test="evaluateType != null">
+              #{evaluateType,jdbcType=INTEGER},
+          </if>
+          <if test="evaluateUserId != null">
+              #{evaluateUserId,jdbcType=BIGINT},
+          </if>
+          <if test="evaluateAuto != null">
+              #{evaluateAuto,jdbcType=INTEGER},
+          </if>
+          <if test="createTm != null">
+              #{createTm,jdbcType=TIMESTAMP},
+          </if>
+          <if test="updateTm != null">
+              #{updateTm,jdbcType=TIMESTAMP},
+          </if>
+      </trim>
+  </insert>
+    <update id="updateByPrimaryKeySelective">
+        update parking_evaluate
+        <set>
+            <if test="record.userId != null">
+                user_id = #{record.userId,jdbcType=BIGINT},
+            </if>
+            <if test="record.parkingOrderId != null">
+                parking_order_id = #{record.parkingOrderId,jdbcType=BIGINT},
+            </if>
+            <if test="record.level != null">
+                level = #{record.level,jdbcType=INTEGER},
+            </if>
+            <if test="record.evaluateDesc != null">
+                evaluate_desc = #{record.evaluateDesc,jdbcType=VARCHAR},
+            </if>
+            <if test="record.evaluateType != null">
+                evaluate_type = #{record.evaluateType,jdbcType=INTEGER},
+            </if>
+            <if test="record.evaluateUserId != null">
+                evaluate_user_id = #{record.evaluateUserId,jdbcType=BIGINT},
+            </if>
+            <if test="record.isEvaluate != null">
+                is_evaluate = #{record.isEvaluate,jdbcType=INTEGER},
+            </if>
+            <if test="record.evaluateAuto != null">
+                evaluate_auto = #{record.evaluateAuto,jdbcType=INTEGER},
+            </if>
+        </set>
+        where parking_evaluate_id = #{record.parkingEvaluateId,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.cf.parking.dao.po.ParkingEvaluatePO">
+    update parking_evaluate
+    set user_id = #{userId,jdbcType=BIGINT},
+      parking_order_id = #{parkingOrderId,jdbcType=BIGINT},
+      level = #{level,jdbcType=INTEGER},
+      evaluate_desc = #{evaluateDesc,jdbcType=VARCHAR},
+      evaluate_type = #{evaluateType,jdbcType=INTEGER},
+      evaluate_user_id = #{evaluateUserId,jdbcType=BIGINT},
+      evaluate_auto = #{evaluateAuto,jdbcType=INTEGER}
+    where parking_evaluate_id = #{parkingEvaluateId,jdbcType=BIGINT}
+  </update>
+    <select id="selectAvg" resultType="java.lang.Float">
+        select AVG(level) from parking_evaluate
+        <where>
+            <if test="record.evaluateType != null">
+                and evaluate_type = #{record.evaluateType,jdbcType=INTEGER}
+            </if>
+            <if test="record.evaluateUserId != null">
+                and evaluate_user_id = #{record.evaluateUserId,jdbcType=BIGINT}
+            </if>
+            <if test="record.isEvaluate != null">
+                and is_evaluate = #{record.isEvaluate,jdbcType=INTEGER}
+            </if>
+        </where>
+        group by evaluate_user_id
+    </select>
+</mapper>

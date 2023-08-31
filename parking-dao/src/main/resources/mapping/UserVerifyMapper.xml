@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cf.parking.dao.mapper.UserVerifyMapper">
+
+    <resultMap id="userVerifyMap" type="com.cf.parking.dao.po.UserVerifyPO">
+        <result column="user_id" property="userId"/>
+        <result column="plate_no" property="plateNo"/>
+        <result column="driving_permit_img" property="drivingPermitImg"/>
+        <result column="driving_license_img" property="drivingLicenseImg"/>
+        <result column="state" property="state"/>
+        <result column="reason" property="reason"/>
+        <result column="create_tm" property="createTm"/>
+        <result column="update_tm" property="updateTm"/>
+    </resultMap>
+</mapper>
+

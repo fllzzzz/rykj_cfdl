@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cf.parking.dao.mapper.ScoreRecordPOMapper">
+  <resultMap id="BaseResultMap" type="com.cf.parking.dao.po.ScoreRecordPO">
+    <id column="score_record_id" jdbcType="BIGINT" property="scoreRecordId" />
+    <result column="parking_order_id" jdbcType="BIGINT" property="parkingOrderId"/>
+    <result column="user_id" jdbcType="BIGINT" property="userId" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="job_number" jdbcType="VARCHAR" property="jobNumber" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="score" jdbcType="INTEGER" property="score" />
+    <result column="admin_user_id" jdbcType="BIGINT" property="adminUserId" />
+    <result column="create_tm" jdbcType="TIMESTAMP" property="createTm" />
+    <result column="update_tm" jdbcType="TIMESTAMP" property="updateTm" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    score_record_id, parking_order_id, user_id, name, job_number, remark, score, admin_user_id,
+    create_tm, update_tm
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from score_record
+    where score_record_id = #{scoreRecordId,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from score_record
+    where score_record_id = #{scoreRecordId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insertSelective" parameterType="com.cf.parking.dao.po.ScoreRecordPO">
+    insert into score_record
+      <trim prefix="(" suffix=")" suffixOverrides=",">
+          <if test="scoreRecordId != null">
+              score_record_id,
+          </if>
+          <if test="parkingOrderId != null">
+              parking_order_id,
+          </if>
+          <if test="userId != null">
+              user_id,
+          </if>
+          <if test="name != null">
+              name,
+          </if>
+          <if test="jobNumber != null">
+              job_number,
+          </if>
+      <if test="remark != null">
+        remark,
+      </if>
+      <if test="score != null">
+        score,
+      </if>
+      <if test="adminUserId != null">
+        admin_user_id,
+      </if>
+      <if test="createTm != null">
+        create_tm,
+      </if>
+      <if test="updateTm != null">
+        update_tm,
+      </if>
+    </trim>
+      <trim prefix="values (" suffix=")" suffixOverrides=",">
+          <if test="scoreRecordId != null">
+              #{scoreRecordId,jdbcType=BIGINT},
+          </if>
+          <if test="parkingOrderId != null">
+              #{parkingOrderId,jdbcType=BIGINT},
+          </if>
+          <if test="userId != null">
+              #{userId,jdbcType=BIGINT},
+          </if>
+          <if test="name != null">
+              #{name,jdbcType=VARCHAR},
+          </if>
+          <if test="jobNumber != null">
+              #{jobNumber,jdbcType=VARCHAR},
+          </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="score != null">
+        #{score,jdbcType=INTEGER},
+      </if>
+      <if test="adminUserId != null">
+        #{adminUserId,jdbcType=BIGINT},
+      </if>
+      <if test="createTm != null">
+        #{createTm,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTm != null">
+        #{updateTm,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cf.parking.dao.po.ScoreRecordPO">
+    update score_record
+      <set>
+          <if test="parkingOrderId != null">
+              parking_order_id = #{parkingOrderId,jdbcType=BIGINT},
+          </if>
+          <if test="userId != null">
+              user_id = #{userId,jdbcType=BIGINT},
+          </if>
+          <if test="name != null">
+              name = #{name,jdbcType=VARCHAR},
+          </if>
+          <if test="jobNumber != null">
+              job_number = #{jobNumber,jdbcType=VARCHAR},
+          </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="score != null">
+        score = #{score,jdbcType=INTEGER},
+      </if>
+      <if test="adminUserId != null">
+        admin_user_id = #{adminUserId,jdbcType=BIGINT},
+      </if>
+      <if test="createTm != null">
+        create_tm = #{createTm,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTm != null">
+        update_tm = #{updateTm,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where score_record_id = #{scoreRecordId,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.cf.parking.dao.po.ScoreRecordPO">
+    update score_record
+    set parking_order_id = #{parkingOrderId,jdbcType=BIGINT},
+      user_id = #{userId,jdbcType=BIGINT},
+      name = #{name,jdbcType=VARCHAR},
+      job_number = #{jobNumber,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR},
+      score = #{score,jdbcType=INTEGER},
+      admin_user_id = #{adminUserId,jdbcType=BIGINT},
+      create_tm = #{createTm,jdbcType=TIMESTAMP},
+      update_tm = #{updateTm,jdbcType=TIMESTAMP}
+    where score_record_id = #{scoreRecordId,jdbcType=BIGINT}
+  </update>
+    <insert id="insertSelectiveList" parameterType="java.util.List">
+        insert into score_record (user_id,name,job_number,remark,score,admin_user_id)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.userId,jdbcType=BIGINT},
+            #{item.name,jdbcType=VARCHAR},
+            #{item.jobNumber,jdbcType=VARCHAR},
+            #{item.remark,jdbcType=VARCHAR},
+            #{item.score,jdbcType=INTEGER},
+            #{item.adminUserId,jdbcType=BIGINT})
+        </foreach>
+    </insert>
+</mapper>

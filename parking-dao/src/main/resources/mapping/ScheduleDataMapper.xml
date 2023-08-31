@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cf.parking.dao.mapper.ScheduleDataMapper">
+
+    <resultMap id="scheduleDataMap" type="com.cf.parking.dao.po.ScheduleDataPO">
+        <result column="create_tm" property="createTm"/>
+        <result column="end_time" property="endTime"/>
+        <result column="hours" property="hours"/>
+        <result column="schedule_data_id" property="scheduleDataId"/>
+        <result column="shift_date" property="shiftDate"/>
+        <result column="start_time" property="startTime"/>
+        <result column="update_tm" property="updateTm"/>
+    </resultMap>
+</mapper>
+

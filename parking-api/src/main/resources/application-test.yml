@@ -1,0 +1,76 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://192.168.1.194:3306/parking?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&allowMultiQueries=true&serverTimezone=Asia/Shanghai
+    username: root
+    password: Cfmoto@123
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      stat-view-servlet:
+        # 是否启用StatViewServlet(监控页面),默认true-启动，false-不启动，漏洞扫描有问题，需要关闭
+        enabled: false
+      initial-size: 2
+      min-idle: 1
+      max-active: 10
+      max-wait: 10000
+      time-between-eviction-runsMillis: 60000
+      min-evictable-idle-timeMillis: 300000
+      validation-query: select 1
+      test-while-idle: true
+      test-on-borrow: true
+      test-on-return: false
+      pool-prepared-statements: true
+      max-open-prepared-statements: 20
+      max-pool-prepared-statement-per-connection-size: 20
+      filters: stat
+  #        connection-properties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
+  #        use-global-data-source-stat: true
+
+  redis:
+    host: 192.168.1.147
+    port: 6379
+    database: 0
+    password: Cfmoto@123
+    timeout: 3000
+    jedis:
+      pool:
+        max-idle: 300
+        max-wait: 1000ms
+        max-total: 500
+        test-on-borrow: true
+        test-on-return: true
+
+#jwt 秘钥
+jwt:
+  secret: 56ac34bd8e133f4e4344c8b784957aa6ffe6552dd92
+
+
+dingtalk:
+  keyWord: parking
+  url: https://oapi.dingtalk.com/robot/send?access_token=764b2ead9c756ac34bd8e133f4e4344c8b784957aa6ffe6552dd92d676d73b5f
+  agentId: 2034016904
+  appKey: dingyuew3xwaajod2wqp
+  secret: U0w5lHtz58n6UEirdxN9-CYfgjTnBPJNZa_4GkTN9uDHh-A02wMFTlWVVTdHZzEq
+  corpId: dingb32dfe3fb37ee75c35c2f4657eb6378f
+  messageActionUrl: http://test-parking.cfmoto.com:8186/#/pages/loading/loading?orderId=
+  signUrl: http://test-parking.cfmoto.com:8186/#/
+
+
+
+aliyun:
+  access:
+    key: LTAI4GJTxFXQEQQbVxrWfMGc
+    secret: cWb1n9q8HpH0gUN0yn3uQ5Ivah9Oeb
+    bucketName: cfmoto-test
+    ossEndPoint: oss-cn-beijing.aliyuncs.com
+    ossUrl: https://cfparking.oss-cn-hangzhou.aliyuncs.com/
+
+gateway:
+  url: http://192.168.1.116:8880
+  cfmotoAppKey:
+    hikvision: 7706dd0d9ddc3fefaf0ba324741a1c6b4895ffeffd47dc2c9be68e98435216f1
+    gaiawork: f273dbdd18d071b5273854beca92256f853cd3ad17679a62868bc8d0ac5bc997
+
+log:
+  topic: test-log
+  address: 47.98.128.233:9092,47.97.22.216:9092,47.98.158.231:9092

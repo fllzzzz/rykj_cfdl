@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+    <contextName>logback-spring</contextName>
+    <property name="service.name" value="parking-api"/>
+    <property name="log.dir" value="/usr/local/app/logs/parking/"/>
+    <property name="log.path" value="${log.dir}/${service.name}.log"/>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <springProperty scope="context" name="topic" source="log.topic"/>
+    <springProperty scope="context" name="address" source="log.address"/>
+    <!-- 控制台输出-带颜色 -->
+    <appender name="CONSOLE-WITH-COLOR" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level --- [%thread] %logger{36} : [%X{traceId}] %msg%n</pattern>
+        </encoder>
+    </appender>
+    <!-- 文件输出 -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.path}</file>
+        <!--滚动策略-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!--日志文件输出的文件名%i指定索引-->
+            <fileNamePattern>${log.dir}/${service.name}.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!--文件大小200M 超过创建新文件-->
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>200MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <!--程序启动时执行归档删除-->
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+            <!--日志文件保留天数-->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level --- [%thread] %logger{36} : [%X{traceId}] %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="kafkaAppender" class="com.github.danielwegener.logback.kafka.KafkaAppender">
+        <!--输出的格式，推荐使用这个-->
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+
+            <providers>
+                <timestamp>UTC</timestamp>
+                <pattern>
+                    <pattern>
+                        {
+                        "level": "%level",
+                        "name": "parking",
+                        "traceId": "%X{traceId}",
+                        "topic": "${topic}",
+                        "message": "%message"
+                        }
+                    </pattern>
+                </pattern>
+            </providers>
+        </encoder>
+        <topic>${topic}</topic>
+        <keyingStrategy class="com.github.danielwegener.logback.kafka.keying.NoKeyKeyingStrategy"/>
+        <deliveryStrategy class="com.github.danielwegener.logback.kafka.delivery.AsynchronousDeliveryStrategy"/>
+
+
+        <producerConfig>bootstrap.servers=${address}</producerConfig>
+
+        <appender-ref ref="CONSOLE-WITH-COLOR"/>
+    </appender>
+    <appender name="async" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="kafkaAppender"/>
+    </appender>
+
+    <springProfile name="prod">
+        <root level="INFO">
+            <appender-ref ref="FILE"/>
+            <appender-ref ref="CONSOLE-WITH-COLOR"/>
+            <appender-ref ref="kafkaAppender"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="dev,test">
+        <root level="INFO">
+            <appender-ref ref="CONSOLE-WITH-COLOR"/>
+            <appender-ref ref="FILE"/>
+            <appender-ref ref="kafkaAppender"/>
+        </root>
+    </springProfile>
+</configuration>

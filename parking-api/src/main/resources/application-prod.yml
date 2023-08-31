@@ -1,0 +1,65 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://rm-bp1twsd9h4bw98a2b.mysql.rds.aliyuncs.com:3306/parking?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&allowMultiQueries=true&serverTimezone=Asia/Shanghai
+    username: uiproot
+    password: Uip@CfdL2022
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      stat-view-servlet:
+        # 是否启用StatViewServlet(监控页面),默认true-启动，false-不启动，漏洞扫描有问题，需要关闭
+        enabled: false
+      initial-size: 2
+      min-idle: 1
+      max-active: 10
+      max-wait: 10000
+      time-between-eviction-runsMillis: 60000
+      min-evictable-idle-timeMillis: 300000
+      validation-query: select 1
+      test-while-idle: true
+      test-on-borrow: true
+      test-on-return: false
+      pool-prepared-statements: true
+      max-open-prepared-statements: 20
+      max-pool-prepared-statement-per-connection-size: 20
+      filters: stat
+  #        connection-properties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
+  #        use-global-data-source-stat: true
+
+  redis:
+    host: r-bp1f5n24e3h05wfjx1.redis.rds.aliyuncs.com
+    port: 6379
+    database: 0
+    password: Uip@cFmotO2022
+    timeout: 3000
+    jedis:
+      pool:
+        max-idle: 300
+        max-wait: 1000ms
+        max-total: 500
+        test-on-borrow: true
+        test-on-return: true
+
+#jwt 秘钥
+jwt:
+  secret: 56ac34bd8e133f4e4344c8b784957aa6ffe6552dd92
+
+dingtalk:
+  keyWord: parking
+  url: https://oapi.dingtalk.com/robot/send?access_token=05c62444d9f02bb5c1b07cf6cd28222fe7ef3663a63e26e433b74dc61e1d2e03
+  agentId: 2039403901
+  appKey: dingbkhlawo0brjhdzkq
+  secret: 3Um_zm8c3j8DkKbsLoo-8U6MqqwVfzqfRYf-v5rYkJ0wUBpcadUdBeMWZPpSh6yX
+  corpId: dingb32dfe3fb37ee75c35c2f4657eb6378f
+  messageActionUrl: https://parking.cfmoto.com:8186/#/pages/loading/loading?orderId=
+  signUrl: https://parking.cfmoto.com:8186/#/
+
+gateway:
+  url: https://uip-gateway.cfmoto.com
+  cfmotoAppKey:
+    hikvision: 42606afb07055999206dae8591d6f627bd0c369e6cd827261c4da97608c6a31f
+    gaiawork: 0938940341f06c7e66759a493ca43e95b2bd6b73df65f8caf092a0c15b974a5c
+
+log:
+  topic: prod-log
+  address: 47.98.128.233:9092,47.97.22.216:9092,47.98.158.231:9092

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cf.parking.dao.mapper.BlackListMapper">
+
+    <resultMap id="blackListMap" type="com.cf.parking.dao.po.BlackListPO">
+        <result column="black_list_id" property="blackListId"/>
+        <result column="create_tm" property="createTm"/>
+        <result column="is_delete" property="isDelete"/>
+        <result column="job_number" property="jobNumber"/>
+        <result column="alarm_syscode" property="alarmSyscode"/>
+        <result column="name" property="name"/>
+        <result column="plate_no" property="plateNo"/>
+        <result column="update_tm" property="updateTm"/>
+    </resultMap>
+</mapper>
+

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cf.parking.dao.mapper.ParkingFreePOMapper">
+    <resultMap id="BaseResultMap" type="com.cf.parking.dao.po.ParkingFreePO">
+        <result column="stat_date" property="statDate"/>
+        <result column="park_flag" property="parkFlag"/>
+        <result column="free_num" property="freeNum"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    stat_date, park_flag, free_num
+  </sql>
+
+    <insert id="insertList" parameterType="java.util.List">
+        <foreach collection="list" item="item" separator=";"  index="index">
+            insert into parking_free
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="item.statDate != null">
+                    stat_date,
+                </if>
+                <if test="item.parkFlag != null">
+                    park_flag,
+                </if>
+                <if test="item.freeNum != null">
+                    free_num,
+                </if>
+            </trim>
+            <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="item.statDate != null">
+                    #{item.statDate,jdbcType=DATE},
+                </if>
+                <if test="item.parkFlag != null">
+                    #{item.parkFlag,jdbcType=INTEGER},
+                </if>
+                <if test="item.freeNum != null">
+                    #{item.freeNum,jdbcType=INTEGER},
+                </if>
+            </trim>
+        </foreach>
+    </insert>
+    <select id="getList" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+         from parking_free where `stat_date` between #{item.startDate} and #{item.endDate} order by `stat_date` asc
+    </select>
+</mapper>

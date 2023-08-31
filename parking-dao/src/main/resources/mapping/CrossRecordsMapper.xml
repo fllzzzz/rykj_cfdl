@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cf.parking.dao.mapper.CrossRecordsMapper">
+
+    <resultMap id="crossRecordsMap" type="com.cf.parking.dao.po.CrossRecordsPO">
+        <result column="create_tm" property="createTm"/>
+        <result column="cross_record_syscode" property="crossRecordSyscode"/>
+        <result column="cross_records_id" property="crossRecordsId"/>
+        <result column="cross_time" property="crossTime"/>
+        <result column="entrance_name" property="entranceName"/>
+        <result column="entrance_syscode" property="entranceSyscode"/>
+        <result column="park_syscode" property="parkSyscode"/>
+        <result column="parking_title" property="parkingTitle"/>
+        <result column="plate_no" property="plateNo"/>
+        <result column="release_mode" property="releaseMode"/>
+        <result column="release_reason" property="releaseReason"/>
+        <result column="release_result" property="releaseResult"/>
+        <result column="release_way" property="releaseWay"/>
+        <result column="update_tm" property="updateTm"/>
+        <result column="vehicle_out" property="vehicleOut"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        parking_title,plate_no,vehicle_out,cross_record_syscode,park_syscode,entrance_syscode,entrance_name,release_mode,release_result,release_way,release_reason,cross_time
+    </sql>
+    <insert id="replaceCrossRecords" parameterType="java.util.List">
+        replace into cross_records
+        (<include refid="Base_Column_List"/>)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.parkingTitle},#{item.plateNo},#{item.vehicleOut},
+            #{item.crossRecordSyscode},#{item.parkSyscode},#{item.entranceSyscode},
+            #{item.entranceName},#{item.releaseMode},#{item.releaseResult},
+            #{item.releaseWay},#{item.releaseReason},#{item.crossTime}
+            )
+        </foreach>
+    </insert>
+</mapper>
+
