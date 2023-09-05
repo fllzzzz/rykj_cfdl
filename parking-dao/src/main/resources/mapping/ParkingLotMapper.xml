@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cf.parking.dao.mapper.ParkingLotMapper">
+    
+    <resultMap type="com.cf.parking.dao.po.ParkingLotPO" id="ParkingLotResult">
+        <result property="id"    column="id"    />
+        <result property="region"    column="region"    />
+        <result property="regionCode"    column="region_code"    />
+        <result property="amount"    column="amount"    />
+        <result property="type"    column="type"    />
+        <result property="isSync"    column="is_sync"    />
+        <result property="createTm"    column="create_tm"    />
+        <result property="updateTm"    column="update_tm"    />
+    </resultMap>
+
+    <sql id="selectParkingLotVo">
+        select id, region, region_code, amount, type, is_sync, create_tm, update_tm from parking_lot
+    </sql>
+
+
+</mapper>

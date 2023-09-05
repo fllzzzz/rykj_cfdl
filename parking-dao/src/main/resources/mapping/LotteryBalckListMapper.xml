@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cf.parking.dao.mapper.LotteryBlackListMapper">
+    
+    <resultMap type="com.cf.parking.dao.po.LotteryBlackListPO" id="LotteryBlackListResult">
+        <result property="id"    column="id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="reason"    column="reason"    />
+        <result property="createTm"    column="create_tm"    />
+        <result property="updateTm"    column="update_tm"    />
+    </resultMap>
+
+    <sql id="selectLotteryBlackListVo">
+        select id, user_id, reason, create_tm, update_tm from lottery_balck_list
+    </sql>
+
+
+</mapper>
