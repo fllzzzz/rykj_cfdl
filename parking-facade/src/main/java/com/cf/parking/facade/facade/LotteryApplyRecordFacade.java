@@ -1,5 +1,9 @@
 package com.cf.parking.facade.facade;
 
+import com.cf.parking.facade.bo.LotteryApplyRecordBO;
+import com.cf.parking.facade.dto.LotteryApplyRecordDTO;
+import com.cf.support.result.PageResponse;
+
 import java.util.List;
 
 /**
@@ -10,5 +14,12 @@ import java.util.List;
  */
 public interface LotteryApplyRecordFacade
 {
+
+    /**
+     * 查询摇号申请记录列表
+     * @param dto
+     * @return
+     */
+    PageResponse<LotteryApplyRecordBO> getApplyRecordList(LotteryApplyRecordDTO dto);
 
 }

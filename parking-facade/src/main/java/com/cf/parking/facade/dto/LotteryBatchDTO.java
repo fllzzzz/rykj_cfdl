@@ -1,5 +1,7 @@
 package com.cf.parking.facade.dto;
 
+import com.cf.support.result.PageRequest;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -12,41 +14,19 @@ import java.util.Date;
  */
 @Data
 @Accessors(chain = true)
-public class LotteryBatchDTO {
+public class LotteryBatchDTO extends PageRequest {
 
-    /** id */
-    private Long id;
+    /** 开始期号 */
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private Date startDate;
 
-    /** 期号 */
-    private Date batchNum;
+    /** 结束期号 */
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private Date endDate;
 
-    /** 车位数量 */
-    private Long parkingAmount;
-
-    /** 摇号轮数，多个间逗号间隔 */
-    private String roundId;
-
-    /** 报名开始时间 */
-    private Date applyStartTime;
-
-    /** 报名结束时间 */
-    private Date applyEndTime;
-
-    /** 车位有效开始日期 */
-    private Date validStartDate;
-
-    /** 车位有效截止日期 */
-    private Date validEndDate;
+    /** 摇号规则轮数 */
+    private Long roundId;
 
     /** 状态（0：待通知；1：已通知；2：已结束） */
     private String state;
-
-    /** 创建时间 */
-    private Date createTm;
-
-    /** 更新时间 */
-    private Date updateTm;
-
-    /** 备注 */
-    private String remark;
 }

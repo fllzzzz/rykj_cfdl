@@ -1,5 +1,8 @@
 package com.cf.parking.facade.bo;
 
+import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.Date;
 
 /**
@@ -7,6 +10,7 @@ import java.util.Date;
  * @author
  * @date 2023/9/5
  */
+@Data
 public class LotteryBatchBO {
 
     /** id */
@@ -20,6 +24,9 @@ public class LotteryBatchBO {
 
     /** 摇号轮数，多个间逗号间隔 */
     private String roundId;
+
+    /** 摇号规则：根据id查询摇号轮数名称，多个间逗号间隔 */
+    private String lotteryRule;
 
     /** 报名开始时间 */
     private Date applyStartTime;
@@ -44,4 +51,5 @@ public class LotteryBatchBO {
 
     /** 备注 */
     private String remark;
+
 }

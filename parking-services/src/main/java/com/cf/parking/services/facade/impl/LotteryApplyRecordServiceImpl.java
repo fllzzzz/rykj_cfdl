@@ -3,11 +3,25 @@ package com.cf.parking.services.facade.impl;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cf.parking.dao.mapper.LotteryApplyRecordMapper;
+import com.cf.parking.dao.po.LotteryApplyRecordPO;
+import com.cf.parking.dao.po.ParkingOrderPO;
+import com.cf.parking.facade.bo.LotteryApplyRecordBO;
+import com.cf.parking.facade.dto.LotteryApplyRecordDTO;
 import com.cf.parking.facade.facade.LotteryApplyRecordFacade;
+import com.cf.parking.services.utils.PageUtils;
+import com.cf.support.authertication.UserAuthenticationServer;
+import com.cf.support.authertication.token.dto.UserSessionDTO;
+import com.cf.support.result.PageResponse;
 import com.cf.support.result.Result;
+import com.cf.support.utils.BeanConvertorUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
 
 /**
  * 摇号申请记录Service业务层处理
@@ -19,77 +33,49 @@ import org.springframework.stereotype.Service;
 public class LotteryApplyRecordServiceImpl implements LotteryApplyRecordFacade
 {
     @Autowired
-    private LotteryApplyRecordMapper lotteryApplyRecordMapper;
+    private LotteryApplyRecordMapper mapper;
 
-    /**
-     * 查询摇号申请记录
-     * 
-     * @param id 摇号申请记录主键
-     * @return 摇号申请记录
-     */
-//    @Override
-//    public Result selectLotteryApplyRecordById(Long id)
-//    {
-//        return lotteryApplyRecordMapper.selectLotteryApplyRecordById(id);
-//    }
+    @Resource
+    private UserAuthenticationServer userAuthenticationServer;
+
+    private UserSessionDTO getUser() {
+        return userAuthenticationServer.getCurrentUser();
+    }
 
     /**
      * 查询摇号申请记录列表
-     * 
-     * @param lotteryApplyRecord 摇号申请记录
-     * @return 摇号申请记录
+     * @param dto
+     * @return
      */
-//    @Override
-//    public List<LotteryApplyRecord> selectLotteryApplyRecordList(LotteryApplyRecord lotteryApplyRecord)
-//    {
-//        return lotteryApplyRecordMapper.selectLotteryApplyRecordList(lotteryApplyRecord);
-//    }
+    @Override
+    public PageResponse<LotteryApplyRecordBO> getApplyRecordList(LotteryApplyRecordDTO dto) {
+        Page<LotteryApplyRecordPO> page = PageUtils.toPage(dto);
+
+        LambdaQueryWrapper<LotteryApplyRecordPO> queryWrapper = new LambdaQueryWrapper<LotteryApplyRecordPO>()
+                .eq(StringUtils.isNotEmpty(dto.getResult()), LotteryApplyRecordPO::getResult, dto.getResult())
+                .eq(LotteryApplyRecordPO::getUserId, getUser().getUserId())
+                .le(null != dto.getEndDate(), LotteryApplyRecordPO::getBatchNum, dto.getEndDate())
+                .ge(null != dto.getStartDate(), LotteryApplyRecordPO::getBatchNum, dto.getStartDate())
+                .orderByDesc(LotteryApplyRecordPO::getUpdateTm);
+
+        Page<LotteryApplyRecordPO> lotteryApplyRecordPOPage = mapper.selectPage(page, queryWrapper);
+        List<LotteryApplyRecordBO> lotteryApplyRecordBOList = BeanConvertorUtils.copyList(lotteryApplyRecordPOPage.getRecords(), LotteryApplyRecordBO.class);
+
+        return PageUtils.toResponseList(page,lotteryApplyRecordBOList);
+    }
+
+
 
     /**
      * 新增摇号申请记录
      * 
-     * @param lotteryApplyRecord 摇号申请记录
+     * @param po 摇号申请记录
      * @return 结果
      */
-//    @Override
-//    public int insertLotteryApplyRecord(LotteryApplyRecord lotteryApplyRecord)
-//    {
-//        return lotteryApplyRecordMapper.insertLotteryApplyRecord(lotteryApplyRecord);
-//    }
+    public int insertLotteryApplyRecord(LotteryApplyRecordPO po)
+    {
+        return mapper.insert(po);
+    }
 
-    /**
-     * 修改摇号申请记录
-     * 
-     * @param lotteryApplyRecord 摇号申请记录
-     * @return 结果
-     */
-//    @Override
-//    public int updateLotteryApplyRecord(LotteryApplyRecord lotteryApplyRecord)
-//    {
-//        return lotteryApplyRecordMapper.updateLotteryApplyRecord(lotteryApplyRecord);
-//    }
 
-    /**
-     * 批量删除摇号申请记录
-     * 
-     * @param ids 需要删除的摇号申请记录主键
-     * @return 结果
-     */
-//    @Override
-//    public int deleteLotteryApplyRecordByIds(Long[] ids)
-//    {
-//        return lotteryApplyRecordMapper.deleteLotteryApplyRecordByIds(ids);
-//    }
-
-    /**
-     * 删除摇号申请记录信息
-     * 
-     * @param id 摇号申请记录主键
-     * @return 结果
-     */
-//    @Override
-//    public int deleteLotteryApplyRecordById(Long id)
-//    {
-//        return lotteryApplyRecordMapper.deleteLotteryApplyRecordById(id);
-//    }
 }

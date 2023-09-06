@@ -23,6 +23,15 @@ public class LotteryApplyRecordPO
     /** 摇号批次id */
     private Long batchId;
 
+    /** 期号 */
+    private Date batchNum;
+
+    /** 车位有效开始日期 */
+    private Date validStartDate;
+
+    /** 车位有效截止日期 */
+    private Date validEndDate;
+
     /** 用户 */
     private Long userId;
 

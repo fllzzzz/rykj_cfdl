@@ -8,13 +8,19 @@ import lombok.experimental.Accessors;
 import java.util.Date;
 
 /**
- * 摇号批次
+ * 摇号申请记录
  * @author
  * @date 2023/09/05
  */
 @Data
 @Accessors(chain = true)
-public class LotteryBatchPageReq extends PageRequest {
+public class LotteryApplyRecordReq extends PageRequest {
+
+    /** id ，删除时使用*/
+    private Long id;
+
+    /** 摇号结果(-1：未开号；0：未中；xx：对应停车场的区域编号) */
+    private String result;
 
     /** 开始期号 */
     @JsonFormat(pattern = "yyyy-MM-dd")
@@ -23,11 +29,4 @@ public class LotteryBatchPageReq extends PageRequest {
     /** 结束期号 */
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date endDate;
-
-    /** 摇号规则轮数 */
-    private Long roundId;
-
-    /** 状态（0：待通知；1：已通知；2：已结束） */
-    private String state;
-
 }
