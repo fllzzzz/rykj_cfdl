@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cf.parking.dao.mapper.LotteryBatchMapper">
+    
+    <resultMap type="com.cf.parking.dao.po.LotteryBatchPO" id="LotteryBatchResult">
+        <result property="id"    column="id"    />
+        <result property="batchNum"    column="batch_num"    />
+        <result property="parkingAmount"    column="parking_amount"    />
+        <result property="roundId"    column="round_id"    />
+        <result property="applyStartTime"    column="apply_start_time"    />
+        <result property="applyEndTime"    column="apply_end_time"    />
+        <result property="validStartDate"    column="valid_start_date"    />
+        <result property="validEndDate"    column="valid_end_date"    />
+        <result property="state"    column="state"    />
+        <result property="remark"    column="remark"    />
+        <result property="createTm"    column="create_tm"    />
+        <result property="updateTm"    column="update_tm"    />
+    </resultMap>
+
+    <sql id="selectLotteryBatchVo">
+        select id, batch_num, parking_amount, round_id, apply_start_time, apply_end_time, valid_start_date, valid_end_date, state, remark, create_tm, update_tm from lottery_batch
+    </sql>
+
+
+</mapper>

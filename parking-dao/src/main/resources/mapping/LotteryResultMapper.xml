@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cf.parking.dao.mapper.LotteryResultMapper">
+    
+    <resultMap type="com.cf.parking.dao.po.LotteryResultPO" id="LotteryResultResult">
+        <result property="id"    column="id"    />
+        <result property="batchId"    column="batch_id"    />
+        <result property="state"    column="state"    />
+        <result property="createTm"    column="create_tm"    />
+        <result property="updateTm"    column="update_tm"    />
+    </resultMap>
+
+    <sql id="selectLotteryResultVo">
+        select id, batch_id, state, create_tm, update_tm from lottery_result
+    </sql>
+
+
+</mapper>
