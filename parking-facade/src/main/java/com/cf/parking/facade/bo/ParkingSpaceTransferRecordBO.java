@@ -1,5 +1,7 @@
 package com.cf.parking.facade.bo;
 
+import io.swagger.annotations.ApiModelProperty;
+
 import java.util.Date;
 
 /**
@@ -19,9 +21,6 @@ public class ParkingSpaceTransferRecordBO {
 
     /** 赠予人userId */
     private Long acceptUserId;
-
-    /** 赠予人车牌号 */
-    private String acceptUserPlateNo;
 
     /** 转赠有效开始日期 */
     private Date validStartDate;
