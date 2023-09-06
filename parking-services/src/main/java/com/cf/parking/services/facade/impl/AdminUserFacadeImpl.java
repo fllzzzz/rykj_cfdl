@@ -61,6 +61,7 @@ public class AdminUserFacadeImpl implements AdminUserFacade {
 
 
     public static void main(String[] args) {
+    	System.out.println(DigestUtils.md5DigestAsHex("CFDL13967123456".getBytes()));
         System.out.println(DigestUtils.md5DigestAsHex("CFDL15244123456".getBytes()));
         System.out.println(DigestUtils.md5DigestAsHex("CFDL13914123456".getBytes()));
         System.out.println(DigestUtils.md5DigestAsHex("CFDL14966123456".getBytes()));

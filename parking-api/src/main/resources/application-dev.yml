@@ -48,10 +48,10 @@ jwt:
 dingtalk:
   keyWord: parking
   url: https://oapi.dingtalk.com/robot/send?access_token=764b2ead9c756ac34bd8e133f4e4344c8b784957aa6ffe6552dd92d676d73b5f
-  agentId: 2034016904
-  appKey: dingyuew3xwaajod2wqp
-  secret: U0w5lHtz58n6UEirdxN9-CYfgjTnBPJNZa_4GkTN9uDHh-A02wMFTlWVVTdHZzEq
-  corpId: dingb32dfe3fb37ee75c35c2f4657eb6378f
+  agentId: 2720211144
+  appKey: dinggtd3vevd9dez7geo
+  secret: hz7MwBBU9wTdLl3er0RCYLDMMaEyQ-dwADqXcphV2f3OlaJo5fWHti_QZ4KGpIHJ
+  corpId: ding037640a7807d374ba39a90f97fcb1e09
   messageActionUrl: http://test-parking.cfmoto.com:8186/#/pages/loading/loading?orderId=
   signUrl: http://test-parking.cfmoto.com:8186/#/
 

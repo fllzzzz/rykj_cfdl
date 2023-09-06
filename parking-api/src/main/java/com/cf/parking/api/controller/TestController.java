@@ -1,10 +1,11 @@
 package com.cf.parking.api.controller;
 
 import com.cf.parking.api.request.BlackListBatchAddReq;
+import com.cf.parking.facade.constant.FeignUrlConstant;
 import com.cf.parking.facade.dto.*;
+import com.cf.parking.facade.facade.BlackListFacade;
 import com.cf.parking.facade.facade.CrossRecordsFacade;
 import com.cf.parking.facade.facade.DingNoticeRecordFacade;
-import com.cf.parking.facade.facade.BlackListFacade;
 import com.cf.parking.facade.facade.ScheduleDataFacade;
 import com.cf.parking.services.integration.GatewayHikvisionFeign;
 import com.cf.parking.services.job.parking.ParkingSpaceTask;
@@ -146,5 +147,42 @@ public class TestController {
 	public Result getUserSpace() {
 		parkingSpaceTask.getUserSpace();
 		return Result.buildSuccessResult();
+	}
+
+	@PostMapping("/setCarCharge")
+	@ApiOperation(value = "车辆充值", notes = "车辆充值")
+	public Result setCarCharge() {
+		CarChargeDTO carChargeDTO = new CarChargeDTO().setParkSyscode("6dc5132a6a7046c09ffd7be54d27ea49").setPlateNo("浙AF72886")
+				.setStartTime("2023-09-05").setEndTime("2023-09-06");
+		HikvisionResult<String> hikvisionResult = gatewayHikvisionFeign.setCarCharge(FeignUrlConstant.CAR_CHARGE_SET_URL, carChargeDTO);
+		log.info("setCarCharge={}", hikvisionResult);
+		return Result.buildSuccessResult(hikvisionResult.getMsg());
+	}
+
+	@PostMapping("/delCarCharge")
+	@ApiOperation(value = "取消车辆包期", notes = "取消车辆包期")
+	public Result delCarCharge() {
+		CarChargeDelDTO carChargeDelDTO = new CarChargeDelDTO().setParkSyscode("6dc5132a6a7046c09ffd7be54d27ea49").setPlateNo("浙AF72886");
+		HikvisionResult<String> hikvisionResult = gatewayHikvisionFeign.delCarCharge(FeignUrlConstant.CAR_CHARGE_DEL_URL, carChargeDelDTO);
+		log.info("delCarCharge={}", hikvisionResult);
+		return Result.buildSuccessResult(hikvisionResult.getMsg());
+	}
+
+	@PostMapping("/getParkList")
+	@ApiOperation(value = "获取停车库列表", notes = "获取停车库列表")
+	public Result getParkList() {
+		GetParkListDTO getParkListDTO = new GetParkListDTO();
+		//getParkListDTO.setParkIndexCodes("6dc5132a6a7046c09ffd7be54d27ea49");
+		HikvisionResult<List<ParkListDTO>> hikvisionResult = gatewayHikvisionFeign.getParkList(FeignUrlConstant.GET_PARK_URL, getParkListDTO);
+		log.info("getParkList={}", hikvisionResult);
+		return Result.buildSuccessResult(hikvisionResult.getData());
+	}
+
+	@PostMapping("/remainSpaceNum")
+	@ApiOperation(value = "查询停车库剩余车位数", notes = "查询停车库剩余车位数")
+	public Result remainSpaceNum() {
+		HikvisionResult<List<SpaceNumDTO>> hikvisionResult = gatewayHikvisionFeign.remainSpaceNum(FeignUrlConstant.SPACE_NUM_URL, new ParkSyscodeDTO());
+		log.info("remainSpaceNum={}", hikvisionResult);
+		return Result.buildSuccessResult(hikvisionResult.getData());
 	}
 }
