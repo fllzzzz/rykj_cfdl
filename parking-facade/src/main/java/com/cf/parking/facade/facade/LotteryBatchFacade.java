@@ -22,4 +22,11 @@ public interface LotteryBatchFacade
      * @return
      */
     PageResponse<LotteryBatchBO> getLotteryBatchList(LotteryBatchDTO dto);
+
+    /**
+     * 获取摇号批次详细信息
+     * @param dto
+     * @return
+     */
+    LotteryBatchBO getInfo(LotteryBatchDTO dto);
 }

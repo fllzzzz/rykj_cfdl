@@ -16,15 +16,10 @@ public class LotteryBlackListDTO {
     /** id */
     private Long id;
 
-    /** userId */
-    private Long userId;
+    /** 工号 */
+    private String jobNumber;
 
-    /** 原因 */
-    private String reason;
+    /** 姓名 */
+    private String name;
 
-    /** 创建时间 */
-    private Date createTm;
-
-    /** 更新时间 */
-    private Date updateTm;
 }

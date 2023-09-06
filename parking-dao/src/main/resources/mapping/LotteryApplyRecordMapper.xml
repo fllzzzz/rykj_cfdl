@@ -6,6 +6,9 @@
     <resultMap  type="com.cf.parking.dao.po.LotteryApplyRecordPO" id="LotteryApplyRecord">
         <result property="id"    column="id"    />
         <result property="batchId"    column="batch_id"    />
+        <result property="batchNum"    column="batch_num"    />
+        <result property="validStartDate"    column="valid_start_date"    />
+        <result property="validEndDate"    column="valid_end_date"    />
         <result property="userId"    column="user_id"    />
         <result property="plateNo"    column="plate_no"    />
         <result property="applyState"    column="apply_state"    />
@@ -15,7 +18,7 @@
     </resultMap>
 
     <sql id="selectLotteryApplyRecordVo">
-        select id, batch_id, user_id, plate_no, apply_state, result, create_tm, update_tm from lottery_apply_record
+        select id, batch_id,batch_num,valid_start_date,valid_end_date, user_id, plate_no, apply_state, result, create_tm, update_tm from lottery_apply_record
     </sql>
 
 

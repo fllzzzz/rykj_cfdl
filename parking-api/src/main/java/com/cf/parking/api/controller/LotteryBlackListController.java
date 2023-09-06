@@ -1,24 +1,18 @@
 package com.cf.parking.api.controller;
 
-import java.util.List;
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
 
-import com.cf.parking.api.request.LotteryBatchPageReq;
-import com.cf.parking.api.request.LotteryBlackListPageReq;
-import com.cf.parking.api.response.LotteryBatchPageRsp;
-import com.cf.parking.api.response.LotteryBlackListPageRsp;
+import com.cf.parking.api.request.LotteryBlackListOptReq;
+import com.cf.parking.api.request.LotteryBlackListReq;
+import com.cf.parking.api.response.LotteryBlackListRsp;
 import com.cf.parking.dao.po.LotteryBlackListPO;
 import com.cf.parking.facade.facade.LotteryBlackListFacade;
 import com.cf.support.result.PageResponse;
 import com.cf.support.result.Result;
-import lombok.extern.java.Log;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author
  * @date 2023-09-05
  */
+@Api(tags = "摇号黑名单模块")
 @Slf4j
 @RestController
 @RequestMapping("/lottery/blackList")
@@ -40,46 +35,51 @@ public class LotteryBlackListController
     /**
      * 查询摇号黑名单列表
      */
+    @ApiOperation(value = "查询摇号黑名单列表", notes = "根据条件分页查询")
     @PostMapping("/list")
-    public Result<PageResponse<LotteryBlackListPageRsp>> list(@RequestBody LotteryBlackListPageReq param)
+    public Result<PageResponse<LotteryBlackListRsp>> list(@RequestBody LotteryBlackListReq param)
     {
-        return null;
+        return Result.buildSuccessResult();
     }
 
 
     /**
      * 获取摇号黑名单详细信息
      */
-    @PostMapping("/1")
-    public Result getInfo(@RequestBody Long id)
+    @ApiOperation(value = "获取摇号黑名单详细信息", notes = "点击修改，根据id查询")
+    @PostMapping("/info")
+    public Result<LotteryBlackListRsp> getInfo(@RequestBody LotteryBlackListReq param)
     {
-        return null;
+        return Result.buildSuccessResult();
     }
 
     /**
      * 新增摇号黑名单
      */
-    @PostMapping("/2")
-    public Result add(@RequestBody LotteryBlackListPO lotteryBlackListPO)
+    @ApiOperation(value = "新增摇号黑名单", notes = "点击新增按钮")
+    @PostMapping("/add")
+    public Result add(@RequestBody LotteryBlackListOptReq param)
     {
-        return null;
+        return Result.buildSuccessResult();
     }
 
     /**
      * 修改摇号黑名单
      */
-    @PostMapping("/3")
-    public Result edit(@RequestBody LotteryBlackListPO lotteryBlackListPO)
+    @ApiOperation(value = "修改摇号黑名单", notes = "点击修改按钮")
+    @PostMapping("/update")
+    public Result edit(@RequestBody LotteryBlackListOptReq param)
     {
-        return null;
+        return Result.buildSuccessResult();
     }
 
     /**
      * 删除摇号黑名单
      */
-	@PostMapping("/4")
-    public Result remove(@RequestBody Long[] ids)
+    @ApiOperation(value = "移出摇号黑名单", notes = "点击移出按钮")
+    @PostMapping("/move")
+    public Result remove(@RequestBody LotteryBlackListReq param)
     {
-        return null;
+        return Result.buildSuccessResult();
     }
 }

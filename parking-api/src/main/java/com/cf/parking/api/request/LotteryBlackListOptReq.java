@@ -1,24 +1,24 @@
 package com.cf.parking.api.request;
 
-import lombok.Data;
-import lombok.experimental.Accessors;
-
 import java.util.Date;
 
 /**
- * 摇号黑名单
  * @author
- * @date 2023/09/05
+ * @date 2023/9/6
  */
-@Data
-@Accessors(chain = true)
-public class LotteryBlackListPageReq {
+public class LotteryBlackListOptReq {
 
     /** id */
     private Long id;
 
     /** userId */
     private Long userId;
+
+    /** 工号 */
+    private String jobNumber;
+
+    /** 姓名 */
+    private String name;
 
     /** 原因 */
     private String reason;

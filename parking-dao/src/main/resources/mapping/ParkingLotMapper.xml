@@ -9,13 +9,12 @@
         <result property="regionCode"    column="region_code"    />
         <result property="amount"    column="amount"    />
         <result property="type"    column="type"    />
-        <result property="isSync"    column="is_sync"    />
         <result property="createTm"    column="create_tm"    />
         <result property="updateTm"    column="update_tm"    />
     </resultMap>
 
     <sql id="selectParkingLotVo">
-        select id, region, region_code, amount, type, is_sync, create_tm, update_tm from parking_lot
+        select id, region, region_code, amount, type, create_tm, update_tm from parking_lot
     </sql>
 
 

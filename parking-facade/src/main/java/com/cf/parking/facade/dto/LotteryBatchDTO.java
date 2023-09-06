@@ -15,6 +15,8 @@ import java.util.Date;
 @Data
 @Accessors(chain = true)
 public class LotteryBatchDTO extends PageRequest {
+    /** id */
+    private Long id;
 
     /** 开始期号 */
     @JsonFormat(pattern = "yyyy-MM-dd")

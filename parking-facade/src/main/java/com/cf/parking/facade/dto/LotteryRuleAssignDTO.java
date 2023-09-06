@@ -1,5 +1,6 @@
 package com.cf.parking.facade.dto;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -13,11 +14,9 @@ import java.util.Date;
 @Data
 @Accessors(chain = true)
 public class LotteryRuleAssignDTO {
+
     /** id */
     private Long id;
-
-    /** 分配类型（按部门分配、按人员分配） */
-    private String type;
 
     /** 分配类型编码（section：部门；person：人员） */
     private String code;
@@ -30,13 +29,4 @@ public class LotteryRuleAssignDTO {
 
     /** 状态(0：停用，1：启用) */
     private String state;
-
-    /** 创建时间 */
-    private Date createTm;
-
-    /** 更新时间 */
-    private Date updateTm;
-
-    /** 备注 */
-    private String remark;
 }

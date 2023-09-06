@@ -6,13 +6,15 @@
     <resultMap type="com.cf.parking.dao.po.LotteryBlackListPO" id="LotteryBlackListResult">
         <result property="id"    column="id"    />
         <result property="userId"    column="user_id"    />
+        <result property="jobNumber"    column="job_number"    />
+        <result property="name"    column="name"    />
         <result property="reason"    column="reason"    />
         <result property="createTm"    column="create_tm"    />
         <result property="updateTm"    column="update_tm"    />
     </resultMap>
 
     <sql id="selectLotteryBlackListVo">
-        select id, user_id, reason, create_tm, update_tm from lottery_balck_list
+        select id, user_id,job_number,name, reason, create_tm, update_tm from lottery_balck_list
     </sql>
 
 

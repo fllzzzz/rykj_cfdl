@@ -15,6 +15,7 @@ import com.cf.parking.services.utils.PageUtils;
 import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -59,6 +60,22 @@ public class LotteryBatchServiceImpl implements LotteryBatchFacade
             bo.setLotteryRule(lotteryRule);
         });
         return PageUtils.toResponseList(page,boList);
+    }
+
+    /**
+     * 获取摇号批次详细信息
+     * @param dto
+     * @return
+     */
+    @Override
+    public LotteryBatchBO getInfo(LotteryBatchDTO dto) {
+        LotteryBatchPO po = mapper.selectById(dto.getId());
+        LotteryBatchBO bo = new LotteryBatchBO();
+        BeanUtils.copyProperties(po,bo);
+
+        String lotteryRule = lotteryRuleRoundService.getNameByRoundId(bo.getRoundId());
+        bo.setLotteryRule(lotteryRule);
+        return bo;
     }
 
     /**

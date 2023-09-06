@@ -1,6 +1,7 @@
 package com.cf.parking.api.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -12,6 +13,7 @@ import java.util.Date;
  * @date 2023/09/05
  */
 @Data
+@ApiModel(description = "摇号申请记录查询结果")
 public class LotteryApplyRecordPageRsp {
 
     /** id */

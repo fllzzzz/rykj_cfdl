@@ -32,9 +32,6 @@ public class ParkingLotPO
     /** 类型(0：不可摇号，1：可摇号) */
     private String type;
 
-    /** 是否同步闸机系统成功，默认0，0：未同步，1：同步成功 */
-    private String isSync;
-
     /** 创建时间 */
     private Date createTm;
 

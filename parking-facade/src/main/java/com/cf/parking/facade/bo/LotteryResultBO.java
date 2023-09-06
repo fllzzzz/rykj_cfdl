@@ -1,5 +1,8 @@
 package com.cf.parking.facade.bo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.annotations.ApiModelProperty;
+
 import java.util.Date;
 
 /**
@@ -13,6 +16,13 @@ public class LotteryResultBO {
 
     /** 摇号批次id */
     private Long batchId;
+
+    /** 期号 */
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private Date batchNum;
+
+    /** 轮号 */
+    private Date RoundName;
 
     /** 状态（0：待摇号；1：待确认；2：确认中；3：待发布；4：待归档） */
     private String state;

@@ -15,7 +15,7 @@ public class LotteryRuleRoundBO {
     private String name;
 
     /** 停车场(编号)，多个间逗号间隔 */
-    private String parkingLotCode;
+    private String parkingLotName;
 
     /** 状态(0：停用，1：启用) */
     private String state;

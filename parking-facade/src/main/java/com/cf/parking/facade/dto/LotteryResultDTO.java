@@ -1,5 +1,7 @@
 package com.cf.parking.facade.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -16,15 +18,17 @@ public class LotteryResultDTO {
     /** id */
     private Long id;
 
-    /** 摇号批次id */
-    private Long batchId;
+    /** 开始期号 */
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private Date startDate;
+
+    /** 结束期号 */
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private Date endDate;
 
     /** 状态（0：待摇号；1：待确认；2：确认中；3：待发布；4：待归档） */
     private String state;
 
-    /** 创建时间 */
-    private Date createTm;
-
-    /** 更新时间 */
-    private Date updateTm;
+    /** 摇号规则 */
+    private Long roundId;
 }

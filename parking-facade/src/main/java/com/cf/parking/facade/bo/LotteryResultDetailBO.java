@@ -8,6 +8,7 @@ import java.util.Date;
  * @date 2023/9/5
  */
 public class LotteryResultDetailBO {
+
     /** id */
     private Long id;
 
@@ -18,7 +19,7 @@ public class LotteryResultDetailBO {
     private Long roundId;
 
     /** 停车场 */
-    private Long parkingLotId;
+    private Long parkingLotName;
 
     /** 用户 */
     private Long userId;

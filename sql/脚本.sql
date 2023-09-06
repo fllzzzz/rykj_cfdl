@@ -3,6 +3,8 @@ drop table if exists lottery_black_list;
 create table lottery_black_list(
   id           bigint(0)            not null           comment 'id',
   user_id      bigint(0)            default 0          comment 'userId',
+  job_number   varchar(64)          default ''         comment '工号',
+  name         varchar(64)          default ''         comment '姓名',
   reason      varchar(128)          default ''         comment '原因',
   create_tm        timestamp(3)                        comment '创建时间',
   update_tm        timestamp(3)                        comment '更新时间',

@@ -23,6 +23,12 @@ public class LotteryBlackListPO
     /** userId */
     private Long userId;
 
+    /** 工号 */
+    private String jobNumber;
+
+    /** 姓名 */
+    private String name;
+
     /** 原因 */
     private String reason;
 
