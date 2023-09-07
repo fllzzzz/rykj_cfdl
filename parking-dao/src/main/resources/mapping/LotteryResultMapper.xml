@@ -13,7 +13,7 @@
     </resultMap>
 
     <sql id="selectLotteryResultVo">
-        select id, batch_id, state, create_tm, update_tm from lottery_result
+        select id, batch_id,round_id, state, create_tm, update_tm from lottery_result
     </sql>
 
 

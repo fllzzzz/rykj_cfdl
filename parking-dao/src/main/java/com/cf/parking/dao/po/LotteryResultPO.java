@@ -22,7 +22,7 @@ public class LotteryResultPO
 
     /** 摇号批次id */
     private Long batchId;
-
+    
     /** 轮数 */
     private Long roundId;
 
