@@ -4,8 +4,11 @@
 <mapper namespace="com.cf.parking.dao.mapper.UserVerifyMapper">
 
     <resultMap id="userVerifyMap" type="com.cf.parking.dao.po.UserVerifyPO">
+        <result property="id"    column="id"    />
         <result column="user_id" property="userId"/>
+        <result column="user_name" property="userName"/>
         <result column="plate_no" property="plateNo"/>
+        <result column="vehicle_img" property="vehicleImg"/>
         <result column="driving_permit_img" property="drivingPermitImg"/>
         <result column="driving_license_img" property="drivingLicenseImg"/>
         <result column="state" property="state"/>

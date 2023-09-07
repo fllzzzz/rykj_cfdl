@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
  * @date 2023-09-05
  */
 @Service
-public class LotteryResultDetailServiceImpl implements LotteryResultDetailFacade
+public class LotteryResultDetailFacadeImpl implements LotteryResultDetailFacade
 {
     @Autowired
     private LotteryResultDetailMapper lotteryResultDetailMapper;

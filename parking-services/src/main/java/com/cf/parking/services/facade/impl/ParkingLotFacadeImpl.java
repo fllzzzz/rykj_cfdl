@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
  * @date 2023-09-05
  */
 @Service
-public class ParkingLotServiceImpl implements ParkingLotFacade
+public class ParkingLotFacadeImpl implements ParkingLotFacade
 {
     @Autowired
     private ParkingLotMapper parkingLotMapper;

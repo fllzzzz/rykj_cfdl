@@ -1,3 +1,20 @@
+drop table if exists user_verify;
+create table user_verify(
+  id           bigint(0)            not null           comment 'id',
+  user_id      bigint(0)            default 0          comment 'userID',
+  user_name    varchar(64)          default ''         comment '申请人',
+  plate_no     varchar(20)          default ''         comment '车牌号',
+  vehicle_img           mediumtext            comment '车辆照片',
+  driving_permit_img    mediumtext            comment '行驶证照片',
+  driving_license_img   mediumtext            comment '驾驶证照片',
+  state       int(0)                default 0          comment '状态(0:默认，1:待审核，2:审核失败,3:审核成功)',
+  reason      varchar(100)          default ''         comment '审核意见',
+  create_tm        timestamp(3)                        comment '创建时间',
+  update_tm        timestamp(3)                        comment '更新时间',
+  primary key (id) USING BTREE
+)engine=innodb  comment ='车主认证表（车辆审核表）' ROW_FORMAT = Dynamic;
+
+
 
 drop table if exists lottery_black_list;
 create table lottery_black_list(

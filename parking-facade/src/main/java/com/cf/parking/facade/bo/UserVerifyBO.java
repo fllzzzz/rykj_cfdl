@@ -1,21 +1,16 @@
-package com.cf.parking.dao.po;
+package com.cf.parking.facade.bo;
 
-import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
-import lombok.experimental.Accessors;
-
 
 import java.util.Date;
 
 /**
- * @author whx
- * @date 2022-11-19 16:55:55
- * @description 车主认证表
+ * 车辆审核
+ * @author
+ * @date 2023/9/7
  */
 @Data
-@TableName("user_verify")
-@Accessors(chain = true)
-public class UserVerifyPO {
+public class UserVerifyBO {
 
     /** id */
     private Long id;
@@ -57,12 +52,12 @@ public class UserVerifyPO {
     private String state;
 
     /**
-     * 审核失败原因
+     * 审核意见
      */
     private String reason;
 
     /**
-     * 创建时间
+     * 申请日期
      */
     private Date createTm;
 

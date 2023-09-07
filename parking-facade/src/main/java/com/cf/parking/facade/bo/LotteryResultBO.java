@@ -1,7 +1,7 @@
 package com.cf.parking.facade.bo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
 import java.util.Date;
 
@@ -10,6 +10,7 @@ import java.util.Date;
  * @author
  * @date 2023/9/5
  */
+@Data
 public class LotteryResultBO {
     /** id */
     private Long id;

@@ -30,7 +30,7 @@ import javax.annotation.Resource;
  * @date 2023-09-05
  */
 @Service
-public class LotteryApplyRecordServiceImpl implements LotteryApplyRecordFacade
+public class LotteryApplyRecordFacadeImpl implements LotteryApplyRecordFacade
 {
     @Autowired
     private LotteryApplyRecordMapper mapper;

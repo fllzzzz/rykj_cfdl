@@ -64,4 +64,8 @@ public class UserSpacePO {
      */
     @TableId(value = "user_space_id", type = IdType.INPUT)
     private Long userSpaceId;
+
+    /** 状态（0：未同步；1：同步成功；2：同步失败） */
+    private String state;
+
 }

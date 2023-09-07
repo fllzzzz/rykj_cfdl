@@ -1,5 +1,6 @@
 package com.cf.parking.api.response;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -46,4 +47,6 @@ public class UserSpaceRsp {
      */
     private String endDate;
 
+    /** 状态（0：未同步；1：同步成功；2：同步失败） */
+    private String state;
 }

@@ -1,5 +1,7 @@
 package com.cf.parking.facade.bo;
 
+import lombok.Data;
+
 import java.util.Date;
 
 /**
@@ -7,6 +9,7 @@ import java.util.Date;
  * @author
  * @date 2023/9/5
  */
+@Data
 public class LotteryResultDetailBO {
 
     /** id */
