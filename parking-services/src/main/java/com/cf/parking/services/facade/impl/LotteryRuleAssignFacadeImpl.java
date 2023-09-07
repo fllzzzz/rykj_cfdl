@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
  * @date 2023-09-05
  */
 @Service
-public class LotteryRuleAssignServiceImpl implements LotteryRuleAssignFacade
+public class LotteryRuleAssignFacadeImpl implements LotteryRuleAssignFacade
 {
     @Autowired
     private LotteryRuleAssignMapper lotteryRuleAssignMapper;

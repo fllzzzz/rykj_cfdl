@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
  * @date 2023-09-05
  */
 @Service
-public class ParkingSpaceTransferRecordServiceImpl implements ParkingSpaceTransferRecordFacade
+public class ParkingSpaceTransferRecordFacadeImpl implements ParkingSpaceTransferRecordFacade
 {
     @Autowired
     private ParkingSpaceTransferRecordMapper parkingSpaceTransferRecordMapper;

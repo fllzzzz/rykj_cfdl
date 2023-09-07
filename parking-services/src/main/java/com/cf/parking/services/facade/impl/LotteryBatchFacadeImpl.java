@@ -5,9 +5,7 @@ import java.util.List;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cf.parking.dao.mapper.LotteryBatchMapper;
-import com.cf.parking.dao.po.LotteryApplyRecordPO;
 import com.cf.parking.dao.po.LotteryBatchPO;
-import com.cf.parking.facade.bo.LotteryApplyRecordBO;
 import com.cf.parking.facade.bo.LotteryBatchBO;
 import com.cf.parking.facade.dto.LotteryBatchDTO;
 import com.cf.parking.facade.facade.LotteryBatchFacade;
@@ -28,13 +26,13 @@ import javax.annotation.Resource;
  * @date 2023-09-05
  */
 @Service
-public class LotteryBatchServiceImpl implements LotteryBatchFacade
+public class LotteryBatchFacadeImpl implements LotteryBatchFacade
 {
     @Autowired
     private LotteryBatchMapper mapper;
 
     @Resource
-    private LotteryRuleRoundServiceImpl lotteryRuleRoundService;
+    private LotteryRuleRoundFacadeImpl lotteryRuleRoundService;
 
     /**
      * 查询摇号批次列表

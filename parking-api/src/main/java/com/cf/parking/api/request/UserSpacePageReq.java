@@ -32,4 +32,8 @@ public class UserSpacePageReq extends PageRequest {
     @ApiModelProperty(value = "结束时间")
     private Date endDate;
 
+    /** 状态（0：未同步；1：同步成功；2：同步失败） */
+    @ApiModelProperty(value = "状态（0：未同步；1：同步成功；2：同步失败）")
+    private String state;
+
 }

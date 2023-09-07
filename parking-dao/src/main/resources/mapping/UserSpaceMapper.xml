@@ -13,6 +13,7 @@
         <result column="start_date" property="startDate"/>
         <result column="update_tm" property="updateTm"/>
         <result column="user_space_id" property="userSpaceId"/>
+        <result column="state" property="state"/>
     </resultMap>
 
     <delete id="deleteAll">

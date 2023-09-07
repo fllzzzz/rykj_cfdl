@@ -57,4 +57,7 @@ public class UserSpaceBO {
      * 更新时间
      */
     private Date updateTm;
+
+    /** 状态（0：未同步；1：同步成功；2：同步失败） */
+    private String state;
 }

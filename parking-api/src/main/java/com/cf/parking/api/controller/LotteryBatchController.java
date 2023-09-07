@@ -28,7 +28,7 @@ import java.util.List;
  * @author
  * @date 2023-09-05
  */
-@Api(tags = "摇号批次模块")
+@Api(tags = "摇号批次模块——摇号系统")
 @Slf4j
 @RestController
 @RequestMapping("/lottery/batch")
