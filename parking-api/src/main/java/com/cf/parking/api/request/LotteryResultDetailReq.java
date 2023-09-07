@@ -21,10 +21,6 @@ public class LotteryResultDetailReq {
     @ApiModelProperty(value = "摇号结果表id")
     private Long resultId;
 
-    /** 轮数 */
-    @ApiModelProperty(value = "轮数")
-    private Long roundId;
-
     /** 状态（0：未同步；1：同步成功；2：同步失败） */
     @ApiModelProperty(value = "状态")
     private String state;

@@ -6,7 +6,6 @@
     <resultMap type="com.cf.parking.dao.po.LotteryResultDetailPO" id="LotteryResultDetailResult">
         <result property="id"    column="id"    />
         <result property="resultId"    column="result_id"    />
-        <result property="roundId"    column="round_id"    />
         <result property="parkingLotId"    column="parking_lot_id"    />
         <result property="userId"    column="user_id"    />
         <result property="plateNo"    column="plate_no"    />

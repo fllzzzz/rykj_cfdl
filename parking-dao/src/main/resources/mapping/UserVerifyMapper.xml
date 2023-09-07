@@ -16,5 +16,9 @@
         <result column="create_tm" property="createTm"/>
         <result column="update_tm" property="updateTm"/>
     </resultMap>
+
+    <delete id="batchAudit">
+        update user_verify set state = #{}
+    </delete>
 </mapper>
 

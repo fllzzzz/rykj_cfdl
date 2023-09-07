@@ -31,7 +31,7 @@ public class LotteryResultPageRsp {
 
     /** 轮号 */
     @ApiModelProperty(value = "轮号")
-    private Date RoundName;
+    private String RoundName;
 
     /** 状态（0：待摇号；1：待确认；2：确认中；3：待发布；4：待归档） */
     @ApiModelProperty(value = "状态")

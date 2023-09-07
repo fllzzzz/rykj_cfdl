@@ -18,7 +18,7 @@ public class LotteryRuleAssignDTO {
     /** id */
     private Long id;
 
-    /** 分配类型编码（section：部门；person：人员） */
+    /** 部门编码/人员工号 */
     private String code;
 
     /** 名称（部门或者人员名称） */

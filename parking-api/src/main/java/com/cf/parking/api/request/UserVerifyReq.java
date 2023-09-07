@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author
@@ -23,9 +24,9 @@ public class UserVerifyReq {
 
     /** 申请人 */
     @ApiModelProperty(value = "申请人")
-    private Long userName;
+    private String userName;
 
-    /** 状态(0:默认，1:待审核，2:审核失败,3:审核成功) */
+    /** 状态(0:待审核，1:审核失败,2:审核通过 3:审核不通过) */
     @ApiModelProperty(value = "状态(1:待审核，2:审核失败,3:审核成功)")
     private String state;
 
@@ -37,5 +38,5 @@ public class UserVerifyReq {
     /** 申请日期（止） */
     @ApiModelProperty(value = "申请日期（止）")
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date updateTm;
+    private Date endDate;
 }

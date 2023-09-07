@@ -7,7 +7,7 @@ create table user_verify(
   vehicle_img           mediumtext            comment '车辆照片',
   driving_permit_img    mediumtext            comment '行驶证照片',
   driving_license_img   mediumtext            comment '驾驶证照片',
-  state       int(0)                default 0          comment '状态(0:默认，1:待审核，2:审核失败,3:审核成功)',
+  state       int(0)                default 0          comment '状态(0:待审核，1:审核失败,2:审核通过 3:审核不通过)',
   reason      varchar(100)          default ''         comment '审核意见',
   create_tm        timestamp(3)                        comment '创建时间',
   update_tm        timestamp(3)                        comment '更新时间',
@@ -62,8 +62,8 @@ create table lottery_rule_round(
 drop table if exists lottery_rule_assign_type;
 create table lottery_rule_assign(
   id           bigint(0)            not null           comment 'id',
-  type         varchar(32)          default ''         comment '分配类型（按部门分配、按人员分配）',
-  code         varchar(16)          default ''         comment '分配类型编码（section：部门；person：人员）',
+  type         varchar(32)          default ''         comment '分配类型（1：按部门分配；2：按人员分配）',
+  code         varchar(16)          default ''         comment '部门编码/人员工号',
   name         varchar(32)          default ''         comment '名称（部门或者人员名称）',
   parking_lot_code  varchar(256)    default ''         comment '停车场(编号)，多个间逗号间隔',
   state        char(1)              default 0          comment '状态(0：停用，1：启用)',
@@ -127,7 +127,7 @@ create table lottery_apply_record(
   id           bigint(0)            not null           comment 'id',
   batch_id     bigint(0)            default 0          comment '摇号批次id',
   user_id      bigint(0)            default 0          comment '用户',
-  plate_no     varchar(12)          default ''         comment '车牌号',
+  job_number   varchar(128)         default ''         comment '工号',
   apply_state  char(1)              default 0          comment '申请状态(0：取消申请；1：申请)',
   result       varchar(16)          default ''         comment '摇号结果(-1：未开号；0：未中；xx：对应停车场的区域编号)',
   create_tm    timestamp(3)                            comment '创建时间',
