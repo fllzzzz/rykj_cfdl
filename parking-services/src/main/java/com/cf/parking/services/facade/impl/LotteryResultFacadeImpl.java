@@ -19,6 +19,12 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
     @Autowired
     private LotteryResultMapper lotteryResultMapper;
 
+	@Override
+	public void lottery(Long id) {
+		
+		
+	}
+
     /**
      * 查询摇号结果
      * 

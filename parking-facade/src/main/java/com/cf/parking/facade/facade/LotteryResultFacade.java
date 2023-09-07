@@ -12,4 +12,10 @@ import java.util.List;
 public interface LotteryResultFacade
 {
 
+	/**
+	 * 摇号
+	 * @param id
+	 */
+	void lottery(Long id);
+
 }
