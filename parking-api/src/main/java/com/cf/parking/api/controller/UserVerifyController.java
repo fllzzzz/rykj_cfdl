@@ -23,7 +23,7 @@ import javax.annotation.Resource;
  * @author
  * @date 2023/9/7
  */
-@Api(tags = "车辆审核模块")
+@Api(tags = "车辆审核模块——摇号系统")
 @Slf4j
 @RestController
 @RequestMapping("/user/verify")

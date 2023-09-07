@@ -98,6 +98,7 @@ drop table if exists lottery_result;
 create table lottery_result(
   id           bigint(0)            not null           comment 'id',
   batch_id     bigint(0)            default 0          comment '摇号批次id',
+  round_id     bigint(0)            default 0          comment '轮数',
   state        char(1)              default 0          comment '状态（0：待摇号；1：待确认；2：确认中；3：待发布；4：待归档）',
   create_tm    timestamp(3)                            comment '创建时间',
   update_tm    timestamp(3)                            comment '更新时间',
@@ -110,7 +111,6 @@ drop table if exists lottery_result_detail;
 create table lottery_result_detail(
   id           bigint(0)            not null           comment 'id',
   result_id    bigint(0)            default 0          comment '摇号结果表id',
-  round_id     bigint(0)            default 0          comment '轮数',
   parking_lot_id  bigint(0)         default 0          comment '停车场',
   user_id      bigint(0)            default 0          comment '用户',
   plate_no     varchar(12)          default ''         comment '车牌号',

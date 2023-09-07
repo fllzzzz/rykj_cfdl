@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author
  * @date 2023-09-05
  */
-@Api(tags = "摇号规则-停车场分配模块")
+@Api(tags = "摇号规则-停车场分配模块——摇号系统")
 @Slf4j
 @RestController
 @RequestMapping("/lottery/assignRule")

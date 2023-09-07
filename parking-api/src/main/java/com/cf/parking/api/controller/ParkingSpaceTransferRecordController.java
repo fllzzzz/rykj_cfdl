@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author
  * @date 2023-09-05
  */
-@Api(tags = "车位转赠记录管理模块")
+@Api(tags = "车位转赠记录管理模块——摇号系统")
 @Slf4j
 @RestController
 @RequestMapping("/parkingSpace/transferRecord")
