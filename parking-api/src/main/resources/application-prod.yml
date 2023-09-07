@@ -63,3 +63,5 @@ gateway:
 log:
   topic: prod-log
   address: 47.98.128.233:9092,47.97.22.216:9092,47.98.158.231:9092
+swagger:
+  enabled: false

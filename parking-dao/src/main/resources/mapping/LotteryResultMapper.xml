@@ -6,13 +6,14 @@
     <resultMap type="com.cf.parking.dao.po.LotteryResultPO" id="LotteryResultResult">
         <result property="id"    column="id"    />
         <result property="batchId"    column="batch_id"    />
+        <result property="roundId"    column="round_id"    />
         <result property="state"    column="state"    />
         <result property="createTm"    column="create_tm"    />
         <result property="updateTm"    column="update_tm"    />
     </resultMap>
 
     <sql id="selectLotteryResultVo">
-        select id, batch_id, state, create_tm, update_tm from lottery_result
+        select id, batch_id,round_id, state, create_tm, update_tm from lottery_result
     </sql>
 
 
