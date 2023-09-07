@@ -10,7 +10,7 @@
         <result property="validStartDate"    column="valid_start_date"    />
         <result property="validEndDate"    column="valid_end_date"    />
         <result property="userId"    column="user_id"    />
-        <result property="plateNo"    column="plate_no"    />
+        <result property="jobNumber"    column="job_number"    />
         <result property="applyState"    column="apply_state"    />
         <result property="result"    column="result"    />
         <result property="createTm"    column="create_tm"    />

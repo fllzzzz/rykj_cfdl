@@ -14,10 +14,10 @@ public class LotteryRuleAssignBO {
     /** id */
     private Long id;
 
-    /** 分配类型（按部门分配、按人员分配） */
+    /** 分配类型（1：按部门分配；2：按人员分配） */
     private String type;
 
-    /** 分配类型编码（section：部门；person：人员） */
+    /** 部门编码/人员工号 */
     private String code;
 
     /** 名称（部门或者人员名称） */

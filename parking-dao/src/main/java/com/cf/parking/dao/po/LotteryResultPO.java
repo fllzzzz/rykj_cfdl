@@ -28,6 +28,9 @@ public class LotteryResultPO
      */
     private Long roundId;
 
+    /** 轮数 */
+    private Long roundId;
+
     /** 状态（0：待摇号；1：待确认；2：确认中；3：待发布；4：待归档） */
     private String state;
 

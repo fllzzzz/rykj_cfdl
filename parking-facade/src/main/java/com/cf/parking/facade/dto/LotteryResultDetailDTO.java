@@ -15,9 +15,6 @@ public class LotteryResultDetailDTO {
     /** 摇号结果表id */
     private Long resultId;
 
-    /** 轮数 */
-    private Long roundId;
-
     /** 状态（0：未同步；1：同步成功；2：同步失败） */
     private String state;
 

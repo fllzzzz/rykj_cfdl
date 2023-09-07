@@ -47,7 +47,7 @@ public class UserVerifyBO {
     private String drivingLicenseImg;
 
     /**
-     * 状态(0:默认，1:待审核，2:审核失败,3:审核成功)
+     * 状态(0:待审核，1:审核失败,2:审核通过 3:审核不通过)
      */
     private String state;
 

@@ -23,7 +23,7 @@ public class LotteryResultBO {
     private Date batchNum;
 
     /** 轮号 */
-    private Date RoundName;
+    private String RoundName;
 
     /** 状态（0：待摇号；1：待确认；2：确认中；3：待发布；4：待归档） */
     private String state;

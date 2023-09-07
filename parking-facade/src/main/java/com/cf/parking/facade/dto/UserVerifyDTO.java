@@ -1,10 +1,13 @@
 package com.cf.parking.facade.dto;
 
+import com.cf.support.result.PageRequest;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * 车辆审核
@@ -13,14 +16,17 @@ import java.util.Date;
  */
 @Data
 @Accessors(chain = true)
-public class UserVerifyDTO {
+public class UserVerifyDTO extends PageRequest {
+    /** 批量审核的ids */
+    private List<Long> ids;
+
     /** id */
     private Long id;
 
     /** 申请人 */
-    private Long userName;
+    private String userName;
 
-    /** 状态(0:默认，1:待审核，2:审核失败,3:审核成功) */
+    /** 状态(0:待审核，1:审核失败,2:审核通过 3:审核不通过) */
     private String state;
 
     /** 申请日期（起） */
@@ -29,5 +35,5 @@ public class UserVerifyDTO {
 
     /** 申请日期（止） */
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date updateTm;
+    private Date endDate;
 }

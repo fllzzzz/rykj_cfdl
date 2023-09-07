@@ -18,9 +18,6 @@ public class LotteryResultDetailBO {
     /** 摇号结果表id */
     private Long resultId;
 
-    /** 轮数 */
-    private Long roundId;
-
     /** 停车场 */
     private Long parkingLotName;
 

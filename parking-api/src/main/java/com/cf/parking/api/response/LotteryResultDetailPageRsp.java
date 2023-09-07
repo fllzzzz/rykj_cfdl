@@ -23,10 +23,6 @@ public class LotteryResultDetailPageRsp {
     @ApiModelProperty(value = "摇号结果表id")
     private Long resultId;
 
-    /** 轮数 */
-    @ApiModelProperty(value = "轮数")
-    private Long roundId;
-
     /** 停车场 */
     @ApiModelProperty(value = "停车场")
     private Long parkingLotName;

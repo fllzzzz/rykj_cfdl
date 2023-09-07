@@ -35,8 +35,8 @@ public class LotteryApplyRecordPO
     /** 用户 */
     private Long userId;
 
-    /** 车牌号 */
-    private String plateNo;
+    /** 工号 */
+    private String jobNumber;
 
     /** 申请状态(0：取消申请；1：申请) */
     private String applyState;
