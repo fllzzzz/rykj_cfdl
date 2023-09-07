@@ -5,7 +5,6 @@ import javax.annotation.Resource;
 import com.cf.parking.api.request.LotteryRuleAssignOptReq;
 import com.cf.parking.api.request.LotteryRuleAssignReq;
 import com.cf.parking.api.response.LotteryRuleAssignRsp;
-import com.cf.parking.dao.po.LotteryRuleAssignPO;
 import com.cf.parking.facade.facade.LotteryRuleAssignFacade;
 import com.cf.support.result.PageResponse;
 import com.cf.support.result.Result;

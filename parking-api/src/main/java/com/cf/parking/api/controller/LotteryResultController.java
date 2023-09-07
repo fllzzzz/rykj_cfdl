@@ -4,8 +4,8 @@ import javax.annotation.Resource;
 
 import com.cf.parking.api.request.LotteryResultReq;
 import com.cf.parking.api.response.LotteryResultPageRsp;
-import com.cf.parking.dao.po.LotteryResultPO;
 import com.cf.parking.facade.facade.LotteryResultFacade;
+import com.cf.support.authertication.AdminUserAuthentication;
 import com.cf.support.result.PageResponse;
 import com.cf.support.result.Result;
 import io.swagger.annotations.Api;
@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author
  * @date 2023-09-05
  */
+@AdminUserAuthentication
 @Api(tags = "摇号结果模块")
 @Slf4j
 @RestController
@@ -48,6 +49,7 @@ public class LotteryResultController
     @PostMapping("/start")
     public Result start(@RequestBody LotteryResultReq param)
     {
+    	lotteryResultFacade.lottery(param.getId());
         return Result.buildSuccessResult();
     }
 
