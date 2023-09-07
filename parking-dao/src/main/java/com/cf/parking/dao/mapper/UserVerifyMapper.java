@@ -17,7 +17,6 @@ public interface UserVerifyMapper extends BaseMapper<UserVerifyPO> {
 
     /**
      * 批量审核
-     *
      * @param ids
      * @param state
      * @param reason

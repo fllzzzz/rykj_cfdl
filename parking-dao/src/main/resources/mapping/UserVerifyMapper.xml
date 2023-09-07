@@ -18,7 +18,11 @@
     </resultMap>
 
     <delete id="batchAudit">
-        update user_verify set state = #{}
+        update user_verify set state = #{state},reason = #{reason}
+        where id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
     </delete>
 </mapper>
 
