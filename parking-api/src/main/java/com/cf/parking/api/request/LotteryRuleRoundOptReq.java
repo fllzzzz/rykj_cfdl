@@ -25,15 +25,15 @@ public class LotteryRuleRoundOptReq {
     private String name;
 
     /** 停车场(编号)，多个间逗号间隔 */
-    @ApiModelProperty(value = "轮数名称")
+    @ApiModelProperty(value = "停车场(编号)，多个间逗号间隔")
     private String parkingLotCode;
 
     /** 状态(0：停用，1：启用) */
-    @ApiModelProperty(value = "轮数名称")
+    @ApiModelProperty(value = "状态(0：停用，1：启用)")
     private String state;
 
     /** 备注 */
-    @ApiModelProperty(value = "轮数名称")
+    @ApiModelProperty(value = "备注")
     private String remark;
 
     /** 创建时间 */

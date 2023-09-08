@@ -20,8 +20,8 @@ public class ParkingSpaceTransferRecordPO
     /** id */
     private Long id;
 
-    /** 转赠停车场id */
-    private Long parkingLotId;
+    /** 转赠停车场编号 */
+    private String parkingLotCode;
 
     /** 申请人userId */
     private Long userId;
@@ -29,8 +29,8 @@ public class ParkingSpaceTransferRecordPO
     /** 赠予人userId */
     private Long acceptUserId;
 
-    /** 赠予人车牌号 */
-    private String acceptUserPlateNo;
+    /** 赠予人姓名 */
+    private String acceptUserName;
 
     /** 转赠有效开始日期 */
     private Date validStartDate;

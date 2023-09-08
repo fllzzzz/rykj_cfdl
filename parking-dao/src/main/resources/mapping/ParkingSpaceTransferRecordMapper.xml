@@ -5,10 +5,10 @@
     
     <resultMap type="com.cf.parking.dao.po.ParkingSpaceTransferRecordPO" id="ParkingSpaceTransferRecordResult">
         <result property="id"    column="id"    />
-        <result property="parkingLotId"    column="parking_lot_id"    />
+        <result property="parkingLotCode"    column="parking_lot_code"    />
         <result property="userId"    column="user_id"    />
         <result property="acceptUserId"    column="accept_user_id"    />
-        <result property="acceptUserPlateNo"    column="accept_user_plate_no"    />
+        <result property="acceptUserName"    column="accept_user_name"    />
         <result property="validStartDate"    column="valid_start_date"    />
         <result property="validEndDate"    column="valid_end_date"    />
         <result property="createTm"    column="create_tm"    />
@@ -16,7 +16,7 @@
     </resultMap>
 
     <sql id="selectParkingSpaceTransferRecordVo">
-        select id, parking_lot_id, user_id, accept_user_id, accept_user_plate_no, valid_start_date, valid_end_date, create_tm, update_tm from parking_space_transfer_record
+        select id, parking_lot_code, user_id, accept_user_id, accept_user_name, valid_start_date, valid_end_date, create_tm, update_tm from parking_space_transfer_record
     </sql>
 
 

@@ -20,7 +20,7 @@ import java.util.Date;
 public class LotteryBatchReq extends PageRequest {
 
     /** id */
-    @ApiModelProperty(value = "id，单个查询或删除时使用此字段")
+    @ApiModelProperty(value = "id，单个查询、删除、通知、查看结果时使用此字段")
     private Long id;
 
     /** 开始期号 */

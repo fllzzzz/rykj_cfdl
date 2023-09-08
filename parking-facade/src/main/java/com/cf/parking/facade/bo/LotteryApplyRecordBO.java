@@ -23,6 +23,9 @@ public class LotteryApplyRecordBO {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date batchNum;
 
+    /** 停车场编号 */
+    private String parkingLotCode;
+
     /** 车位有效开始日期 */
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date validStartDate;

@@ -21,12 +21,16 @@ public class LotteryRuleAssignReq {
     @ApiModelProperty(value = "id，单个查询或删除时使用此字段")
     private Long id;
 
+    /** 分配类型（1：按部门分配；2：按人员分配） */
+    @ApiModelProperty(value = "分配类型（1：按部门分配；2：按人员分配）")
+    private String type;
+
     /** 部门编码/人员工号 */
     @ApiModelProperty(value = "部门编码/人员工号")
     private String code;
 
     /** 名称（部门或者人员名称） */
-    @ApiModelProperty(value = "名称")
+    @ApiModelProperty(value = "名称（部门或者人员名称）")
     private String name;
 
     /** 停车场(编号)，多个间逗号间隔 */

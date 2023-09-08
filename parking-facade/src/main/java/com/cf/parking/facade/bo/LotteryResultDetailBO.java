@@ -18,14 +18,20 @@ public class LotteryResultDetailBO {
     /** 摇号结果表id */
     private Long resultId;
 
-    /** 停车场 */
-    private Long parkingLotName;
+    /** 停车场名称 */
+    private String parkingLotName;
 
-    /** 用户 */
+    /** 停车场编号 */
+    private String parkingLotCode;
+
+    /** 用户id */
     private Long userId;
 
-    /** 车牌号 */
-    private String plateNo;
+    /** 用户姓名 */
+    private String userName;
+
+    /** 用户工号 */
+    private String userJobNumber;
 
     /** 状态（0：未同步；1：同步成功；2：同步失败） */
     private String state;

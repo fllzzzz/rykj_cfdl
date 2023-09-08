@@ -111,10 +111,11 @@ drop table if exists lottery_result_detail;
 create table lottery_result_detail(
   id           bigint(0)            not null           comment 'id',
   result_id    bigint(0)            default 0          comment '摇号结果表id',
-  parking_lot_id  bigint(0)         default 0          comment '停车场',
-  user_id      bigint(0)            default 0          comment '用户',
-  plate_no     varchar(12)          default ''         comment '车牌号',
-	state        char(1)              default 0          comment '状态（0：未同步；1：同步成功；2：同步失败）',
+  parking_lot_code  varchar(32)     default ''         comment '停车场编号',
+  user_id      bigint(0)            default 0          comment '用户id',
+  user_name     varchar(64)         default ''        comment '用户姓名',
+  user_job_number   varchar(128)    default ''        comment '用户工号',
+  state        char(1)              default 0          comment '状态（0：待摇号；1：待确认；2：待发布；3：待归档）',
   create_tm    timestamp(3)                            comment '创建时间',
   update_tm    timestamp(3)                            comment '更新时间',
   primary key (id) USING BTREE
@@ -126,8 +127,12 @@ drop table if exists lottery_apply_record;
 create table lottery_apply_record(
   id           bigint(0)            not null           comment 'id',
   batch_id     bigint(0)            default 0          comment '摇号批次id',
+  batch_num      date                      comment '期号',
+  parking_lot_code     varchar(256)  default ''         comment '停车场编号',
+  valid_start_date     date                            comment '车位有效开始日期',
+  valid_end_date       date                            comment '车位有效截止日期',
   user_id      bigint(0)            default 0          comment '用户',
-  job_number   varchar(128)         default ''         comment '工号',
+  job_number     varchar(128)          default ''         comment '工号',
   apply_state  char(1)              default 0          comment '申请状态(0：取消申请；1：申请)',
   result       varchar(16)          default ''         comment '摇号结果(-1：未开号；0：未中；xx：对应停车场的区域编号)',
   create_tm    timestamp(3)                            comment '创建时间',
@@ -142,10 +147,10 @@ create table lottery_apply_record(
 drop table if exists parking_space_transfer_record;
 create table parking_space_transfer_record(
   id           bigint(0)            not null           comment 'id',
-  parking_lot_id  bigint(0)         default 0          comment '转赠停车场id',
+  parking_lot_code  varchar(32)     default ''         comment '转赠停车场编码',
   user_id         bigint(0)         default 0          comment '申请人userId',
   accept_user_id  bigint(0)         default 0          comment '赠予人userId',
-  accept_user_plate_no   varchar(12)    default ''     comment '赠予人车牌号',
+  accept_user_name   varchar(64)    default ''         comment '赠予人姓名',
   valid_start_date     date                            comment '转赠有效开始日期',
   valid_end_date       date                            comment '转赠有效截止日期',
   create_tm    timestamp(3)                            comment '创建时间',
