@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 /**
@@ -76,6 +77,7 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
     private DepartmentService departmentService;
     
     
+    @Transactional(rollbackFor = Exception.class)
 	@Override
 	public void lottery(Long id) {
 		
@@ -127,44 +129,7 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 			 * 4.然后按照部门---停车场维度进行分组，如果当前的部门配置的停车场不包含摇号的停车场，就剔除该部门的摇号人员
 			 * 5.留下的最终结果即为摇号人员
 			 */
-			//获取该车库的报名人员信息
-			parkApplyList = applyList.stream().filter(item-> item.getParkingLotCode().equals(parkLot.getRegionCode())).collect(Collectors.toList());
-			//获取该车库报名人员的工号
-			jobNumberList = applyList.stream().filter(item-> item.getParkingLotCode().equals(parkLot.getRegionCode())).map(item -> item.getJobNumber()).collect(Collectors.toList());
-			log.info("获取到报名停车场：{}的人员工号{}",parkLot.getRegionCode(),JSON.toJSONString(jobNumberList));
-			
-			//获取配置人员数据
-			List<LotteryRuleAssignPO> empList = lotteryRuleAssignService.queryRuleAssignListByJobNumber(jobNumberList,RuleAssignTypeEnum.EMPLOYEE.getState());
-			if(!CollectionUtils.isEmpty(empList)) {
-				//把数据映射成工号-->停车集合的形式
-				Map<String,List<String>> userParking = empList.stream().collect(Collectors.groupingBy(LotteryRuleAssignPO::getCode,Collectors.mapping(LotteryRuleAssignPO::getParkingLotCode, Collectors.toList())));
-				//获取到待剔除人员工号
-				List<String> deleteJobNumList = userParking.entrySet().stream().filter(item -> !item.getValue().contains(parkLot.getRegionCode())).map(Map.Entry::getKey).collect(Collectors.toList());
-				log.info("获取到因未设置车库={}而需要剔除的人员工号={}",parkLot.getRegionCode(),deleteJobNumList);
-				parkApplyList = parkApplyList.stream().filter(item -> !deleteJobNumList.contains(item.getParkingLotCode())).collect(Collectors.toList());
-				deleteJobNumList.clear();
-				userParking.clear();
-			}
-			
-			//处理部门配置
-			
-			//根据包名人员工号获取对应的部门id
-			List<String> deptCodeList = employeeService.queryDeptListByJobNum(jobNumberList);
-			//获取配置部门的数据
-			List<LotteryRuleAssignPO> deptList = lotteryRuleAssignService.queryRuleAssignListByJobNumber(deptCodeList,RuleAssignTypeEnum.DEPARMENT.getState());
-			if(!CollectionUtils.isEmpty(deptList)) {
-				//把数据映射成部门代号-->停车集合的形式
-				Map<String,List<String>> departParking = deptList.stream().collect(Collectors.groupingBy(LotteryRuleAssignPO::getCode,Collectors.mapping(LotteryRuleAssignPO::getParkingLotCode, Collectors.toList())));
-				//获取到待剔除部门工号
-				List<String> deleteDeptList = departParking.entrySet().stream().filter(item -> !item.getValue().contains(parkLot.getRegionCode())).map(Map.Entry::getKey).collect(Collectors.toList());
-				log.info("获取到因未设置车库={}而需要剔除的部门工号={}",parkLot.getRegionCode(),deleteDeptList);
-				List<String> deptEmplyeeList = employeeService.queryEmployeeListByDept(deleteDeptList);
-				parkApplyList = parkApplyList.stream().filter(item -> !deptEmplyeeList.contains(item.getParkingLotCode())).collect(Collectors.toList());
-				deleteDeptList.clear();
-				departParking.clear();
-				deptEmplyeeList.clear();
-			}
-			
+			parkApplyList = lotteryRuleAssignService.dealApplyByRule(parkLot, applyList);
 			lotteryDealService.doLottery(batch,lottery,parkLot,parkApplyList);
 			parkApplyList.clear();
 		}
