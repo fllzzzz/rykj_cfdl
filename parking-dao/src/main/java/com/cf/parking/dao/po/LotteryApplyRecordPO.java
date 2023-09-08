@@ -49,6 +49,9 @@ public class LotteryApplyRecordPO
 
     /** 更新时间 */
     private Date updateTm;
+    
+    /** 停车场 */
+    private String parkingLotCode;
 
 
 }

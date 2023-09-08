@@ -3,6 +3,7 @@ package com.cf.parking.services.facade.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.cf.parking.dao.mapper.LotteryResultMapper;
+import com.cf.parking.dao.po.LotteryApplyRecordPO;
 import com.cf.parking.dao.po.LotteryBatchPO;
 import com.cf.parking.dao.po.LotteryResultPO;
 import com.cf.parking.dao.po.LotteryRuleAssignPO;
@@ -10,6 +11,8 @@ import com.cf.parking.dao.po.LotteryRuleRoundPO;
 import com.cf.parking.dao.po.ParkingLotPO;
 import com.cf.parking.facade.facade.LotteryResultFacade;
 import com.cf.parking.services.enums.EnableStateEnum;
+import com.cf.parking.services.enums.RuleAssignTypeEnum;
+import com.cf.parking.services.service.LotteryApplyRecordService;
 import com.cf.parking.services.service.LotteryBatchService;
 import com.cf.parking.services.service.LotteryRuleAssignService;
 import com.cf.parking.services.service.LotteryRuleRoundService;
@@ -20,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
@@ -54,6 +58,9 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
     @Resource
     private ParkingLotService parkingLotService;
     
+    @Resource
+    private LotteryApplyRecordService lotteryApplyRecordService;
+    
     
 	@Override
 	public void lottery(Long id) {
@@ -70,13 +77,28 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 		String parklotCode = round.getParkingLotCode();
 		List<String> parkingList = Arrays.asList(parklotCode.split(","));
 		List<ParkingLotPO> parkingLotList = parkingLotService.selectParkingLotByCodes(parkingList);
-		log.info("获取到摇号停车场信息：{}",JSON.toJSONString(parkingLotList));
+		log.info("初步获取到摇号停车场信息：{}",JSON.toJSONString(parkingLotList));
 		AssertUtil.checkTrue(!CollectionUtils.isEmpty(parkingLotList), "停车场信息不存在，请检查设置");
 		parkingLotList = parkingLotList.stream().filter(item -> EnableStateEnum.ENABLE.getState().equals(item.getType())).collect(Collectors.toList());
 		AssertUtil.checkTrue(!CollectionUtils.isEmpty(parkingLotList), "停车场的配置为不可参加摇号，请检查设置");
-		//获取报名的人员
+		//获取报名的人员,要符合个人中心的车库在这次摇号的车库中这个条件
+		List<LotteryApplyRecordPO> applyList = lotteryApplyRecordService.queryLotteryApplyList(lottery.getBatchId(),parkingList);
+		log.info("获取到报名摇号的人员信息：{}",JSON.toJSONString(applyList));
 		parkingLotList.forEach(parkLot -> {
-			//获取配置摇号的部门和人员
+			//获取该车库报名人员的工号
+			List<String> jobNumberList = applyList.stream().filter(item-> item.getParkingLotCode().equals(parkLot.getRegionCode())).map(item -> item.getJobNumber()).collect(Collectors.toList());
+			log.info("获取到报名停车场：{}的人员工号",parkLot.getRegionCode(),JSON.toJSONString(jobNumberList));
+			
+			//获取配置人员数据
+			List<LotteryRuleAssignPO> empList = lotteryRuleAssignService.queryRuleAssignListByJobNumber(jobNumberList,RuleAssignTypeEnum.EMPLOYEE.getState());
+			//获取配置部门的数据
+			List<LotteryRuleAssignPO> deptList = lotteryRuleAssignService.queryRuleAssignListByJobNumber(jobNumberList,RuleAssignTypeEnum.DEPARMENT.getState());
+			
+			if(!CollectionUtils.isEmpty(empList)) {
+				//把数据映射成工号-->停车集合的形式
+				Map<String,List<String>> userParking = empList.stream().collect(Collectors.groupingBy(LotteryRuleAssignPO::getCode,Collectors.mapping(LotteryRuleAssignPO::getParkingLotCode, Collectors.toList())));
+				//userParking.
+			}
 			
 		});
 		lotteryService.doLottery(batch,lottery,round);

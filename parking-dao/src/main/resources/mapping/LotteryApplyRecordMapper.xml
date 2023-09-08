@@ -13,12 +13,13 @@
         <result property="jobNumber"    column="job_number"    />
         <result property="applyState"    column="apply_state"    />
         <result property="result"    column="result"    />
+        <result property="parkingLotCode"    column="parking_lot_code"    />
         <result property="createTm"    column="create_tm"    />
         <result property="updateTm"    column="update_tm"    />
     </resultMap>
 
     <sql id="selectLotteryApplyRecordVo">
-        select id, batch_id,batch_num,job_number,valid_start_date,valid_end_date, user_id, plate_no, apply_state, result, create_tm, update_tm from lottery_apply_record
+        select id, batch_id,batch_num,job_number,valid_start_date,valid_end_date, user_id, plate_no, apply_state, result,parking_lot_code, create_tm, update_tm from lottery_apply_record
     </sql>
 
 

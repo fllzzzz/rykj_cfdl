@@ -152,3 +152,9 @@ create table parking_space_transfer_record(
   update_tm    timestamp(3)                            comment '更新时间',
   primary key (id) USING BTREE
 )engine=innodb  comment ='车位转赠记录表' ROW_FORMAT = Dynamic;
+
+
+alter table lottery_apply_record add index batch_id_idx(batch_id);
+
+alter table lottery_apply_record add column parking_lot_code varchar(256) default '' comment '停车场编号';
+alter table lottery_rule_assign add index code_idx(code,type);
