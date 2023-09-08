@@ -5,24 +5,15 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cf.parking.dao.mapper.LotteryResultMapper;
-import com.cf.parking.dao.po.LotteryApplyRecordPO;
-import com.cf.parking.dao.po.LotteryBatchPO;
-import com.cf.parking.dao.po.LotteryResultPO;
-import com.cf.parking.dao.po.LotteryRuleAssignPO;
-import com.cf.parking.dao.po.LotteryRuleRoundPO;
-import com.cf.parking.dao.po.ParkingLotPO;
+import com.cf.parking.dao.po.*;
 import com.cf.parking.facade.bo.LotteryBatchBO;
 import com.cf.parking.facade.bo.LotteryResultBO;
+import com.cf.parking.facade.bo.LotteryResultDetailBO;
 import com.cf.parking.facade.dto.LotteryResultDTO;
 import com.cf.parking.facade.facade.LotteryResultFacade;
 import com.cf.parking.services.enums.EnableStateEnum;
 import com.cf.parking.services.enums.RuleAssignTypeEnum;
-import com.cf.parking.services.service.LotteryApplyRecordService;
-import com.cf.parking.services.service.LotteryBatchService;
-import com.cf.parking.services.service.LotteryRuleAssignService;
-import com.cf.parking.services.service.LotteryRuleRoundService;
-import com.cf.parking.services.service.LotteryService;
-import com.cf.parking.services.service.ParkingLotService;
+import com.cf.parking.services.service.*;
 import com.cf.parking.services.utils.AssertUtil;
 import com.cf.parking.services.utils.PageUtils;
 import com.cf.support.result.PageResponse;
@@ -73,6 +64,9 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
     
     @Resource
     private LotteryApplyRecordService lotteryApplyRecordService;
+
+    @Resource
+	private LotteryResultDetailService lotteryResultDetailService;
     
     
 	@Override
@@ -151,7 +145,7 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 		//1.更新状态为已归档
 		LotteryResultPO po = lotteryResultMapper.selectById(id);
 		po.setState("5");
-		lotteryResultMapper.updateById(po);
+		int result = lotteryResultMapper.updateById(po);
 
 		//2.查看相同期号下是否还有其他未归档的记录。如果没有，将该期摇号批次表状态变为已结束
 		List<LotteryResultPO> lotteryResultPOList = lotteryResultMapper.selectList(new LambdaQueryWrapper<LotteryResultPO>()
@@ -159,10 +153,20 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 				.ne(LotteryResultPO::getState, "5"));
 
 		if (CollectionUtils.isEmpty(lotteryResultPOList)){
-//			lotteryBatchService.archive(po.getBatchId());
+			result = lotteryBatchService.archive(po.getBatchId());
 		}
-		return null;
+		return result;
 	}
 
+	/**
+	 * 摇号结果分页查询
+	 * @param dto
+	 * @return
+	 */
+	@Override
+	public PageResponse<LotteryResultDetailBO> lotteryResult(LotteryResultDTO dto) {
+		Page<LotteryResultDetailPO> page = PageUtils.toPage(dto);
+		return lotteryResultDetailService.selectDetailListByResultId(page, dto.getId());
+	}
 
 }

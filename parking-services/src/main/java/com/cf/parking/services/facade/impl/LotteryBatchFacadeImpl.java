@@ -155,9 +155,8 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
     @Override
     public PageResponse<LotteryResultDetailBO> viewResult(LotteryBatchDTO dto) {
         Page<LotteryResultDetailPO> page = PageUtils.toPage(dto);
-
-        List<LotteryResultDetailBO> boList = lotteryResultService.viewResult(page,dto.getId(),dto.getRoundId());
-        return PageUtils.toResponseList(page,boList);
+        PageResponse<LotteryResultDetailBO> boPageResponse = lotteryResultService.viewResult(page,dto.getId(),dto.getRoundId());
+        return boPageResponse;
     }
 
 }

@@ -4,9 +4,11 @@ import javax.annotation.Resource;
 
 import com.cf.parking.api.request.LotteryResultReq;
 import com.cf.parking.api.response.LotteryBatchRsp;
+import com.cf.parking.api.response.LotteryResultDetailPageRsp;
 import com.cf.parking.api.response.LotteryResultPageRsp;
 import com.cf.parking.facade.bo.LotteryBatchBO;
 import com.cf.parking.facade.bo.LotteryResultBO;
+import com.cf.parking.facade.bo.LotteryResultDetailBO;
 import com.cf.parking.facade.dto.LotteryBatchDTO;
 import com.cf.parking.facade.dto.LotteryResultDTO;
 import com.cf.parking.facade.facade.LotteryResultFacade;
@@ -99,6 +101,38 @@ public class LotteryResultController
         AssertUtil.checkNull(param.getId(),"请选择要归档的摇号结果！");
 
         Integer result = lotteryResultFacade.archive(param.getId());
+        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult();
+    }
+
+    /**
+     * 摇号结果查询
+     */
+    @ApiOperation(value = "摇号结果查询", notes = "摇号结果查询")
+    @PostMapping("/lotteryResult")
+    public Result<PageResponse<LotteryResultDetailPageRsp>> lotteryResult(@RequestBody LotteryResultReq param)
+    {
+        AssertUtil.checkNull(param.getId(),"请选择要查询的摇号结果记录！");
+        LotteryResultDTO dto = new LotteryResultDTO();
+        BeanUtils.copyProperties(param,dto);
+
+        PageResponse<LotteryResultDetailBO> result = lotteryResultFacade.lotteryResult(dto);
+        List<LotteryResultDetailPageRsp> detailPageRsps = BeanConvertorUtils.copyList(result.getList(), LotteryResultDetailPageRsp.class);
+        return Result.buildSuccessResult(new PageResponse(detailPageRsps,result.getPageNo(),result.getTotal(),result.getPageSize()));
+    }
+
+
+    /**
+     * 确认结果查询
+     * 确认结果是用户车位表中的记录
+     */
+    @ApiOperation(value = "确认结果查询", notes = "确认结果查询")
+    @PostMapping("/confirmResult")
+    public Result confirmResult(@RequestBody LotteryResultReq param)
+    {
+        AssertUtil.checkNull(param.getId(),"请选择要归档的摇号结果！");
+
+        //TODO：查询用户车位表中的记录
+        Integer result = 1;
         return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult();
     }
 }
