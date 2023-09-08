@@ -32,7 +32,7 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
     private LotteryBatchMapper mapper;
 
     @Resource
-    private LotteryRuleRoundFacadeImpl lotteryRuleRoundService;
+    private LotteryRuleRoundFacadeImpl lotteryRuleRoundFacade;
 
     /**
      * 查询摇号批次列表
@@ -54,7 +54,7 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
         List<LotteryBatchBO> boList = BeanConvertorUtils.copyList(poPage.getRecords(), LotteryBatchBO.class);
         //生成摇号规则轮数
         boList.forEach(bo -> {
-            String lotteryRule = lotteryRuleRoundService.getNameByRoundId(bo.getRoundId());
+            String lotteryRule = lotteryRuleRoundFacade.getNameByRoundId(bo.getRoundId());
             bo.setLotteryRule(lotteryRule);
         });
         return PageUtils.toResponseList(page,boList);
@@ -71,7 +71,7 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
         LotteryBatchBO bo = new LotteryBatchBO();
         BeanUtils.copyProperties(po,bo);
 
-        String lotteryRule = lotteryRuleRoundService.getNameByRoundId(bo.getRoundId());
+        String lotteryRule = lotteryRuleRoundFacade.getNameByRoundId(bo.getRoundId());
         bo.setLotteryRule(lotteryRule);
         return bo;
     }
