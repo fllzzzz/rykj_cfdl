@@ -7,6 +7,7 @@ import com.cf.parking.api.request.LotteryBatchReq;
 import com.cf.parking.api.response.LotteryBatchRsp;
 import com.cf.parking.api.response.LotteryResultDetailPageRsp;
 import com.cf.parking.facade.bo.LotteryBatchBO;
+import com.cf.parking.facade.bo.LotteryResultDetailBO;
 import com.cf.parking.facade.dto.LotteryBatchDTO;
 import com.cf.parking.facade.dto.LotteryBatchOptDTO;
 import com.cf.parking.facade.facade.LotteryBatchFacade;
@@ -130,13 +131,15 @@ public class LotteryBatchController
      */
     @ApiOperation(value = "结果查看", notes = "点击结果查看按钮")
     @PostMapping("/viewResult")
-    public Result viewResult(@RequestBody LotteryBatchReq param)
+    public Result<PageResponse<LotteryResultDetailPageRsp>> viewResult(@RequestBody LotteryBatchReq param)
     {
         AssertUtil.checkNull(param.getId(),"请选择摇号批次！");
+        AssertUtil.checkNull(param.getRoundId(),"请选择摇号轮数！");
         LotteryBatchDTO dto = new LotteryBatchDTO();
         BeanUtils.copyProperties(param,dto);
 
-
-        return Result.buildSuccessResult("接口暂未开发");
+        PageResponse<LotteryResultDetailBO> result = lotteryBatchFacade.viewResult(dto);
+        List<LotteryResultDetailPageRsp> lotteryBatchRsps = BeanConvertorUtils.copyList(result.getList(), LotteryResultDetailPageRsp.class);
+        return Result.buildSuccessResult(new PageResponse(lotteryBatchRsps,result.getPageNo(),result.getTotal(),result.getPageSize()));
     }
 }

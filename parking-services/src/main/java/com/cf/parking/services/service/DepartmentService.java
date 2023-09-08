@@ -4,11 +4,9 @@ package com.cf.parking.services.service;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -41,3 +39,4 @@ public class DepartmentService extends ServiceImpl<DepartmentPOMapper, Departmen
 
 	
 }
+

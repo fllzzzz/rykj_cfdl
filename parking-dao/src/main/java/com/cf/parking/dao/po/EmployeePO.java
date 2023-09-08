@@ -2,6 +2,15 @@ package com.cf.parking.dao.po;
 
 import java.util.Date;
 
+import com.baomidou.mybatisplus.annotation.TableName;
+
+import lombok.Data;
+import lombok.experimental.Accessors;
+
+
+@Data
+@TableName("employee")
+@Accessors(chain = true)
 public class EmployeePO {
     private String emplNo;
 

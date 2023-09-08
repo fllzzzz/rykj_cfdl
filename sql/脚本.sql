@@ -1,20 +1,9 @@
-drop table if exists user_verify;
-create table user_verify(
-  id           bigint(0)            not null           comment 'id',
-  user_id      bigint(0)            default 0          comment 'userID',
-  user_name    varchar(64)          default ''         comment '申请人',
-  plate_no     varchar(20)          default ''         comment '车牌号',
-  vehicle_img           mediumtext            comment '车辆照片',
-  driving_permit_img    mediumtext            comment '行驶证照片',
-  driving_license_img   mediumtext            comment '驾驶证照片',
-  state       int(0)                default 0          comment '状态(0:待审核，1:审核失败,2:审核通过 3:审核不通过)',
-  reason      varchar(100)          default ''         comment '审核意见',
-  create_tm        timestamp(3)                        comment '创建时间',
-  update_tm        timestamp(3)                        comment '更新时间',
-  primary key (id) USING BTREE
-)engine=innodb  comment ='车主认证表（车辆审核表）' ROW_FORMAT = Dynamic;
-
-
+ALTER  TABLE  user_verify  DROP  PRIMARY  KEY;
+ALTER  TABLE  user_verify
+add COLUMN id bigint   comment 'id',
+add COLUMN user_name    varchar(64)    comment '申请人',
+add COLUMN vehicle_img           mediumtext             comment '车辆照片',
+add PRIMARY key(id);
 
 drop table if exists lottery_black_list;
 create table lottery_black_list(
@@ -98,8 +87,9 @@ drop table if exists lottery_result;
 create table lottery_result(
   id           bigint(0)            not null           comment 'id',
   batch_id     bigint(0)            default 0          comment '摇号批次id',
+  batch_num      date                      comment '期号',
   round_id     bigint(0)            default 0          comment '轮数',
-  state        char(1)              default 0          comment '状态（0：待摇号；1：待确认；2：确认中；3：待发布；4：待归档）',
+  state        char(1)              default 0          comment '状态（0：待摇号；1：待确认；2：确认中；3：待发布；4：待归档；5：已归档）',
   create_tm    timestamp(3)                            comment '创建时间',
   update_tm    timestamp(3)                            comment '更新时间',
   primary key (id) USING BTREE
@@ -131,8 +121,9 @@ create table lottery_apply_record(
   parking_lot_code     varchar(256)  default ''         comment '停车场编号',
   valid_start_date     date                            comment '车位有效开始日期',
   valid_end_date       date                            comment '车位有效截止日期',
-  user_id      bigint(0)            default 0          comment '用户',
-  job_number     varchar(128)          default ''         comment '工号',
+  user_id      bigint(0)            default 0          comment '申请人id',
+  user_name     varchar(64)         default ''        comment '申请人姓名',
+  job_number     varchar(128)          default ''         comment '申请人工号',
   apply_state  char(1)              default 0          comment '申请状态(0：取消申请；1：申请)',
   result       varchar(16)          default ''         comment '摇号结果(-1：未开号；0：未中；xx：对应停车场的区域编号)',
   create_tm    timestamp(3)                            comment '创建时间',

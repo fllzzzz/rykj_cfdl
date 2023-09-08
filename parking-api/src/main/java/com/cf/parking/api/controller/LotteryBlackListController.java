@@ -4,18 +4,31 @@ import javax.annotation.Resource;
 
 import com.cf.parking.api.request.LotteryBlackListOptReq;
 import com.cf.parking.api.request.LotteryBlackListReq;
+import com.cf.parking.api.response.LotteryBatchRsp;
 import com.cf.parking.api.response.LotteryBlackListRsp;
+import com.cf.parking.dao.po.LotteryBatchPO;
 import com.cf.parking.dao.po.LotteryBlackListPO;
+import com.cf.parking.facade.bo.LotteryBatchBO;
+import com.cf.parking.facade.bo.LotteryBlackListBO;
+import com.cf.parking.facade.dto.LotteryBatchDTO;
+import com.cf.parking.facade.dto.LotteryBlackListDTO;
+import com.cf.parking.facade.dto.LotteryBlackListOptDTO;
 import com.cf.parking.facade.facade.LotteryBlackListFacade;
+import com.cf.parking.services.utils.AssertUtil;
 import com.cf.support.result.PageResponse;
 import com.cf.support.result.Result;
+import com.cf.support.utils.BeanConvertorUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * 摇号黑名单Controller
@@ -32,6 +45,7 @@ public class LotteryBlackListController
     @Resource
     private LotteryBlackListFacade lotteryBlackListFacade;
 
+
     /**
      * 查询摇号黑名单列表
      */
@@ -39,19 +53,14 @@ public class LotteryBlackListController
     @PostMapping("/list")
     public Result<PageResponse<LotteryBlackListRsp>> list(@RequestBody LotteryBlackListReq param)
     {
-        return Result.buildSuccessResult();
+        LotteryBlackListDTO dto = new LotteryBlackListDTO();
+        BeanUtils.copyProperties(param,dto);
+
+        PageResponse<LotteryBlackListBO> result = lotteryBlackListFacade.getLotteryBlackList(dto);
+        List<LotteryBlackListRsp> lotteryBlackListRsps = BeanConvertorUtils.copyList(result.getList(), LotteryBlackListRsp.class);
+        return Result.buildSuccessResult(new PageResponse(lotteryBlackListRsps,result.getPageNo(),result.getTotal(),result.getPageSize()));
     }
 
-
-    /**
-     * 获取摇号黑名单详细信息
-     */
-    @ApiOperation(value = "获取摇号黑名单详细信息", notes = "点击修改，根据id查询")
-    @PostMapping("/info")
-    public Result<LotteryBlackListRsp> getInfo(@RequestBody LotteryBlackListReq param)
-    {
-        return Result.buildSuccessResult();
-    }
 
     /**
      * 新增摇号黑名单
@@ -60,7 +69,11 @@ public class LotteryBlackListController
     @PostMapping("/add")
     public Result add(@RequestBody LotteryBlackListOptReq param)
     {
-        return Result.buildSuccessResult();
+        LotteryBlackListOptDTO dto = new LotteryBlackListOptDTO();
+        BeanUtils.copyProperties(param,dto);
+
+        Integer result = lotteryBlackListFacade.add(dto);
+        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult();
     }
 
     /**
@@ -68,18 +81,25 @@ public class LotteryBlackListController
      */
     @ApiOperation(value = "修改摇号黑名单", notes = "点击修改按钮")
     @PostMapping("/update")
-    public Result edit(@RequestBody LotteryBlackListOptReq param)
+    public Result update(@RequestBody LotteryBlackListOptReq param)
     {
-        return Result.buildSuccessResult();
+        AssertUtil.checkNull(param.getId(),"请选择要修改记录！");
+        LotteryBlackListOptDTO dto = new LotteryBlackListOptDTO();
+        BeanUtils.copyProperties(param,dto);
+
+        Integer result = lotteryBlackListFacade.update(dto);
+        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult();
     }
 
     /**
-     * 删除摇号黑名单
+     * 移出摇号黑名单
      */
     @ApiOperation(value = "移出摇号黑名单", notes = "点击移出按钮")
     @PostMapping("/move")
     public Result remove(@RequestBody LotteryBlackListReq param)
     {
-        return Result.buildSuccessResult();
+        AssertUtil.checkNull(param.getId(),"请选择要移出黑名单的记录！");
+        Integer result = lotteryBlackListFacade.deleteById(param.getId());
+        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult();
     }
 }

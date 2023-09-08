@@ -26,9 +26,9 @@ public class UserVerifyReq {
     @ApiModelProperty(value = "申请人")
     private String userName;
 
-    /** 状态(0:待审核，1:审核失败,2:审核通过 3:审核不通过) */
-    @ApiModelProperty(value = "状态(1:待审核，2:审核失败,3:审核成功)")
-    private String state;
+    /** 状态(0:默认，1:待审核，2:审核不通过,3:审核通过) */
+    @ApiModelProperty(value = "状态(0:默认，1:待审核，2:审核不通过,3:审核通过)")
+    private Integer state;
 
     /** 申请日期（起） */
     @ApiModelProperty(value = "申请日期（起）")

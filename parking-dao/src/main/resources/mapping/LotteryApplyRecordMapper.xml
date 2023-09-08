@@ -10,6 +10,7 @@
         <result property="validStartDate"    column="valid_start_date"    />
         <result property="validEndDate"    column="valid_end_date"    />
         <result property="userId"    column="user_id"    />
+        <result property="userName"    column="user_name"    />
         <result property="jobNumber"    column="job_number"    />
         <result property="applyState"    column="apply_state"    />
         <result property="result"    column="result"    />
@@ -19,7 +20,7 @@
     </resultMap>
 
     <sql id="selectLotteryApplyRecordVo">
-        select id, batch_id,batch_num,job_number,valid_start_date,valid_end_date, user_id, plate_no, apply_state, result,parking_lot_code, create_tm, update_tm from lottery_apply_record
+        select id, batch_id,batch_num, user_id,user_name,job_number,valid_start_date,valid_end_date, apply_state, result,parking_lot_code, create_tm, update_tm from lottery_apply_record
     </sql>
 
 

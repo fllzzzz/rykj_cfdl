@@ -25,7 +25,7 @@ public class LotteryResultBO {
     /** 轮号 */
     private String RoundName;
 
-    /** 状态（0：待摇号；1：待确认；2：确认中；3：待发布；4：待归档） */
+    /** 状态（0：待摇号；1：待确认；2：确认中；3：待发布；4：待归档；5：已归档） */
     private String state;
 
     /** 创建时间 */
