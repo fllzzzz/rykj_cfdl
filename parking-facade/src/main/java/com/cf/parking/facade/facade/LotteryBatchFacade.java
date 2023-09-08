@@ -1,6 +1,7 @@
 package com.cf.parking.facade.facade;
 
 import com.cf.parking.facade.bo.LotteryBatchBO;
+import com.cf.parking.facade.bo.LotteryResultDetailBO;
 import com.cf.parking.facade.dto.LotteryBatchDTO;
 import com.cf.parking.facade.dto.LotteryBatchOptDTO;
 import com.cf.support.result.PageResponse;
@@ -51,4 +52,12 @@ public interface LotteryBatchFacade
      * @return
      */
     Integer deleteById(Long id);
+
+    /**
+     * 已结束的摇号批次进行结果查看
+     * @param dto
+     * @return
+     */
+    PageResponse<LotteryResultDetailBO> viewResult(LotteryBatchDTO dto);
+
 }

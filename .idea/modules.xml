@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/parking.iml" filepath="$PROJECT_DIR$/parking.iml" />
+      <module fileurl="file://$PROJECT_DIR$/parking-api/parking-api.iml" filepath="$PROJECT_DIR$/parking-api/parking-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/parking-dao/parking-dao.iml" filepath="$PROJECT_DIR$/parking-dao/parking-dao.iml" />
+      <module fileurl="file://$PROJECT_DIR$/parking-facade/parking-facade.iml" filepath="$PROJECT_DIR$/parking-facade/parking-facade.iml" />
+      <module fileurl="file://$PROJECT_DIR$/parking-services/parking-services.iml" filepath="$PROJECT_DIR$/parking-services/parking-services.iml" />
+    </modules>
+  </component>
+</project>

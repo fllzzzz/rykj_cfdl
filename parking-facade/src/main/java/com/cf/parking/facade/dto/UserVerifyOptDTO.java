@@ -55,9 +55,9 @@ public class UserVerifyOptDTO {
     private String drivingLicenseImg;
 
     /**
-     * 状态(0:待审核，1:审核失败,2:审核通过 3:审核不通过)
+     * 状态(0:默认，1:待审核，2:审核不通过,3:审核通过)
      */
-    private String state;
+    private Integer state;
 
     /**
      * 审核意见

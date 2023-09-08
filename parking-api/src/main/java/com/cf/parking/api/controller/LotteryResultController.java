@@ -3,18 +3,28 @@ package com.cf.parking.api.controller;
 import javax.annotation.Resource;
 
 import com.cf.parking.api.request.LotteryResultReq;
+import com.cf.parking.api.response.LotteryBatchRsp;
 import com.cf.parking.api.response.LotteryResultPageRsp;
+import com.cf.parking.facade.bo.LotteryBatchBO;
+import com.cf.parking.facade.bo.LotteryResultBO;
+import com.cf.parking.facade.dto.LotteryBatchDTO;
+import com.cf.parking.facade.dto.LotteryResultDTO;
 import com.cf.parking.facade.facade.LotteryResultFacade;
+import com.cf.parking.services.utils.AssertUtil;
 import com.cf.support.authertication.AdminUserAuthentication;
 import com.cf.support.result.PageResponse;
 import com.cf.support.result.Result;
+import com.cf.support.utils.BeanConvertorUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * 摇号结果Controller
@@ -39,7 +49,12 @@ public class LotteryResultController
     @PostMapping("/list")
     public Result<PageResponse<LotteryResultPageRsp>> list(@RequestBody LotteryResultReq param)
     {
-        return Result.buildSuccessResult();
+        LotteryResultDTO dto = new LotteryResultDTO();
+        BeanUtils.copyProperties(param,dto);
+
+        PageResponse<LotteryResultBO> result = lotteryResultFacade.getLotteryResultList(dto);
+        List<LotteryResultPageRsp> lotteryResultRsps = BeanConvertorUtils.copyList(result.getList(), LotteryResultPageRsp.class);
+        return Result.buildSuccessResult(new PageResponse(lotteryResultRsps,result.getPageNo(),result.getTotal(),result.getPageSize()));
     }
 
     /**
@@ -75,11 +90,15 @@ public class LotteryResultController
 
     /**
      * 结果归档
+     *
      */
     @ApiOperation(value = "结果归档", notes = "点击结果归档按钮")
     @PostMapping("/archive")
     public Result archive(@RequestBody LotteryResultReq param)
     {
-        return Result.buildSuccessResult();
+        AssertUtil.checkNull(param.getId(),"请选择要归档的摇号结果！");
+
+        Integer result = lotteryResultFacade.archive(param.getId());
+        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult();
     }
 }

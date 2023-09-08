@@ -2,6 +2,8 @@ package com.cf.parking.services.facade.impl;
 
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cf.parking.dao.mapper.LotteryResultMapper;
 import com.cf.parking.dao.po.LotteryApplyRecordPO;
 import com.cf.parking.dao.po.LotteryBatchPO;
@@ -9,6 +11,9 @@ import com.cf.parking.dao.po.LotteryResultPO;
 import com.cf.parking.dao.po.LotteryRuleAssignPO;
 import com.cf.parking.dao.po.LotteryRuleRoundPO;
 import com.cf.parking.dao.po.ParkingLotPO;
+import com.cf.parking.facade.bo.LotteryBatchBO;
+import com.cf.parking.facade.bo.LotteryResultBO;
+import com.cf.parking.facade.dto.LotteryResultDTO;
 import com.cf.parking.facade.facade.LotteryResultFacade;
 import com.cf.parking.services.enums.EnableStateEnum;
 import com.cf.parking.services.enums.RuleAssignTypeEnum;
@@ -19,16 +24,24 @@ import com.cf.parking.services.service.LotteryRuleRoundService;
 import com.cf.parking.services.service.LotteryService;
 import com.cf.parking.services.service.ParkingLotService;
 import com.cf.parking.services.utils.AssertUtil;
+import com.cf.parking.services.utils.PageUtils;
+import com.cf.support.result.PageResponse;
+import com.cf.support.utils.BeanConvertorUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
+
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
 /**
  * 摇号结果Service业务层处理
@@ -104,76 +117,52 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 		lotteryService.doLottery(batch,lottery,round);
 	}
 
-	
-    /**
-     * 查询摇号结果
-     * 
-     * @param id 摇号结果主键
-     * @return 摇号结果
-     */
-//    @Override
-//    public LotteryResult selectLotteryResultById(Long id)
-//    {
-//        return lotteryResultMapper.selectLotteryResultById(id);
-//    }
+	/**
+	 * 查询摇号结果列表
+	 * @param dto
+	 * @return
+	 */
+	@Override
+	public PageResponse<LotteryResultBO> getLotteryResultList(LotteryResultDTO dto) {
+		Page<LotteryResultPO> page = PageUtils.toPage(dto);
 
-    /**
-     * 查询摇号结果列表
-     * 
-     * @param lotteryResult 摇号结果
-     * @return 摇号结果
-     */
-//    @Override
-//    public List<LotteryResult> selectLotteryResultList(LotteryResult lotteryResult)
-//    {
-//        return lotteryResultMapper.selectLotteryResultList(lotteryResult);
-//    }
+		LambdaQueryWrapper<LotteryResultPO> queryWrapper = new LambdaQueryWrapper<LotteryResultPO>()
+				.le(!ObjectUtils.isEmpty(dto.getEndDate()), LotteryResultPO::getBatchNum, dto.getEndDate())
+				.ge(!ObjectUtils.isEmpty(dto.getStartDate()) , LotteryResultPO::getBatchNum, dto.getStartDate())
+				.like(!ObjectUtils.isEmpty(dto.getRoundId()) , LotteryResultPO::getRoundId, dto.getRoundId())
+				.eq(StringUtils.isNotEmpty(dto.getState()), LotteryResultPO::getState, dto.getState())
+				.ne(LotteryResultPO::getState,"5")
+				.orderByDesc(LotteryResultPO::getBatchNum);
 
-    /**
-     * 新增摇号结果
-     * 
-     * @param lotteryResult 摇号结果
-     * @return 结果
-     */
-//    @Override
-//    public int insertLotteryResult(LotteryResult lotteryResult)
-//    {
-//        return lotteryResultMapper.insertLotteryResult(lotteryResult);
-//    }
+		Page<LotteryResultPO> poPage = lotteryResultMapper.selectPage(page, queryWrapper);
+		List<LotteryResultBO> boList = BeanConvertorUtils.copyList(poPage.getRecords(), LotteryResultBO.class);
+		return PageUtils.toResponseList(page,boList);
+	}
 
-    /**
-     * 修改摇号结果
-     * 
-     * @param lotteryResult 摇号结果
-     * @return 结果
-     */
-//    @Override
-//    public int updateLotteryResult(LotteryResult lotteryResult)
-//    {
-//        return lotteryResultMapper.updateLotteryResult(lotteryResult);
-//    }
+	/**
+	 * 结果归档(当本期所有记录均归档完成后，将该批次的状态更改为已结束)
+	 * @param id
+	 * @return
+	 */
+	@Transactional(rollbackFor = Exception.class)
+	@Override
+	public Integer archive(Long id) {
 
-    /**
-     * 批量删除摇号结果
-     * 
-     * @param ids 需要删除的摇号结果主键
-     * @return 结果
-     */
-//    @Override
-//    public int deleteLotteryResultByIds(Long[] ids)
-//    {
-//        return lotteryResultMapper.deleteLotteryResultByIds(ids);
-//    }
+		//1.更新状态为已归档
+		LotteryResultPO po = lotteryResultMapper.selectById(id);
+		po.setState("5");
+		lotteryResultMapper.updateById(po);
 
-    /**
-     * 删除摇号结果信息
-     * 
-     * @param id 摇号结果主键
-     * @return 结果
-     */
-//    @Override
-//    public int deleteLotteryResultById(Long id)
-//    {
-//        return lotteryResultMapper.deleteLotteryResultById(id);
-//    }
+		//2.查看相同期号下是否还有其他未归档的记录。如果没有，将该期摇号批次表状态变为已结束
+		List<LotteryResultPO> lotteryResultPOList = lotteryResultMapper.selectList(new LambdaQueryWrapper<LotteryResultPO>()
+				.eq(LotteryResultPO::getBatchNum, po.getBatchNum())
+				.ne(LotteryResultPO::getState, "5"));
+
+		if (CollectionUtils.isEmpty(lotteryResultPOList)){
+//			lotteryBatchService.archive(po.getBatchId());
+		}
+		return null;
+	}
+
+
 }

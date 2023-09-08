@@ -22,11 +22,14 @@ public class LotteryResultPO
 
     /** 摇号批次id */
     private Long batchId;
+
+    /** 期号 */
+    private Date batchNum;
     
     /** 轮数 */
     private Long roundId;
 
-    /** 状态（0：待摇号；1：待确认；2：确认中；3：待发布；4：待归档） */
+    /** 状态（0：待摇号；1：待确认；2：确认中；3：待发布；4：待归档 ；5：已归档） */
     private String state;
 
     /** 创建时间 */

@@ -1,11 +1,14 @@
 package com.cf.parking.api.request;
 
+import lombok.Data;
+
 import java.util.Date;
 
 /**
  * @author
  * @date 2023/9/6
  */
+@Data
 public class LotteryBlackListOptReq {
 
     /** id */

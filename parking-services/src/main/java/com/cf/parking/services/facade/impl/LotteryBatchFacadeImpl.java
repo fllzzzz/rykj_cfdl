@@ -7,16 +7,20 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cf.parking.dao.mapper.LotteryBatchMapper;
 import com.cf.parking.dao.po.LotteryBatchPO;
+import com.cf.parking.dao.po.LotteryResultDetailPO;
 import com.cf.parking.dao.po.UserVerifyPO;
 import com.cf.parking.facade.bo.LotteryBatchBO;
+import com.cf.parking.facade.bo.LotteryResultDetailBO;
 import com.cf.parking.facade.dto.LotteryBatchDTO;
 import com.cf.parking.facade.dto.LotteryBatchOptDTO;
 import com.cf.parking.facade.facade.LotteryBatchFacade;
+import com.cf.parking.services.service.LotteryResultService;
 import com.cf.parking.services.utils.PageUtils;
 import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,11 +38,14 @@ import javax.annotation.Resource;
 @Service
 public class LotteryBatchFacadeImpl implements LotteryBatchFacade
 {
-    @Autowired
+    @Resource
     private LotteryBatchMapper mapper;
 
     @Resource
     private LotteryRuleRoundFacadeImpl lotteryRuleRoundFacade;
+
+    @Resource
+    private LotteryResultService lotteryResultService;
 
     /**
      * 查询摇号批次列表
@@ -141,74 +148,16 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
     }
 
     /**
-     * 查询摇号批次
-     * 
-     * @param id 摇号批次主键
-     * @return 摇号批次
+     * 已结束的摇号批次进行结果查看
+     * @param dto
+     * @return
      */
-//    @Override
-//    public LotteryBatch selectLotteryBatchById(Long id)
-//    {
-//        return lotteryBatchMapper.selectLotteryBatchById(id);
-//    }
+    @Override
+    public PageResponse<LotteryResultDetailBO> viewResult(LotteryBatchDTO dto) {
+        Page<LotteryResultDetailPO> page = PageUtils.toPage(dto);
 
-    /**
-     * 查询摇号批次列表
-     * 
-     * @param lotteryBatch 摇号批次
-     * @return 摇号批次
-     */
-//    @Override
-//    public List<LotteryBatch> selectLotteryBatchList(LotteryBatch lotteryBatch)
-//    {
-//        return lotteryBatchMapper.selectLotteryBatchList(lotteryBatch);
-//    }
+        List<LotteryResultDetailBO> boList = lotteryResultService.viewResult(page,dto.getId(),dto.getRoundId());
+        return PageUtils.toResponseList(page,boList);
+    }
 
-    /**
-     * 新增摇号批次
-     * 
-     * @param lotteryBatch 摇号批次
-     * @return 结果
-     */
-//    @Override
-//    public int insertLotteryBatch(LotteryBatch lotteryBatch)
-//    {
-//        return lotteryBatchMapper.insertLotteryBatch(lotteryBatch);
-//    }
-
-    /**
-     * 修改摇号批次
-     * 
-     * @param lotteryBatch 摇号批次
-     * @return 结果
-     */
-//    @Override
-//    public int updateLotteryBatch(LotteryBatch lotteryBatch)
-//    {
-//        return lotteryBatchMapper.updateLotteryBatch(lotteryBatch);
-//    }
-
-    /**
-     * 批量删除摇号批次
-     * 
-     * @param ids 需要删除的摇号批次主键
-     * @return 结果
-     */
-//    @Override
-//    public int deleteLotteryBatchByIds(Long[] ids)
-//    {
-//        return lotteryBatchMapper.deleteLotteryBatchByIds(ids);
-//    }
-
-    /**
-     * 删除摇号批次信息
-     * 
-     * @param id 摇号批次主键
-     * @return 结果
-     */
-//    @Override
-//    public int deleteLotteryBatchById(Long id)
-//    {
-//        return lotteryBatchMapper.deleteLotteryBatchById(id);
-//    }
 }

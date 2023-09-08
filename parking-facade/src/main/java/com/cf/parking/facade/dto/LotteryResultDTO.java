@@ -1,5 +1,6 @@
 package com.cf.parking.facade.dto;
 
+import com.cf.support.result.PageRequest;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -14,7 +15,7 @@ import java.util.Date;
  */
 @Data
 @Accessors(chain = true)
-public class LotteryResultDTO {
+public class LotteryResultDTO extends PageRequest {
     /** id */
     private Long id;
 
@@ -26,7 +27,7 @@ public class LotteryResultDTO {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date endDate;
 
-    /** 状态（0：待摇号；1：待确认；2：确认中；3：待发布；4：待归档） */
+    /** 状态（0：待摇号；1：待确认；2：确认中；3：待发布；4：待归档；5：已归档） */
     private String state;
 
     /** 摇号规则 */

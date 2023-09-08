@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cf.parking.dao.mapper.DepartmentMapper">
+
+    <resultMap id="departmentMap" type="com.cf.parking.dao.po.DepartmentPO">
+            <result column="create_tm" property="createTm"/>
+            <result column="department_name" property="departmentName"/>
+            <result column="dept_code" property="deptCode"/>
+            <result column="full_path" property="fullPath"/>
+            <result column="state" property="state"/>
+    </resultMap>
+</mapper>
+

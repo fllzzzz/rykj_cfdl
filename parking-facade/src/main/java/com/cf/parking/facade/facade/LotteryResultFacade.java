@@ -1,6 +1,9 @@
 package com.cf.parking.facade.facade;
 
 
+import com.cf.parking.facade.bo.LotteryResultBO;
+import com.cf.parking.facade.dto.LotteryResultDTO;
+import com.cf.support.result.PageResponse;
 
 /**
  * 摇号结果Service接口
@@ -17,4 +20,18 @@ public interface LotteryResultFacade
 	 */
 	void lottery(Long id);
 
+	/**
+	 * 查询摇号结果列表
+	 * @param dto
+	 * @return
+	 */
+    PageResponse<LotteryResultBO> getLotteryResultList(LotteryResultDTO dto);
+
+	/**
+	 * 结果归档
+	 *
+	 * @param id
+	 * @return
+	 */
+	Integer archive(Long id);
 }

@@ -32,10 +32,13 @@ public class LotteryApplyRecordPO
     /** 车位有效截止日期 */
     private Date validEndDate;
 
-    /** 用户 */
+    /** 申请人id */
     private Long userId;
 
-    /** 工号 */
+    /** 申请人姓名*/
+    private String userName;
+
+    /** 申请人工号 */
     private String jobNumber;
 
     /** 申请状态(0：取消申请；1：申请) */

@@ -32,7 +32,7 @@ public class LotteryResultReq {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date endDate;
 
-    /** 状态（0：待摇号；1：待确认；2：确认中；3：待发布；4：待归档） */
+    /** 状态（0：待摇号；1：待确认；2：确认中；3：待发布；4：待归档；5：已归档） */
     @ApiModelProperty(value = "状态")
     private String state;
 
