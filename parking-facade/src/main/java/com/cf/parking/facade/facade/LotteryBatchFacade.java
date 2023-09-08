@@ -2,6 +2,7 @@ package com.cf.parking.facade.facade;
 
 import com.cf.parking.facade.bo.LotteryBatchBO;
 import com.cf.parking.facade.dto.LotteryBatchDTO;
+import com.cf.parking.facade.dto.LotteryBatchOptDTO;
 import com.cf.support.result.PageResponse;
 
 import java.util.List;
@@ -29,4 +30,25 @@ public interface LotteryBatchFacade
      * @return
      */
     LotteryBatchBO getInfo(LotteryBatchDTO dto);
+
+    /**
+     * 新增摇号批次
+     * @param dto
+     * @return
+     */
+    Integer add(LotteryBatchOptDTO dto);
+
+    /**
+     * 修改摇号批次
+     * @param dto
+     * @return
+     */
+    Integer update(LotteryBatchOptDTO dto);
+
+    /**
+     * 删除摇号批次
+     * @param id
+     * @return
+     */
+    Integer deleteById(Long id);
 }

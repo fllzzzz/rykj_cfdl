@@ -23,17 +23,25 @@ public class LotteryResultDetailPageRsp {
     @ApiModelProperty(value = "摇号结果表id")
     private Long resultId;
 
-    /** 停车场 */
-    @ApiModelProperty(value = "停车场")
-    private Long parkingLotName;
+    /** 停车场名称 */
+    @ApiModelProperty(value = "停车场名称")
+    private String parkingLotName;
+
+    /** 停车场编号 */
+    @ApiModelProperty(value = "停车场编号")
+    private String parkingLotCode;
 
     /** 用户 */
     @ApiModelProperty(value = "用户id")
     private Long userId;
 
-    /** 车牌号 */
-    @ApiModelProperty(value = "车牌号")
-    private String plateNo;
+    /** 用户姓名 */
+    @ApiModelProperty(value = "用户姓名")
+    private String userName;
+
+    /** 用户工号 */
+    @ApiModelProperty(value = "用户工号")
+    private String userJobNumber;
 
     /** 状态（0：未同步；1：同步成功；2：同步失败） */
     @ApiModelProperty(value = "状态")
