@@ -11,16 +11,14 @@ import com.cf.parking.facade.dto.UserVerifyOptDTO;
 import com.cf.parking.facade.facade.UserVerifyFacade;
 import com.cf.parking.services.utils.PageUtils;
 import com.cf.support.result.PageResponse;
-import com.cf.support.result.Result;
 import com.cf.support.utils.BeanConvertorUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
+import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
 
@@ -33,7 +31,7 @@ import java.util.List;
 @Service
 public class UserVerifyFacadeImpl implements UserVerifyFacade {
 
-    @Autowired
+    @Resource
     private UserVerifyMapper mapper;
 
     /**
@@ -100,14 +98,12 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
      */
     @Override
     public Integer audit(UserVerifyOptDTO dto) {
-
         UserVerifyPO userVerifyPO = mapper.selectById(dto.getId());
         try{
             LambdaUpdateWrapper<UserVerifyPO> updateWrapper = new LambdaUpdateWrapper<UserVerifyPO>()
                     .eq(UserVerifyPO::getId, dto.getId())
                     .set(UserVerifyPO::getState, dto.getState())
                     .set(UserVerifyPO::getReason, dto.getReason());
-
             int result = mapper.update(userVerifyPO,updateWrapper);
             log.info("车辆审核成功，审核结果：{}，审核意见：{}，审核对象：{}", dto.getState(),dto.getReason(),userVerifyPO);
             return result;
@@ -127,12 +123,4 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
         mapper.batchAudit(dto.getIds(),dto.getState(),dto.getReason());
     }
 
-    private Integer audit(Long id,String state,String reason) {
-        UserVerifyPO userVerifyPO = mapper.selectById(id);
-        LambdaUpdateWrapper<UserVerifyPO> updateWrapper = new LambdaUpdateWrapper<UserVerifyPO>()
-                .eq(UserVerifyPO::getId, id)
-                .set(UserVerifyPO::getState, state)
-                .set(UserVerifyPO::getReason, reason);
-        return mapper.update(userVerifyPO,updateWrapper);
-    }
 }

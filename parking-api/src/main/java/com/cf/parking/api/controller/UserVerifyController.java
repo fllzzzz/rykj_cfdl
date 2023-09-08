@@ -1,18 +1,13 @@
 package com.cf.parking.api.controller;
 
-import com.cf.parking.api.request.LotteryRuleRoundOptReq;
-import com.cf.parking.api.request.LotteryRuleRoundReq;
 import com.cf.parking.api.request.UserVerifyOptReq;
 import com.cf.parking.api.request.UserVerifyReq;
-import com.cf.parking.api.response.LotteryApplyRecordPageRsp;
-import com.cf.parking.api.response.LotteryRuleRoundRsp;
 import com.cf.parking.api.response.UserVerifyRsp;
-import com.cf.parking.facade.bo.LotteryApplyRecordBO;
 import com.cf.parking.facade.bo.UserVerifyBO;
-import com.cf.parking.facade.dto.LotteryApplyRecordDTO;
 import com.cf.parking.facade.dto.UserVerifyDTO;
 import com.cf.parking.facade.dto.UserVerifyOptDTO;
 import com.cf.parking.facade.facade.UserVerifyFacade;
+import com.cf.support.authertication.AdminUserAuthentication;
 import com.cf.support.result.PageResponse;
 import com.cf.support.result.Result;
 import com.cf.support.utils.BeanConvertorUtils;
@@ -37,6 +32,7 @@ import java.util.List;
 @Api(tags = "车辆审核模块——摇号系统")
 @Slf4j
 @RestController
+@AdminUserAuthentication
 @RequestMapping("/user/verify")
 public class UserVerifyController {
 
@@ -68,6 +64,7 @@ public class UserVerifyController {
     {
         UserVerifyDTO dto = new UserVerifyDTO();
         BeanUtils.copyProperties(param,dto);
+
         UserVerifyBO bo = userVerifyFacade.getUserVerify(dto);
         UserVerifyRsp userVerifyRsp = new UserVerifyRsp();
         BeanUtils.copyProperties(param,userVerifyRsp);
@@ -114,6 +111,7 @@ public class UserVerifyController {
 
         UserVerifyOptDTO dto = new UserVerifyOptDTO();
         BeanUtils.copyProperties(param,dto);
+
         userVerifyFacade.batchAudit(dto);
         return Result.buildSuccessResult("审核完成！") ;
     }
