@@ -189,5 +189,10 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 		return null;
 	}
 
+	@Override
+	public void confirm(Long id) {
+		
+	}
+
 
 }

@@ -34,4 +34,10 @@ public interface LotteryResultFacade
 	 * @return
 	 */
 	Integer archive(Long id);
+
+	/**
+	 * 摇号结果确认
+	 * @param id
+	 */
+	void confirm(Long id);
 }

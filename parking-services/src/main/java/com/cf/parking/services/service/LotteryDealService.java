@@ -77,7 +77,6 @@ public class LotteryDealService {
 		lotteryResultDetailService.saveBatch(result);
 		lottery.setUpdateTm(new Date()).setState(LotteryResultStateEnum.UNCONFIRM.getState());
 		lotteryResultService.updateById(lottery);
-		//userSpaceService.initLotteryResult();
 	}
 
 	/**
@@ -91,7 +90,7 @@ public class LotteryDealService {
 		LotteryResultDetailPO detail = new LotteryResultDetailPO();
 		detail.setCreateTm(new Date()).setId(idWorker.nextId()).setParkingLotCode(parkLotCode)
 		.setResultId(resultId).setUpdateTm(new Date()).setUserId(apply.getUserId())
-		.setUserName(null);
+		.setUserName(apply.getUserName()).setUserJobNumber(apply.getJobNumber());
 		return detail;
 	}
 	
