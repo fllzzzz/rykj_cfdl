@@ -7,10 +7,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cf.parking.dao.mapper.LotteryResultMapper;
 import com.cf.parking.dao.po.LotteryApplyRecordPO;
 import com.cf.parking.dao.po.LotteryBatchPO;
+import com.cf.parking.dao.po.LotteryResultDetailPO;
 import com.cf.parking.dao.po.LotteryResultPO;
 import com.cf.parking.dao.po.LotteryRuleRoundPO;
 import com.cf.parking.dao.po.ParkingLotPO;
 import com.cf.parking.facade.bo.LotteryResultBO;
+import com.cf.parking.facade.bo.LotteryResultDetailBO;
 import com.cf.parking.facade.dto.LotteryResultDTO;
 import com.cf.parking.facade.facade.LotteryResultFacade;
 import com.cf.parking.services.enums.EnableStateEnum;
@@ -20,6 +22,7 @@ import com.cf.parking.services.service.LotteryApplyRecordService;
 import com.cf.parking.services.service.LotteryBatchService;
 import com.cf.parking.services.service.LotteryBlackListService;
 import com.cf.parking.services.service.LotteryDealService;
+import com.cf.parking.services.service.LotteryResultDetailService;
 import com.cf.parking.services.service.LotteryRuleAssignService;
 import com.cf.parking.services.service.LotteryRuleRoundService;
 import com.cf.parking.services.service.ParkingLotService;
@@ -77,6 +80,9 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
     
     @Resource
     private LotteryBlackListService lotteryBlackListService;
+    
+    @Resource
+    private LotteryResultDetailService lotteryResultDetailService;
     
     
     @Resource
@@ -192,6 +198,12 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 	@Override
 	public void confirm(Long id) {
 		
+	}
+
+	@Override
+	public PageResponse<LotteryResultDetailBO> lotteryResult(LotteryResultDTO dto) {
+        Page<LotteryResultDetailPO> page = PageUtils.toPage(dto);
+        return lotteryResultDetailService.selectDetailListByResultId(page, dto.getId());
 	}
 
 

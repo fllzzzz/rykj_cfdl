@@ -43,10 +43,10 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
     public PageResponse<UserVerifyBO> getUserVerifyList(UserVerifyDTO dto) {
         Page<UserVerifyPO> page = PageUtils.toPage(dto);
 
-        //TODO:这里日期格式如何处理
+
         LambdaQueryWrapper<UserVerifyPO> queryWrapper = new LambdaQueryWrapper<UserVerifyPO>()
-                .eq(StringUtils.isNoneBlank(dto.getState()), UserVerifyPO::getState, dto.getState())
-                .like(StringUtils.isNoneBlank(dto.getUserName()), UserVerifyPO::getUserName, dto.getUserName())
+                .eq(!ObjectUtils.isEmpty(dto.getState()), UserVerifyPO::getState, dto.getState())
+                .like(StringUtils.isNotBlank(dto.getUserName()), UserVerifyPO::getUserName, dto.getUserName())
                 .le( !ObjectUtils.isEmpty(dto.getEndDate()) , UserVerifyPO::getCreateTm, dto.getEndDate())
                 .ge(!ObjectUtils.isEmpty(dto.getStartDate()), UserVerifyPO::getCreateTm, dto.getStartDate())
                 .orderByDesc(UserVerifyPO::getCreateTm);

@@ -1,16 +1,17 @@
 package com.cf.parking.services.service;
 
-
-import org.springframework.stereotype.Service;
-
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cf.parking.dao.mapper.LotteryResultMapper;
-import com.cf.parking.dao.po.LotteryResultPO;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cf.parking.dao.po.LotteryResultDetailPO;
+import com.cf.parking.dao.po.LotteryResultPO;
+import com.cf.parking.facade.bo.LotteryResultBO;
 import com.cf.parking.facade.bo.LotteryResultDetailBO;
+import com.cf.support.result.PageResponse;
+import org.springframework.stereotype.Service;
+
 import javax.annotation.Resource;
 import java.util.List;
 
@@ -35,7 +36,7 @@ public class LotteryResultService extends ServiceImpl<LotteryResultMapper, Lotte
      * @param roundId
      * @return
      */
-    public List<LotteryResultDetailBO> viewResult(Page<LotteryResultDetailPO> page, Long batchId, Long roundId) {
+    public PageResponse<LotteryResultDetailBO> viewResult(Page<LotteryResultDetailPO> page, Long batchId, Long roundId) {
         //1.根据摇号批次的id和轮数查询结果id
         LotteryResultPO po = mapper.selectOne(new LambdaQueryWrapper<LotteryResultPO>()
                 .eq(LotteryResultPO::getBatchId, batchId)
@@ -46,7 +47,7 @@ public class LotteryResultService extends ServiceImpl<LotteryResultMapper, Lotte
         }
 
         //2.根据结果id查询对应的结果详情
-        List<LotteryResultDetailBO> boList = lotteryResultDetailService.selectDetailListByResultId(page,po.getId());
-        return boList;
+        PageResponse<LotteryResultDetailBO> result =  lotteryResultDetailService.selectDetailListByResultId(page,po.getId());
+        return result;
     }
 }

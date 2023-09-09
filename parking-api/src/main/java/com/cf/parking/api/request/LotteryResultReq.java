@@ -1,5 +1,6 @@
 package com.cf.parking.api.request;
 
+import com.cf.support.result.PageRequest;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -16,7 +17,7 @@ import java.util.Date;
 @Data
 @Accessors(chain = true)
 @ApiModel(description = "摇号结果查询对象")
-public class LotteryResultReq {
+public class LotteryResultReq extends PageRequest {
 
     /** id */
     @ApiModelProperty(value = "摇号、确认、发布、归档时需要使用此id")
