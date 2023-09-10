@@ -14,6 +14,7 @@
         <result column="update_tm" property="updateTm"/>
         <result column="user_space_id" property="userSpaceId"/>
         <result column="state" property="state"/>
+        <result column="schedule_date" property="scheduleDate"/>
     </resultMap>
 
     <delete id="deleteAll">

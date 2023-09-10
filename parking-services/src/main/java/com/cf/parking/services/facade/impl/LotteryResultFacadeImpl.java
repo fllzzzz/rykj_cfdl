@@ -11,11 +11,13 @@ import com.cf.parking.dao.po.LotteryResultDetailPO;
 import com.cf.parking.dao.po.LotteryResultPO;
 import com.cf.parking.dao.po.LotteryRuleRoundPO;
 import com.cf.parking.dao.po.ParkingLotPO;
+import com.cf.parking.dao.po.UserSpacePO;
 import com.cf.parking.facade.bo.LotteryResultBO;
 import com.cf.parking.facade.bo.LotteryResultDetailBO;
 import com.cf.parking.facade.dto.LotteryResultDTO;
 import com.cf.parking.facade.facade.LotteryResultFacade;
 import com.cf.parking.services.enums.EnableStateEnum;
+import com.cf.parking.services.enums.LotteryResultStateEnum;
 import com.cf.parking.services.service.DepartmentService;
 import com.cf.parking.services.service.EmployeeService;
 import com.cf.parking.services.service.LotteryApplyRecordService;
@@ -26,6 +28,7 @@ import com.cf.parking.services.service.LotteryResultDetailService;
 import com.cf.parking.services.service.LotteryRuleAssignService;
 import com.cf.parking.services.service.LotteryRuleRoundService;
 import com.cf.parking.services.service.ParkingLotService;
+import com.cf.parking.services.service.UserSpaceService;
 import com.cf.parking.services.utils.AssertUtil;
 import com.cf.support.exception.BusinessException;
 import com.cf.parking.services.utils.PageUtils;
@@ -87,6 +90,11 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
     
     @Resource
     private DepartmentService departmentService;
+    
+    @Resource
+    private UserSpaceService userSpaceService;
+    
+    
     
     
     @Transactional(rollbackFor = Exception.class)
@@ -195,9 +203,29 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 		return null;
 	}
 
+	/**
+	 * 摇号结果确认
+	 */
+	@Transactional(rollbackFor = Exception.class)
 	@Override
 	public void confirm(Long id) {
-		
+		LotteryResultPO lottery = lotteryResultMapper.selectById(id);
+		AssertUtil.checkNull(lottery, "数据不存在");
+		AssertUtil.checkTrue(LotteryResultStateEnum.UNCONFIRM.getState().equals(lottery.getState()),"状态已变更，请刷新重试");
+		LotteryBatchPO batch = lotteryBatchService.getById(lottery.getBatchId());
+		AssertUtil.checkNull(batch, "批次数据不存在");
+		int num = lotteryResultMapper.updateByState(id,LotteryResultStateEnum.UNCONFIRM.getState(),LotteryResultStateEnum.CONFIRM_IN_PROCESS.getState());
+		if (num < 1) {
+			throw new BusinessException("状态已变更，请刷新重试");
+		}
+		//查询中签明细列表数据
+		List<LotteryResultDetailPO> detailList = lotteryResultDetailService.queryDetailListByResultId(id);
+		AssertUtil.checkTrue(!CollectionUtils.isEmpty(detailList), "无摇号中签数据");
+		List<String> jobNumList = detailList.stream().map(item -> item.getUserJobNumber()).collect(Collectors.toList());
+		//根据本期人员的工号获取其中仍有车位的人员
+		List<UserSpacePO> spaceList = userSpaceService.querySpaceListByJobNum(jobNumList);
+		userSpaceService.initLotteryDetailIntoSpace(batch,detailList,spaceList);
+	
 	}
 
 	@Override
@@ -207,4 +235,5 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 	}
 
 
+	
 }

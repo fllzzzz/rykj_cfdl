@@ -40,5 +40,21 @@ public interface RedisConstant {
     // 过车记录锁
     String PARKING_JOB_CROSS_RECORDS_LOCK_KEY = "parking:job:crossRecords:lock";
     String PARKING_JOB_NOT_PARK_LOCK_KEY = "parking:job:notPark:lock";
+    
+    /**
+     * 过期车位
+     */
+    String PARKING_EXPIRED_LOCK_KEY = "parking:expired:lock";
+    
+    
+    /**
+     * 车位生效当天进行闸机录入
+     */
+    String PARKING_DOWN_LOCK_KEY = "parking:down:lock";
+    
+    
+    String PARKING_SYNC_LOCK_KEY = "parking:sync:lock";
+    
+    
 }
 

@@ -1,5 +1,7 @@
 package com.cf.parking.dao.mapper;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.cf.parking.dao.po.LotteryResultPO;
 
@@ -11,5 +13,13 @@ import com.cf.parking.dao.po.LotteryResultPO;
  */
 public interface LotteryResultMapper extends BaseMapper<LotteryResultPO>
 {
+
+	/**带状态更新
+	 * @param id
+	 * @param state
+	 * @param state2
+	 * @return
+	 */
+	int updateByState(@Param("id") Long id, @Param("oldState") String oldState, @Param("newState") String newState);
 
 }
