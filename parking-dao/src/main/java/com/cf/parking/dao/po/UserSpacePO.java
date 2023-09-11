@@ -71,4 +71,13 @@ public class UserSpacePO {
     /** 定时器执行时间 */
     private String scheduleDate;
 
+    /**
+     * 期号
+     */
+    private Date batchNum;
+
+    /**
+     * 摇号轮数id
+     */
+    private Long roundId;
 }

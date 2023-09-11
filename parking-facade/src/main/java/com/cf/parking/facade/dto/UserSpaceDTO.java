@@ -1,9 +1,12 @@
 package com.cf.parking.facade.dto;
 
+import com.cf.support.result.PageRequest;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -13,7 +16,7 @@ import java.util.List;
  */
 @Data
 @Accessors(chain = true)
-public class UserSpaceDTO implements Serializable {
+public class UserSpaceDTO extends PageRequest implements Serializable {
 
 
     /**
@@ -35,4 +38,10 @@ public class UserSpaceDTO implements Serializable {
 
     /** 状态（0：未同步；1：同步成功；2：同步失败） */
     private String state;
+
+    /** 期号 */
+    private Date batchNum;
+
+    /** 摇号轮数id */
+    private Long roundId;
 }

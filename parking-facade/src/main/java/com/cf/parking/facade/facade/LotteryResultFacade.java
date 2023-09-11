@@ -3,7 +3,9 @@ package com.cf.parking.facade.facade;
 
 import com.cf.parking.facade.bo.LotteryResultBO;
 import com.cf.parking.facade.bo.LotteryResultDetailBO;
+import com.cf.parking.facade.bo.UserSpaceBO;
 import com.cf.parking.facade.dto.LotteryResultDTO;
+import com.cf.parking.facade.dto.UserSpaceDTO;
 import com.cf.support.result.PageResponse;
 
 /**
@@ -48,4 +50,11 @@ public interface LotteryResultFacade
 	 * @return
 	 */
 	PageResponse<LotteryResultDetailBO> lotteryResult(LotteryResultDTO dto);
+
+	/**
+	 * 确认结果查询（用户车位表中的记录）
+	 * @param dto
+	 * @return
+	 */
+    PageResponse<UserSpaceBO> confirmResult(UserSpaceDTO dto);
 }

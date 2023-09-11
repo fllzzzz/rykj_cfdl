@@ -15,6 +15,8 @@
         <result column="user_space_id" property="userSpaceId"/>
         <result column="state" property="state"/>
         <result column="schedule_date" property="scheduleDate"/>
+        <result column="batch_num" property="batchNum"/>
+        <result column="round_id" property="roundId"/>
     </resultMap>
 
     <delete id="deleteAll">

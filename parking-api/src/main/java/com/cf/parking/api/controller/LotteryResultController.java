@@ -2,14 +2,21 @@ package com.cf.parking.api.controller;
 
 import javax.annotation.Resource;
 
+import com.cf.parking.api.request.LotteryResultDetailReq;
 import com.cf.parking.api.request.LotteryResultReq;
+import com.cf.parking.api.request.UserSpacePageReq;
 import com.cf.parking.api.response.LotteryResultDetailPageRsp;
 import com.cf.parking.api.response.LotteryResultPageRsp;
+import com.cf.parking.api.response.UserSpaceRsp;
 import com.cf.parking.facade.bo.LotteryResultBO;
 import com.cf.parking.facade.bo.LotteryResultDetailBO;
+import com.cf.parking.facade.bo.UserSpaceBO;
 import com.cf.parking.facade.dto.LotteryResultDTO;
+import com.cf.parking.facade.dto.LotteryResultDetailDTO;
+import com.cf.parking.facade.dto.UserSpaceDTO;
 import com.cf.parking.facade.facade.LotteryResultFacade;
 import com.cf.parking.services.utils.AssertUtil;
+import com.cf.parking.services.utils.PageUtils;
 import com.cf.support.authertication.AdminUserAuthentication;
 import com.cf.support.result.PageResponse;
 import com.cf.support.result.Result;
@@ -116,22 +123,24 @@ public class LotteryResultController
 
         PageResponse<LotteryResultDetailBO> result = lotteryResultFacade.lotteryResult(dto);
         List<LotteryResultDetailPageRsp> detailPageRsps = BeanConvertorUtils.copyList(result.getList(), LotteryResultDetailPageRsp.class);
-        return Result.buildSuccessResult(new PageResponse(detailPageRsps,result.getPageNo(),result.getTotal(),result.getPageSize()));
+        return PageUtils.pageResult(result,detailPageRsps);
     }
 
 
     /**
-     * 确认结果查询
-     * 确认结果是用户车位表中的记录
+     * 确认结果查询（用户车位表中的记录）
      */
     @ApiOperation(value = "确认结果查询", notes = "确认结果查询")
     @PostMapping("/confirmResult")
-    public Result confirmResult(@RequestBody LotteryResultReq param)
+    public Result<List<UserSpaceRsp>> confirmResult(@RequestBody UserSpacePageReq param)
     {
-        AssertUtil.checkNull(param.getId(),"请选择要归档的摇号结果！");
+        AssertUtil.checkNull(param.getBatchNum(),"确认结果的期号不能为空！");
+        AssertUtil.checkNull(param.getBatchNum(),"确认结果的轮数不能为空！");
+        UserSpaceDTO dto = new UserSpaceDTO();
+        BeanUtils.copyProperties(param,dto);
 
-        //TODO：查询用户车位表中的记录
-        Integer result = 1;
-        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult();
+        PageResponse<UserSpaceBO> result = lotteryResultFacade.confirmResult(dto);
+        List<UserSpaceRsp> userSpaceRsps = BeanConvertorUtils.copyList(result.getList(), UserSpaceRsp.class);
+        return PageUtils.pageResult(result,userSpaceRsps);
     }
 }

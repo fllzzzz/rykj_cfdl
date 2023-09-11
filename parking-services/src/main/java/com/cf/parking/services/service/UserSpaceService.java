@@ -2,6 +2,8 @@ package com.cf.parking.services.service;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import com.cf.parking.facade.bo.UserSpaceBO;
+import com.cf.parking.services.utils.PageUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import com.alibaba.fastjson.JSON;
@@ -357,6 +359,21 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 		
 		//TODO 调闸机接口
 	}
-	
+
+	/**
+	 * 根据批次与轮数查询对应的列表
+	 * @param dto
+	 * @return
+	 */
+	public PageResponse<UserSpaceBO> pageSelectListByBatchAndRound(UserSpaceDTO dto) {
+		Page<UserSpacePO> page = PageUtils.toPage(dto);
+		Page<UserSpacePO> poPage = userSpaceMapper.selectPage(page, new LambdaQueryWrapper<UserSpacePO>()
+				.eq(UserSpacePO::getBatchNum, dto.getBatchNum())
+				.eq(UserSpacePO::getRoundId, dto.getRoundId())
+				.eq(StringUtils.isNotBlank(dto.getState()), UserSpacePO::getState, dto.getState()));
+
+		List<UserSpaceBO> userSpaceBOS = BeanConvertorUtils.copyList(poPage.getRecords(), UserSpaceBO.class);
+		return PageUtils.toResponseList(page,userSpaceBOS);
+	}
 }
 
