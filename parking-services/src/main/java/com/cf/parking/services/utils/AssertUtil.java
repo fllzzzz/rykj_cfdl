@@ -11,6 +11,11 @@ public class AssertUtil {
 		}
 	}
 
+	/**
+	 * flag != true时抛出异常
+	 * @param flag
+	 * @param message
+	 */
 	public static void checkTrue(Boolean flag, String message) {
 		if(flag == null || !flag) {
 			throw new BusinessException(message);

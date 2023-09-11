@@ -5,17 +5,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cf.parking.dao.mapper.LotteryResultDetailMapper;
-import com.cf.parking.dao.mapper.LotteryResultMapper;
-import com.cf.parking.dao.po.LotteryBatchPO;
 import com.cf.parking.dao.po.LotteryResultDetailPO;
-import com.cf.parking.dao.po.LotteryResultPO;
 import com.cf.parking.facade.bo.LotteryResultDetailBO;
 import com.cf.parking.services.utils.PageUtils;
 import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
-import org.apache.poi.ss.formula.functions.T;
 import org.springframework.stereotype.Service;
-
 import javax.annotation.Resource;
 import java.util.List;
 
@@ -44,4 +39,15 @@ public class LotteryResultDetailService extends ServiceImpl<LotteryResultDetailM
         List<LotteryResultDetailBO> boList = BeanConvertorUtils.copyList(poPage.getRecords(), LotteryResultDetailBO.class);
         return PageUtils.toResponseList(page,boList);
     }
+
+	/**
+	 * 根据摇号id查询摇号结果列表
+	 * @param resultId
+	 * @return
+	 */
+	public List<LotteryResultDetailPO> queryDetailListByResultId(Long resultId) {
+		return mapper.selectList(new LambdaQueryWrapper<LotteryResultDetailPO>()
+					.eq(LotteryResultDetailPO::getResultId, resultId)
+				);
+	}
 }

@@ -3,13 +3,10 @@ package com.cf.parking.api.controller;
 import javax.annotation.Resource;
 
 import com.cf.parking.api.request.LotteryResultReq;
-import com.cf.parking.api.response.LotteryBatchRsp;
 import com.cf.parking.api.response.LotteryResultDetailPageRsp;
 import com.cf.parking.api.response.LotteryResultPageRsp;
-import com.cf.parking.facade.bo.LotteryBatchBO;
 import com.cf.parking.facade.bo.LotteryResultBO;
 import com.cf.parking.facade.bo.LotteryResultDetailBO;
-import com.cf.parking.facade.dto.LotteryBatchDTO;
 import com.cf.parking.facade.dto.LotteryResultDTO;
 import com.cf.parking.facade.facade.LotteryResultFacade;
 import com.cf.parking.services.utils.AssertUtil;
@@ -66,6 +63,7 @@ public class LotteryResultController
     @PostMapping("/start")
     public Result start(@RequestBody LotteryResultReq param)
     {
+    	AssertUtil.checkNull(param.getId(), "id不能为空");
     	lotteryResultFacade.lottery(param.getId());
         return Result.buildSuccessResult();
     }
@@ -77,6 +75,7 @@ public class LotteryResultController
     @PostMapping("/confirm")
     public Result confirm(@RequestBody LotteryResultReq param)
     {
+    	lotteryResultFacade.confirm(param.getId());
         return Result.buildSuccessResult();
     }
 

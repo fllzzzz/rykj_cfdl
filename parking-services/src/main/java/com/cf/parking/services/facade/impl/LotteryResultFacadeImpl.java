@@ -5,13 +5,30 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cf.parking.dao.mapper.LotteryResultMapper;
-import com.cf.parking.dao.po.*;
+import com.cf.parking.dao.po.LotteryApplyRecordPO;
+import com.cf.parking.dao.po.LotteryBatchPO;
+import com.cf.parking.dao.po.LotteryResultDetailPO;
+import com.cf.parking.dao.po.LotteryResultPO;
+import com.cf.parking.dao.po.LotteryRuleRoundPO;
+import com.cf.parking.dao.po.ParkingLotPO;
+import com.cf.parking.dao.po.UserSpacePO;
 import com.cf.parking.facade.bo.LotteryResultBO;
 import com.cf.parking.facade.bo.LotteryResultDetailBO;
 import com.cf.parking.facade.dto.LotteryResultDTO;
 import com.cf.parking.facade.facade.LotteryResultFacade;
 import com.cf.parking.services.enums.EnableStateEnum;
-import com.cf.parking.services.service.*;
+import com.cf.parking.services.enums.LotteryResultStateEnum;
+import com.cf.parking.services.service.DepartmentService;
+import com.cf.parking.services.service.EmployeeService;
+import com.cf.parking.services.service.LotteryApplyRecordService;
+import com.cf.parking.services.service.LotteryBatchService;
+import com.cf.parking.services.service.LotteryBlackListService;
+import com.cf.parking.services.service.LotteryDealService;
+import com.cf.parking.services.service.LotteryResultDetailService;
+import com.cf.parking.services.service.LotteryRuleAssignService;
+import com.cf.parking.services.service.LotteryRuleRoundService;
+import com.cf.parking.services.service.ParkingLotService;
+import com.cf.parking.services.service.UserSpaceService;
 import com.cf.parking.services.utils.AssertUtil;
 import com.cf.support.exception.BusinessException;
 import com.cf.parking.services.utils.PageUtils;
@@ -74,7 +91,12 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
     @Resource
     private DepartmentService departmentService;
     
-    
+    @Resource
+    private UserSpaceService userSpaceService;
+
+
+
+
     @Transactional(rollbackFor = Exception.class)
 	@Override
 	public void lottery(Long id) {
@@ -168,7 +190,7 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 		//1.更新状态为已归档
 		LotteryResultPO po = lotteryResultMapper.selectById(id);
 		po.setState("5");
-		int result = lotteryResultMapper.updateById(po);
+		lotteryResultMapper.updateById(po);
 
 		//2.查看相同期号下是否还有其他未归档的记录。如果没有，将该期摇号批次表状态变为已结束
 		List<LotteryResultPO> lotteryResultPOList = lotteryResultMapper.selectList(new LambdaQueryWrapper<LotteryResultPO>()
@@ -176,16 +198,41 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 				.ne(LotteryResultPO::getState, "5"));
 
 		if (CollectionUtils.isEmpty(lotteryResultPOList)){
-			result = lotteryBatchService.archive(po.getBatchId());
+//			lotteryBatchService.archive(po.getBatchId());
 		}
-		return result;
+		return null;
 	}
 
 	/**
-	 * 摇号结果分页查询
-	 * @param dto
-	 * @return
+	 * 摇号结果确认
 	 */
+	@Transactional(rollbackFor = Exception.class)
+	@Override
+	public void confirm(Long id) {
+		LotteryResultPO lottery = lotteryResultMapper.selectById(id);
+		AssertUtil.checkNull(lottery, "数据不存在");
+		AssertUtil.checkTrue(LotteryResultStateEnum.UNCONFIRM.getState().equals(lottery.getState()),"状态已变更，请刷新重试");
+		LotteryBatchPO batch = lotteryBatchService.getById(lottery.getBatchId());
+		AssertUtil.checkNull(batch, "批次数据不存在");
+		int num = lotteryResultMapper.updateByState(id,LotteryResultStateEnum.UNCONFIRM.getState(),LotteryResultStateEnum.CONFIRM_IN_PROCESS.getState());
+		if (num < 1) {
+			throw new BusinessException("状态已变更，请刷新重试");
+		}
+		//查询中签明细列表数据
+		List<LotteryResultDetailPO> detailList = lotteryResultDetailService.queryDetailListByResultId(id);
+		AssertUtil.checkTrue(!CollectionUtils.isEmpty(detailList), "无摇号中签数据");
+		List<String> jobNumList = detailList.stream().map(item -> item.getUserJobNumber()).collect(Collectors.toList());
+		//根据本期人员的工号获取其中仍有车位的人员
+		List<UserSpacePO> spaceList = userSpaceService.querySpaceListByJobNum(jobNumList);
+		userSpaceService.initLotteryDetailIntoSpace(batch,detailList,spaceList);
+
+	}
+
+    /**
+     * 摇号结果分页查询
+     * @param dto
+     * @return
+     */
 	@Override
 	public PageResponse<LotteryResultDetailBO> lotteryResult(LotteryResultDTO dto) {
 		Page<LotteryResultDetailPO> page = PageUtils.toPage(dto);
