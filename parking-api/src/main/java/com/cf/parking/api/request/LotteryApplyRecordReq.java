@@ -36,4 +36,8 @@ public class LotteryApplyRecordReq extends PageRequest {
     @ApiModelProperty(value = "结束期号")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date endDate;
+
+    /** userId */
+    @ApiModelProperty(value = "当前登录用户的userId")
+    private Long userId;
 }

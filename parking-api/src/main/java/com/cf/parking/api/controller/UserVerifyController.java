@@ -7,6 +7,7 @@ import com.cf.parking.facade.bo.UserVerifyBO;
 import com.cf.parking.facade.dto.UserVerifyDTO;
 import com.cf.parking.facade.dto.UserVerifyOptDTO;
 import com.cf.parking.facade.facade.UserVerifyFacade;
+import com.cf.parking.services.utils.AssertUtil;
 import com.cf.support.authertication.AdminUserAuthentication;
 import com.cf.support.result.PageResponse;
 import com.cf.support.result.Result;
@@ -105,14 +106,12 @@ public class UserVerifyController {
     public Result batchAudit(@RequestBody UserVerifyOptReq param)
     {
         List<Long> ids = param.getIds();
-        if (CollectionUtils.isEmpty(ids)){
-            return Result.buildErrorResult("请选择要审核的记录！");
-        }
+        AssertUtil.checkNull(ids,"请选择要审核的记录！");
 
         UserVerifyOptDTO dto = new UserVerifyOptDTO();
         BeanUtils.copyProperties(param,dto);
 
         userVerifyFacade.batchAudit(dto);
-        return Result.buildSuccessResult("审核完成！") ;
+        return Result.buildSuccessResult() ;
     }
 }

@@ -1,5 +1,6 @@
 package com.cf.parking.facade.dto;
 
+import com.cf.support.result.PageRequest;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -12,7 +13,7 @@ import java.util.Date;
  */
 @Data
 @Accessors(chain = true)
-public class LotteryRuleRoundDTO {
+public class LotteryRuleRoundDTO extends PageRequest {
     /** id */
     private Long id;
 

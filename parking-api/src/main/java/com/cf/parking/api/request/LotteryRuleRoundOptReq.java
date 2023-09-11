@@ -1,5 +1,6 @@
 package com.cf.parking.api.request;
 
+import com.cf.support.result.PageRequest;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -15,7 +16,7 @@ import java.util.Date;
 @Data
 @Accessors(chain = true)
 @ApiModel(description = "摇号规则-轮数操作对象（新增/修改）")
-public class LotteryRuleRoundOptReq {
+public class LotteryRuleRoundOptReq extends PageRequest {
 
     /** id */
     private Long id;

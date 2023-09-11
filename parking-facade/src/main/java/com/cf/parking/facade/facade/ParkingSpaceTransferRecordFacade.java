@@ -1,5 +1,9 @@
 package com.cf.parking.facade.facade;
 
+import com.cf.parking.facade.bo.ParkingSpaceTransferRecordBO;
+import com.cf.parking.facade.dto.ParkingSpaceTransferRecordDTO;
+import com.cf.support.result.PageResponse;
+
 import java.util.List;
 
 /**
@@ -11,4 +15,10 @@ import java.util.List;
 public interface ParkingSpaceTransferRecordFacade
 {
 
+    /**
+     * 查询车位转赠记录列表
+     * @param dto
+     * @return
+     */
+    PageResponse<ParkingSpaceTransferRecordBO> getParkingSpaceTransferRecordList(ParkingSpaceTransferRecordDTO dto);
 }

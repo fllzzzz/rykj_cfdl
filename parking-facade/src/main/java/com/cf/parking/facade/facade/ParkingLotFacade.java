@@ -1,5 +1,10 @@
 package com.cf.parking.facade.facade;
 
+import com.cf.parking.facade.bo.ParkingLotBO;
+import com.cf.parking.facade.dto.ParkingLotDTO;
+import com.cf.parking.facade.dto.ParkingLotOptDTO;
+import com.cf.support.result.PageResponse;
+
 import java.util.List;
 
 
@@ -12,4 +17,31 @@ import java.util.List;
 public interface ParkingLotFacade
 {
 
+    /**
+     * 查询停车场列表
+     * @param dto
+     * @return
+     */
+    PageResponse<ParkingLotBO> getParkingLotList(ParkingLotDTO dto);
+
+    /**
+     * 新增停车场
+     * @param dto
+     * @return
+     */
+    Integer add(ParkingLotOptDTO dto);
+
+    /**
+     * 修改停车场
+     * @param dto
+     * @return
+     */
+    Integer update(ParkingLotOptDTO dto);
+
+    /**
+     * 删除停车场
+     * @param id
+     * @return
+     */
+    Integer deleteById(Long id);
 }

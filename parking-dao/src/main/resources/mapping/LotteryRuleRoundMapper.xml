@@ -17,5 +17,7 @@
         select id, name, parking_lot_code, state, remark, create_tm, update_tm from lottery_rule_round
     </sql>
 
-
+    <select id="selectBaseList" resultMap="LotteryRuleRoundResult">
+        select id,name from lottery_rule_round
+    </select>
 </mapper>

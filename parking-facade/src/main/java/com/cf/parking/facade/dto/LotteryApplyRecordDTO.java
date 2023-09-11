@@ -28,4 +28,7 @@ public class LotteryApplyRecordDTO extends PageRequest {
     /** 期号结束事件 */
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date endDate;
+
+    /** userId */
+    private Long userId;
 }

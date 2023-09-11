@@ -16,6 +16,7 @@ import com.cf.support.authertication.token.dto.UserSessionDTO;
 import com.cf.support.result.PageResponse;
 import com.cf.support.result.Result;
 import com.cf.support.utils.BeanConvertorUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,10 +53,11 @@ public class LotteryApplyRecordFacadeImpl implements LotteryApplyRecordFacade
         Page<LotteryApplyRecordPO> page = PageUtils.toPage(dto);
 
         LambdaQueryWrapper<LotteryApplyRecordPO> queryWrapper = new LambdaQueryWrapper<LotteryApplyRecordPO>()
-                .eq(StringUtils.isNotEmpty(dto.getResult()), LotteryApplyRecordPO::getResult, dto.getResult())
+                .eq(ObjectUtils.isNotEmpty(dto.getUserId()), LotteryApplyRecordPO::getUserId, dto.getUserId())
+                .eq(StringUtils.isNotBlank(dto.getResult()), LotteryApplyRecordPO::getResult, dto.getResult())
                 .eq(LotteryApplyRecordPO::getUserId, getUser().getUserId())
-                .le(null != dto.getEndDate(), LotteryApplyRecordPO::getBatchNum, dto.getEndDate())
-                .ge(null != dto.getStartDate(), LotteryApplyRecordPO::getBatchNum, dto.getStartDate())
+                .le(ObjectUtils.isNotEmpty(dto.getEndDate()), LotteryApplyRecordPO::getBatchNum, dto.getEndDate())
+                .ge(ObjectUtils.isNotEmpty(dto.getStartDate()), LotteryApplyRecordPO::getBatchNum, dto.getStartDate())
                 .orderByDesc(LotteryApplyRecordPO::getUpdateTm);
 
         Page<LotteryApplyRecordPO> lotteryApplyRecordPOPage = mapper.selectPage(page, queryWrapper);
