@@ -4,17 +4,26 @@ import javax.annotation.Resource;
 
 import com.cf.parking.api.request.LotteryRuleAssignOptReq;
 import com.cf.parking.api.request.LotteryRuleAssignReq;
+import com.cf.parking.api.response.LotteryBlackListRsp;
 import com.cf.parking.api.response.LotteryRuleAssignRsp;
+import com.cf.parking.facade.bo.LotteryBlackListBO;
+import com.cf.parking.facade.bo.LotteryRuleAssignBO;
+import com.cf.parking.facade.dto.LotteryBlackListDTO;
+import com.cf.parking.facade.dto.LotteryRuleAssignDTO;
 import com.cf.parking.facade.facade.LotteryRuleAssignFacade;
 import com.cf.support.result.PageResponse;
 import com.cf.support.result.Result;
+import com.cf.support.utils.BeanConvertorUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * 摇号规则-停车场分配Controller
@@ -38,7 +47,12 @@ public class LotteryRuleAssignController
     @PostMapping("/list")
     public Result<PageResponse<LotteryRuleAssignRsp>> list(@RequestBody LotteryRuleAssignReq param)
     {
-        return null;
+        LotteryRuleAssignDTO dto = new LotteryRuleAssignDTO();
+        BeanUtils.copyProperties(param,dto);
+
+        PageResponse<LotteryRuleAssignBO> result = lotteryRuleAssignFacade.getLotteryRuleAssignList(dto);
+        List<LotteryRuleAssignRsp> lotteryRuleAssignRsps = BeanConvertorUtils.copyList(result.getList(), LotteryRuleAssignRsp.class);
+        return Result.buildSuccessResult(new PageResponse(lotteryRuleAssignRsps,result.getPageNo(),result.getTotal(),result.getPageSize()));
     }
 
 

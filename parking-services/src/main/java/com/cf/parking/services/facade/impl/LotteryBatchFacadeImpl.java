@@ -31,7 +31,7 @@ import javax.annotation.Resource;
 /**
  * 摇号批次Service业务层处理
  * 
- * @author ruoyi
+ * @author
  * @date 2023-09-05
  */
 @Slf4j

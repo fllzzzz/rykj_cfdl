@@ -1,5 +1,6 @@
 package com.cf.parking.facade.dto;
 
+import com.cf.support.result.PageRequest;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -13,13 +14,13 @@ import java.util.Date;
  */
 @Data
 @Accessors(chain = true)
-public class LotteryRuleAssignDTO {
+public class LotteryRuleAssignDTO extends PageRequest {
 
     /** id */
     private Long id;
 
-    /** 部门编码/人员工号 */
-    private String code;
+    /** 分配类型（1：按部门分配；2：按人员分配） */
+    private String type;
 
     /** 名称（部门或者人员名称） */
     private String name;

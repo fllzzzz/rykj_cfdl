@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 /**
  * 摇号黑名单Service业务层处理
  * 
- * @author ruoyi
+ * @author
  * @date 2023-09-05
  */
 @Slf4j

@@ -32,7 +32,7 @@ import org.springframework.util.ObjectUtils;
 /**
  * 摇号结果Service业务层处理
  * 
- * @author ruoyi
+ * @author
  * @date 2023-09-05
  */
 @Service

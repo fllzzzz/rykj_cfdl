@@ -26,7 +26,7 @@ import javax.annotation.Resource;
 /**
  * 摇号申请记录Service业务层处理
  * 
- * @author ruoyi
+ * @author
  * @date 2023-09-05
  */
 @Service
