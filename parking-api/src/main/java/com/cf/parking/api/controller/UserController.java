@@ -1,6 +1,7 @@
 package com.cf.parking.api.controller;
 
 
+import com.alibaba.fastjson.JSON;
 import com.cf.parking.api.annotation.PreventRepeat;
 import com.cf.parking.api.request.*;
 import com.cf.parking.api.response.*;
@@ -74,8 +75,8 @@ public class UserController {
     @ApiOperation(value = "jsapi鉴权", notes = "jsapi鉴权")
     @PostMapping("/jsapi/authentication")
     public Result<AuthenticationResp> authentication() {
-
-        return Result.buildSuccessResult(BeanConvertorUtils.map(userFacade.getAuthenticationInfo(), AuthenticationResp.class));
+    	log.info("jsapi授权参数");
+    	return Result.buildSuccessResult(BeanConvertorUtils.map(userFacade.getAuthenticationInfo(), AuthenticationResp.class));
     }
 
 
@@ -87,6 +88,7 @@ public class UserController {
      */
     @PostMapping("/loginByCode")
     public Result<UserLoginResp> loginByCode(@RequestBody LoginByCodeReq param) {
+    	log.info("code登陆：{}",JSON.toJSONString(param));
         Result<UserLoginBO> facadeResult = userFacade.loginByCode(param.getCode());
         if (!facadeResult.isSuccess()) {
             return BeanConvertorUtils.map(facadeResult, Result.class);
