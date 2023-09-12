@@ -409,6 +409,7 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 		boolean flag = parkInvokeService.replaceCarInfo(dto);
 		if (flag) {
 			
+			userSpaceMapper.updateById(space);
 		}
 	}
 
