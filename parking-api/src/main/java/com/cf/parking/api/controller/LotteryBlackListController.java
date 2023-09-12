@@ -88,7 +88,7 @@ public class LotteryBlackListController
         BeanUtils.copyProperties(param,dto);
 
         Integer result = lotteryBlackListFacade.update(dto);
-        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult();
+        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult("修改失败，请重试");
     }
 
     /**

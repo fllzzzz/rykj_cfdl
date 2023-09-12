@@ -41,4 +41,10 @@ public class ParkingLotOptReq {
 
     /** 更新时间 */
     private Date updateTm;
+
+    /** 备注 */
+    @ApiModelProperty(value = "备注")
+    private String remark;
+
+
 }

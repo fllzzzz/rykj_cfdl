@@ -38,4 +38,7 @@ public class ParkingLotPO
     /** 更新时间 */
     private Date updateTm;
 
+    /** 备注 */
+    private String remark;
+
 }

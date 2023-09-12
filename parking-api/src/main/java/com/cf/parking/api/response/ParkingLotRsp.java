@@ -1,5 +1,6 @@
 package com.cf.parking.api.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -36,8 +37,13 @@ public class ParkingLotRsp {
     private String type;
 
     /** 创建时间 */
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date createTm;
 
     /** 更新时间 */
     private Date updateTm;
+
+    /** 备注 */
+    @ApiModelProperty(value = "备注")
+    private String remark;
 }
