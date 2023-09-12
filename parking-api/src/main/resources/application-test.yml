@@ -74,3 +74,9 @@ gateway:
 log:
   topic: test-log
   address: 47.98.128.233:9092,47.97.22.216:9092,47.98.158.231:9092
+  
+#闸机系统
+parking:
+  host: http://127.0.0.1:8080
+  addCarmanagementUrl: /service/cfdl__ConvenientAccess/0.0.1/addCarmanagement
+  queryyardUrl: /service/cfdl__ConvenientAccess/0.0.1/queryyard
