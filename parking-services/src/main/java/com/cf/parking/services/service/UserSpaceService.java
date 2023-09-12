@@ -19,16 +19,19 @@ import com.cf.parking.dao.po.LotteryResultDetailPO;
 import com.cf.parking.dao.po.LotteryResultPO;
 import com.cf.parking.dao.po.UserSpacePO;
 import com.cf.parking.dao.po.UserVerifyPO;
+import com.cf.parking.facade.dto.Carmanagement;
 import com.cf.parking.facade.dto.UserSpaceDTO;
 import com.cf.parking.facade.dto.UserSpaceFuncTimeDTO;
 import com.cf.parking.facade.dto.UserSpacePageDTO;
 import com.cf.parking.facade.dto.UserSpaceValidityDTO;
 import com.cf.parking.services.enums.UserSpaceStateEnum;
+import com.cf.parking.services.integration.ParkInvokeService;
 import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.*;
@@ -51,6 +54,10 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
     @Resource
     private UserSpaceMapper userSpaceMapper;
 
+    @Resource
+    private ParkInvokeService parkInvokeService;
+    
+    
     /**
      * 获取请求数据，返回数据总大小
      *
@@ -397,7 +404,12 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 			return ;
 		}
 		
-		//TODO 调闸机接口
+		UserSpaceDTO dto = new UserSpaceDTO();
+		BeanUtils.copyProperties(space, dto);;
+		boolean flag = parkInvokeService.replaceCarInfo(dto);
+		if (flag) {
+			
+		}
 	}
 
 
