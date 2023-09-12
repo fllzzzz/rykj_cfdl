@@ -26,6 +26,7 @@ create table parking_lot(
   region_code varchar(32)           default ''         comment '区域编号',
   amount        int(0)              default 0          comment '车位数量',
   type          char(1)             default 0         comment '类型(0：不可摇号，1：可摇号)',
+  remark      varchar(128)          default ''         comment '备注',
   create_tm     timestamp(3)                          comment '创建时间',
   update_tm     timestamp(3)                          comment '更新时间',
   primary key (id) USING BTREE,
@@ -159,4 +160,4 @@ alter table user_space add schedule_date varchar(10) default '' comment '定时�
 alter table user_space add column batch_num date comment '期号',add column round_id bigint default 0 comment '摇号轮数id';
 alter table user_space  add column batch_id BIGINT comment '批次ID';
 
-alter table user_profile  add column parking_lot_code varchar(64) default '' comment '停车场区域';
+alter table user_profile  add column parking_lot_region varchar(64) default '' comment '停车场区域';

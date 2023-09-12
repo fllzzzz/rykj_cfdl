@@ -124,5 +124,5 @@ public class UserProfilePO {
      * 停车场区域
      * 2023/09/12
      */
-    private String parkingLotCode;
+    private String parkingLotRegion;
 }

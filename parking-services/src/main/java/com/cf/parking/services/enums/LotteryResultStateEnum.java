@@ -9,7 +9,7 @@ package com.cf.parking.services.enums;
  */
 public enum LotteryResultStateEnum {
 
-	UNLOTTERY("0","带摇号"),
+	UNLOTTERY("0","待摇号"),
 	UNCONFIRM("1","待确认"),
 	CONFIRM_IN_PROCESS("2","确认中"),
 	UNPUBLIC("3","待发布"),

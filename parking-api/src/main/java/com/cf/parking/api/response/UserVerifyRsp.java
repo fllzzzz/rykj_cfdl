@@ -79,6 +79,7 @@ public class UserVerifyRsp {
     /**
      * 更新时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date updateTm;
 
 }

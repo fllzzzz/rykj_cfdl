@@ -20,7 +20,7 @@
 		<result column="drive_evaluate_num" jdbcType="INTEGER" property="driveEvaluateNum"/>
 		<result column="ride_total_mark" jdbcType="INTEGER" property="rideTotalMark"/>
 		<result column="drive_total_mark" jdbcType="INTEGER" property="driveTotalMark"/>
-		<result column="parking_lot_code" jdbcType="VARCHAR" property="parkingLotCode"/>
+		<result column="parking_lot_region" jdbcType="VARCHAR" property="parkingLotRegion"/>
 	</resultMap>
 	<sql id="Base_Column_List">
     user_id, mobile, name, job_number, avatar, drive_time, ride_time, drive_mark, ride_mark, 
