@@ -16,6 +16,7 @@ import com.cf.parking.facade.dto.LotteryRuleRoundDTO;
 import com.cf.parking.facade.dto.LotteryRuleRoundOptDTO;
 import com.cf.parking.facade.facade.LotteryRuleRoundFacade;
 import com.cf.parking.services.utils.PageUtils;
+import com.cf.support.bean.IdWorker;
 import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
 
 /**
  * 摇号规则-轮数Service业务层处理
@@ -37,6 +40,9 @@ public class LotteryRuleRoundFacadeImpl implements LotteryRuleRoundFacade
 {
     @Autowired
     private LotteryRuleRoundMapper mapper;
+
+    @Resource
+    private IdWorker idWorker;
 
     /** 根据摇号轮数id转换成对应的轮数名称并进行拼接*/
     public String getNameByRoundId(String roundId){
@@ -101,6 +107,7 @@ public class LotteryRuleRoundFacadeImpl implements LotteryRuleRoundFacade
     public Integer add(LotteryRuleRoundOptDTO dto) {
         LotteryRuleRoundPO po = new LotteryRuleRoundPO();
         BeanUtils.copyProperties(dto,po);
+        po.setId(idWorker.nextId());
         po.setCreateTm(new Date());
         po.setUpdateTm(new Date());
         try{

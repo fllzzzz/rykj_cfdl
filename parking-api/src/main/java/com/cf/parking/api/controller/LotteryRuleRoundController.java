@@ -92,7 +92,7 @@ public class LotteryRuleRoundController
 
         //3.新增处理
         Integer result = lotteryRuleRoundFacade.add(dto);
-        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult();
+        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult("新增失败，请重试！");
     }
 
     /**
@@ -111,7 +111,7 @@ public class LotteryRuleRoundController
 
         //3.修改处理
         Integer result = lotteryRuleRoundFacade.update(dto);
-        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult();
+        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult("修改失败，请重试！");
     }
 
     private void paramVerify(@RequestBody LotteryRuleRoundOptReq param) {
@@ -129,6 +129,6 @@ public class LotteryRuleRoundController
     {
         AssertUtil.checkNull(param.getId(),"请选择要删除的轮数记录！");
         Integer result = lotteryRuleRoundFacade.deleteById(param.getId());
-        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult();
+        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult("删除失败，请重试！");
     }
 }

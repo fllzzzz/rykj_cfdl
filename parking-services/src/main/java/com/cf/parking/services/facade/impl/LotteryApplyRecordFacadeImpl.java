@@ -13,6 +13,7 @@ import com.cf.parking.facade.facade.LotteryApplyRecordFacade;
 import com.cf.parking.services.utils.PageUtils;
 import com.cf.support.authertication.UserAuthenticationServer;
 import com.cf.support.authertication.token.dto.UserSessionDTO;
+import com.cf.support.bean.IdWorker;
 import com.cf.support.result.PageResponse;
 import com.cf.support.result.Result;
 import com.cf.support.utils.BeanConvertorUtils;
@@ -33,8 +34,11 @@ import javax.annotation.Resource;
 @Service
 public class LotteryApplyRecordFacadeImpl implements LotteryApplyRecordFacade
 {
-    @Autowired
+    @Resource
     private LotteryApplyRecordMapper mapper;
+
+    @Resource
+    private IdWorker idWorker;
 
     @Resource
     private UserAuthenticationServer userAuthenticationServer;
@@ -76,6 +80,7 @@ public class LotteryApplyRecordFacadeImpl implements LotteryApplyRecordFacade
      */
     public int insertLotteryApplyRecord(LotteryApplyRecordPO po)
     {
+        po.setId(idWorker.nextId());
         return mapper.insert(po);
     }
 

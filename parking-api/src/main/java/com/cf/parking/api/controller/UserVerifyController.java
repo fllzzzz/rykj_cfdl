@@ -16,7 +16,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -57,9 +56,9 @@ public class UserVerifyController {
 
 
     /**
-     * 获取摇车辆审核详细信息
+     * 获取车辆审核详细信息
      */
-    @ApiOperation(value = "获取摇车辆审核详细信息", notes = "点击审核，根据id查询")
+    @ApiOperation(value = "获取车辆审核详细信息", notes = "点击审核，根据id查询")
     @PostMapping("/info")
     public Result<UserVerifyRsp> getInfo(@RequestBody UserVerifyReq param)
     {
@@ -68,7 +67,7 @@ public class UserVerifyController {
 
         UserVerifyBO bo = userVerifyFacade.getUserVerify(dto);
         UserVerifyRsp userVerifyRsp = new UserVerifyRsp();
-        BeanUtils.copyProperties(param,userVerifyRsp);
+        BeanUtils.copyProperties(bo,userVerifyRsp);
         return Result.buildSuccessResult(userVerifyRsp);
     }
 
@@ -82,7 +81,7 @@ public class UserVerifyController {
         UserVerifyOptDTO dto = new UserVerifyOptDTO();
         BeanUtils.copyProperties(param,dto);
         Integer result = userVerifyFacade.add(dto);
-        return result > 0 ?  Result.buildSuccessResult("提交审核成功！") : Result.buildErrorResult("提交审核失败，请重试！");
+        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult("提交审核失败，请重试！");
     }
 
     /**
@@ -95,7 +94,7 @@ public class UserVerifyController {
         UserVerifyOptDTO dto = new UserVerifyOptDTO();
         BeanUtils.copyProperties(param,dto);
         Integer result = userVerifyFacade.audit(dto);
-        return result > 0 ?  Result.buildSuccessResult("审核成功！") : Result.buildErrorResult("审核失败，请重试！");
+        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult("审核失败，请重试！");
     }
 
     /**

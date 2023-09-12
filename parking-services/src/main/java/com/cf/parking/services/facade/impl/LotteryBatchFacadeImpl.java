@@ -16,6 +16,7 @@ import com.cf.parking.facade.dto.LotteryBatchOptDTO;
 import com.cf.parking.facade.facade.LotteryBatchFacade;
 import com.cf.parking.services.service.LotteryResultService;
 import com.cf.parking.services.utils.PageUtils;
+import com.cf.support.bean.IdWorker;
 import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +47,9 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
 
     @Resource
     private LotteryResultService lotteryResultService;
+
+    @Resource
+    private IdWorker idWorker;
 
     /**
      * 查询摇号批次列表
@@ -98,6 +102,7 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
     public Integer add(LotteryBatchOptDTO dto) {
         LotteryBatchPO po = new LotteryBatchPO();
         BeanUtils.copyProperties(dto,po);
+        po.setId(idWorker.nextId());
         po.setCreateTm(new Date());
         po.setUpdateTm(new Date());
         try{

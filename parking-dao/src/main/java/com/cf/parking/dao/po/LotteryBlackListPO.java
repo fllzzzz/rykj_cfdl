@@ -2,6 +2,8 @@ package com.cf.parking.dao.po;
 
 import java.util.Date;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -18,6 +20,7 @@ import lombok.experimental.Accessors;
 public class LotteryBlackListPO
 {
     /** id */
+    @TableId(value = "id", type =  IdType.INPUT )
     private Long id;
 
     /** userId */

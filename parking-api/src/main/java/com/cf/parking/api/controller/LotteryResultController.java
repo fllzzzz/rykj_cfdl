@@ -107,7 +107,7 @@ public class LotteryResultController
         AssertUtil.checkNull(param.getId(),"请选择要归档的摇号结果！");
 
         Integer result = lotteryResultFacade.archive(param.getId());
-        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult();
+        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult("归档失败，请重试！");
     }
 
     /**

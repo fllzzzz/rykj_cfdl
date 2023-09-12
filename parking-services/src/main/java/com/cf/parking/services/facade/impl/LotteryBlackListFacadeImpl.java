@@ -13,6 +13,7 @@ import com.cf.parking.facade.dto.LotteryBlackListDTO;
 import com.cf.parking.facade.dto.LotteryBlackListOptDTO;
 import com.cf.parking.facade.facade.LotteryBlackListFacade;
 import com.cf.parking.services.utils.PageUtils;
+import com.cf.support.bean.IdWorker;
 import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,8 @@ import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
 
 /**
  * 摇号黑名单Service业务层处理
@@ -34,6 +37,9 @@ public class LotteryBlackListFacadeImpl implements LotteryBlackListFacade
 {
     @Autowired
     private LotteryBlackListMapper mapper;
+
+    @Resource
+    private IdWorker idWorker;
 
     /**
      * 查询摇号黑名单列表
@@ -62,6 +68,7 @@ public class LotteryBlackListFacadeImpl implements LotteryBlackListFacade
     public Integer add(LotteryBlackListOptDTO dto) {
         LotteryBlackListPO po = new LotteryBlackListPO();
         BeanUtils.copyProperties(dto,po);
+        po.setId(idWorker.nextId());
         po.setCreateTm(new Date());
         po.setUpdateTm(new Date());
         try{

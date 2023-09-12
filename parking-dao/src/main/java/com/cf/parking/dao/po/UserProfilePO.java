@@ -119,4 +119,10 @@ public class UserProfilePO {
      * 更新时间
      */
     private Date updateTm;
+
+    /**
+     * 停车场区域
+     * 2023/09/12
+     */
+    private String parkingLotCode;
 }

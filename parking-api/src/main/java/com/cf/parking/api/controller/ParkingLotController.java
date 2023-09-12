@@ -75,7 +75,7 @@ public class ParkingLotController
 
         //3.新增处理
         Integer result = parkingLotFacade.add(dto);
-        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult();
+        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult("新增失败，请重试！");
     }
 
     /**
@@ -94,7 +94,7 @@ public class ParkingLotController
 
         //3.新增处理
         Integer result = parkingLotFacade.update(dto);
-        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult();
+        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult("修改失败，请重试！");
     }
 
     private void paramVerify(@RequestBody ParkingLotOptReq param) {
@@ -112,6 +112,6 @@ public class ParkingLotController
     {
         AssertUtil.checkNull(param.getId(), "请选择要删除的停车场记录！");
         Integer result = parkingLotFacade.deleteById(param.getId());
-        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult();
+        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult("删除失败，请重试！");
     }
 }

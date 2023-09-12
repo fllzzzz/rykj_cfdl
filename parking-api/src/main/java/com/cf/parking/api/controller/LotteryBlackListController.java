@@ -73,7 +73,7 @@ public class LotteryBlackListController
         BeanUtils.copyProperties(param,dto);
 
         Integer result = lotteryBlackListFacade.add(dto);
-        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult();
+        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult("添加失败，请重试！");
     }
 
     /**
@@ -88,7 +88,7 @@ public class LotteryBlackListController
         BeanUtils.copyProperties(param,dto);
 
         Integer result = lotteryBlackListFacade.update(dto);
-        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult("修改失败，请重试");
+        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult("修改失败，请重试！");
     }
 
     /**
@@ -100,6 +100,6 @@ public class LotteryBlackListController
     {
         AssertUtil.checkNull(param.getId(),"请选择要移出黑名单的记录！");
         Integer result = lotteryBlackListFacade.deleteById(param.getId());
-        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult();
+        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult("移出失败，请重试！");
     }
 }

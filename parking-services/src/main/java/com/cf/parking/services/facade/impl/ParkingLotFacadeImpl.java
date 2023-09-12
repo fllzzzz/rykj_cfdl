@@ -6,22 +6,22 @@ import java.util.List;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cf.parking.dao.mapper.ParkingLotMapper;
-import com.cf.parking.dao.po.LotteryRuleRoundPO;
 import com.cf.parking.dao.po.ParkingLotPO;
 import com.cf.parking.facade.bo.ParkingLotBO;
 import com.cf.parking.facade.dto.ParkingLotDTO;
 import com.cf.parking.facade.dto.ParkingLotOptDTO;
 import com.cf.parking.facade.facade.ParkingLotFacade;
 import com.cf.parking.services.utils.PageUtils;
+import com.cf.support.bean.IdWorker;
 import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
 
 /**
  * 停车场Service业务层处理
@@ -33,8 +33,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class ParkingLotFacadeImpl implements ParkingLotFacade
 {
-    @Autowired
+    @Resource
     private ParkingLotMapper mapper;
+
+    @Resource
+    private IdWorker idWorker;
 
     /**
      * 查询停车场列表
@@ -64,6 +67,7 @@ public class ParkingLotFacadeImpl implements ParkingLotFacade
     public Integer add(ParkingLotOptDTO dto) {
         ParkingLotPO po = new ParkingLotPO();
         BeanUtils.copyProperties(dto,po);
+        po.setId(idWorker.nextId());
         po.setCreateTm(new Date());
         po.setUpdateTm(new Date());
         try{

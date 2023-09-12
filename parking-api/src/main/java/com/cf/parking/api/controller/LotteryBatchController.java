@@ -85,7 +85,7 @@ public class LotteryBatchController
         BeanUtils.copyProperties(param,dto);
 
         Integer result = lotteryBatchFacade.add(dto);
-        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult();
+        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult("批次新增失败，请重试！");
     }
 
     /**
@@ -99,7 +99,7 @@ public class LotteryBatchController
         BeanUtils.copyProperties(param,dto);
 
         Integer result = lotteryBatchFacade.update(dto);
-        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult();
+        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult("批次修改失败，请重试！");
     }
 
     /**
@@ -112,7 +112,7 @@ public class LotteryBatchController
         AssertUtil.checkNull(param.getId(),"请选择要删除的批次！");
 
         Integer result = lotteryBatchFacade.deleteById(param.getId());
-        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult();
+        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult("批次删除失败，请重试！");
     }
 
     /**

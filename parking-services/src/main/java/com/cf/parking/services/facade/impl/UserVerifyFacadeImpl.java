@@ -10,6 +10,7 @@ import com.cf.parking.facade.dto.UserVerifyDTO;
 import com.cf.parking.facade.dto.UserVerifyOptDTO;
 import com.cf.parking.facade.facade.UserVerifyFacade;
 import com.cf.parking.services.utils.PageUtils;
+import com.cf.support.bean.IdWorker;
 import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +34,9 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
 
     @Resource
     private UserVerifyMapper mapper;
+
+    @Resource
+    private IdWorker idWorker;
 
     /**
      * 查询车辆审核列表
@@ -79,6 +83,7 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
     public Integer add(UserVerifyOptDTO dto) {
         UserVerifyPO userVerifyPO = new UserVerifyPO();
         BeanUtils.copyProperties(dto,userVerifyPO);
+        userVerifyPO.setId(idWorker.nextId());
         userVerifyPO.setCreateTm(new Date());
         userVerifyPO.setUpdateTm(new Date());
         try{

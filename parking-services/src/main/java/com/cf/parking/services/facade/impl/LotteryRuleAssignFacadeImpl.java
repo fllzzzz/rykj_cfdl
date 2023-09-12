@@ -13,6 +13,7 @@ import com.cf.parking.facade.dto.LotteryRuleAssignDTO;
 import com.cf.parking.facade.dto.LotteryRuleAssignOptDTO;
 import com.cf.parking.facade.facade.LotteryRuleAssignFacade;
 import com.cf.parking.services.utils.PageUtils;
+import com.cf.support.bean.IdWorker;
 import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
 
 /**
  * 摇号规则-停车场分配Service业务层处理
@@ -33,6 +36,9 @@ public class LotteryRuleAssignFacadeImpl implements LotteryRuleAssignFacade
 {
     @Autowired
     private LotteryRuleAssignMapper mapper;
+
+    @Resource
+    private IdWorker idWorker;
 
     /**
      * 查询摇号规则-停车场分配列表
@@ -65,6 +71,7 @@ public class LotteryRuleAssignFacadeImpl implements LotteryRuleAssignFacade
     public Integer add(LotteryRuleAssignOptDTO dto) {
         LotteryRuleAssignPO po = new LotteryRuleAssignPO();
         BeanUtils.copyProperties(dto,po);
+        po.setId(idWorker.nextId());
         po.setCreateTm(new Date());
         po.setUpdateTm(new Date());
         try{

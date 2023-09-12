@@ -75,7 +75,7 @@ public class LotteryRuleAssignController
 
         //3.新增处理
         Integer result = lotteryRuleAssignFacade.add(dto);
-        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult();
+        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult("新增失败，请重试！");
     }
 
     /**
@@ -93,7 +93,7 @@ public class LotteryRuleAssignController
 
         //3.新增处理
         Integer result = lotteryRuleAssignFacade.update(dto);
-        return result > 0 ? Result.buildSuccessResult() : Result.buildErrorResult();
+        return result > 0 ? Result.buildSuccessResult() : Result.buildErrorResult("修改失败，请重试！");
 
     }
 
@@ -112,6 +112,6 @@ public class LotteryRuleAssignController
     {
         AssertUtil.checkNull(param.getId(),"请选择要删除的分配记录！");
         Integer result = lotteryRuleAssignFacade.deleteById(param.getId());
-        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult();
+        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult("删除失败，请重试！");
     }
 }
