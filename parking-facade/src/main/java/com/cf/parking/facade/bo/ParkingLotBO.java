@@ -1,5 +1,6 @@
 package com.cf.parking.facade.bo;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.util.Date;
@@ -31,4 +32,7 @@ public class ParkingLotBO {
 
     /** 更新时间 */
     private Date updateTm;
+
+    /** 备注 */
+    private String remark;
 }

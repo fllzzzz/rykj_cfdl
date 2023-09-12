@@ -45,8 +45,8 @@ public class LotteryBlackListFacadeImpl implements LotteryBlackListFacade
         Page<LotteryBlackListPO> page = PageUtils.toPage(dto);
 
         Page<LotteryBlackListPO> poPage = mapper.selectPage(page, new LambdaQueryWrapper<LotteryBlackListPO>()
-                .eq(StringUtils.isNoneBlank(dto.getName()), LotteryBlackListPO::getName, dto.getName())
-                .eq(StringUtils.isNoneBlank(dto.getJobNumber()), LotteryBlackListPO::getJobNumber, dto.getJobNumber())
+                .like(StringUtils.isNoneBlank(dto.getName()), LotteryBlackListPO::getName, dto.getName())
+                .like(StringUtils.isNoneBlank(dto.getJobNumber()), LotteryBlackListPO::getJobNumber, dto.getJobNumber())
                 .orderByDesc(LotteryBlackListPO::getCreateTm));
 
         List<LotteryBlackListBO> boList = BeanConvertorUtils.copyList(poPage.getRecords(), LotteryBlackListBO.class);

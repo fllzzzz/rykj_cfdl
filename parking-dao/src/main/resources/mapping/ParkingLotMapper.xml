@@ -11,10 +11,11 @@
         <result property="type"    column="type"    />
         <result property="createTm"    column="create_tm"    />
         <result property="updateTm"    column="update_tm"    />
+        <result property="remark"    column="remark"    />
     </resultMap>
 
     <sql id="selectParkingLotVo">
-        select id, region, region_code, amount, type, create_tm, update_tm from parking_lot
+        select id, region, region_code, amount, type, create_tm, update_tm ,remark from parking_lot
     </sql>
 
 
