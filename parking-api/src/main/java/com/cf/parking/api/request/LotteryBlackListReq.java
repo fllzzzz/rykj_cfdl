@@ -1,11 +1,10 @@
 package com.cf.parking.api.request;
 
+import com.cf.support.result.PageRequest;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
-
-import java.util.Date;
 
 /**
  * 摇号黑名单
@@ -15,7 +14,7 @@ import java.util.Date;
 @Data
 @Accessors(chain = true)
 @ApiModel(description = "摇号黑名单查询对象（单个/批量）")
-public class LotteryBlackListReq {
+public class LotteryBlackListReq extends PageRequest {
 
     /** id */
     @ApiModelProperty(value = "id，单个查询或删除时使用此字段")
