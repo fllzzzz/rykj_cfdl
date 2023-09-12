@@ -12,6 +12,7 @@ import com.cf.parking.dao.po.LotteryResultPO;
 import com.cf.parking.dao.po.LotteryRuleRoundPO;
 import com.cf.parking.dao.po.ParkingLotPO;
 import com.cf.parking.dao.po.UserSpacePO;
+import com.cf.parking.dao.po.UserVerifyPO;
 import com.cf.parking.facade.bo.LotteryResultBO;
 import com.cf.parking.facade.bo.LotteryResultDetailBO;
 import com.cf.parking.facade.dto.LotteryResultDTO;
@@ -29,6 +30,7 @@ import com.cf.parking.services.service.LotteryRuleAssignService;
 import com.cf.parking.services.service.LotteryRuleRoundService;
 import com.cf.parking.services.service.ParkingLotService;
 import com.cf.parking.services.service.UserSpaceService;
+import com.cf.parking.services.service.UserVerifyService;
 import com.cf.parking.services.utils.AssertUtil;
 import com.cf.support.exception.BusinessException;
 import com.cf.parking.services.utils.PageUtils;
@@ -94,7 +96,8 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
     @Resource
     private UserSpaceService userSpaceService;
     
-    
+    @Resource
+    private UserVerifyService userVerifyService;
     
     
     @Transactional(rollbackFor = Exception.class)
@@ -224,7 +227,12 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 		List<String> jobNumList = detailList.stream().map(item -> item.getUserJobNumber()).collect(Collectors.toList());
 		//根据本期人员的工号获取其中仍有车位的人员
 		List<UserSpacePO> spaceList = userSpaceService.querySpaceListByJobNum(jobNumList);
-		userSpaceService.initLotteryDetailIntoSpace(batch,detailList,spaceList);
+		jobNumList.clear();
+		//查询车牌信息;
+		List<Long> userIdList = detailList.stream().map(item -> item.getUserId()).collect(Collectors.toList());
+		List<UserVerifyPO> verifyList = userVerifyService.queryVerifyListByUserIdList(userIdList);
+		userIdList.clear();
+		userSpaceService.initLotteryDetailIntoSpace(batch,detailList,spaceList,verifyList);
 	
 	}
 

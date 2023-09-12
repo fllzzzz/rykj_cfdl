@@ -1,7 +1,5 @@
 package com.cf.parking.facade.facade;
 
-import java.util.List;
-
 /**
  * 车位转赠记录Service接口
  * 
@@ -10,5 +8,12 @@ import java.util.List;
  */
 public interface ParkingSpaceTransferRecordFacade
 {
+
+	/**
+	 * 车位转让
+	 * @param openId 转让人
+	 * @param jobNum 受让人
+	 */
+	void transfer(String outJobNum, String inJobNum);
 
 }
