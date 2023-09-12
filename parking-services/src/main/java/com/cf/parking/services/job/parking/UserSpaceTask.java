@@ -35,8 +35,7 @@ public class UserSpaceTask {
 	public void dealExpiredSpace() {
 		
 		try {
-			Date date = DateUtil.beginOfDay(new Date());
-			String time = DateUtil.format(date, "yyyy-MM-dd HH:mm:ss");
+			String time = DateUtil.format(new Date(), "yyyy-MM-dd");
 			log.info("删除过期车定时任务：{}",time);
 			userSpaceService.deleteExpiredSpace(time);
 		} catch (Exception e) {
@@ -53,8 +52,7 @@ public class UserSpaceTask {
 	public void parkingDown() {
 		
 		try {
-			Date date = DateUtil.endOfDay(new Date());
-			String time = DateUtil.format(date, "yyyy-MM-dd");
+			String time = DateUtil.format(new Date(), "yyyy-MM-dd");
 			log.info("按照表里的定时器时间进行下发闸机：{}",time);
 			userSpaceService.parkingDownOnStartTtime(time);
 		} catch (Exception e) {
