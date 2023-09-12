@@ -1,15 +1,12 @@
 package com.cf.parking.api.controller;
 
 import javax.annotation.Resource;
-
 import com.cf.parking.api.request.ParkingSpaceTransferRecordReq;
-import com.cf.parking.api.response.LotteryApplyRecordPageRsp;
 import com.cf.parking.api.response.ParkingSpaceTransferRecordRsp;
-import com.cf.parking.facade.bo.LotteryApplyRecordBO;
 import com.cf.parking.facade.bo.ParkingSpaceTransferRecordBO;
-import com.cf.parking.facade.dto.LotteryApplyRecordDTO;
 import com.cf.parking.facade.dto.ParkingSpaceTransferRecordDTO;
 import com.cf.parking.facade.facade.ParkingSpaceTransferRecordFacade;
+import com.cf.support.authertication.UserAuthentication;
 import com.cf.parking.services.utils.PageUtils;
 import com.cf.support.authertication.UserAuthenticationServer;
 import com.cf.support.authertication.token.dto.UserSessionDTO;
@@ -33,6 +30,7 @@ import java.util.List;
  * @author
  * @date 2023-09-05
  */
+@UserAuthentication
 @Api(tags = "车位转赠记录管理模块——摇号系统")
 @Slf4j
 @RestController
@@ -41,13 +39,14 @@ public class ParkingSpaceTransferRecordController
 {
     @Resource
     private ParkingSpaceTransferRecordFacade parkingSpaceTransferRecordFacade;
-
+    
     @Resource
     private UserAuthenticationServer userAuthenticationServer;
 
     private UserSessionDTO getUser() {
         return userAuthenticationServer.getCurrentUser();
     }
+    
     /**
      * 查询车位转赠记录列表
      */
@@ -67,6 +66,15 @@ public class ParkingSpaceTransferRecordController
         PageResponse<ParkingSpaceTransferRecordBO> result = parkingSpaceTransferRecordFacade.getParkingSpaceTransferRecordList(dto);
         List<ParkingSpaceTransferRecordRsp> transferRecordRsps = BeanConvertorUtils.copyList(result.getList(), ParkingSpaceTransferRecordRsp.class);
         return PageUtils.pageResult(result,transferRecordRsps);
+    }
+    
+    
+    @ApiOperation(value = "车位转赠", notes = "车位转赠")
+    @PostMapping("/transfer")
+    public Result transfer(@RequestBody String jobNum){
+    	String openId = getUser().getOpenId();
+    	parkingSpaceTransferRecordFacade.transfer(openId,jobNum);
+    	return Result.buildSuccessResult();
     }
 
 }

@@ -22,5 +22,11 @@
     <delete id="deleteAll">
         TRUNCATE TABLE user_space; <!-- 或者使用 DELETE FROM my_table -->
     </delete>
+    
+    <select id="querySpaceGroupByExpireDate" resultMap="userSpaceMap">
+    	select job_number,parking_lot ,start_date,end_date from user_space where job_number = #{jobNum} GROUP BY parking_lot ,start_date,end_date
+    
+    </select>
+    
 </mapper>
 
