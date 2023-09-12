@@ -16,6 +16,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cf.parking.dao.mapper.UserSpaceMapper;
 import com.cf.parking.dao.po.LotteryBatchPO;
 import com.cf.parking.dao.po.LotteryResultDetailPO;
+import com.cf.parking.dao.po.LotteryResultPO;
 import com.cf.parking.dao.po.UserSpacePO;
 import com.cf.parking.dao.po.UserVerifyPO;
 import com.cf.parking.facade.dto.UserSpaceDTO;
@@ -216,12 +217,13 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 
 	/**
 	 * 把中签结果和已有车位结合起来生产新车位信息数据
+	 * @param lottery 
 	 * @param batch
 	 * @param detailList
 	 * @param spaceList
 	 * @param verifyList 
 	 */
-	public void initLotteryDetailIntoSpace(LotteryBatchPO batch, List<LotteryResultDetailPO> detailList,
+	public void initLotteryDetailIntoSpace(LotteryResultPO lottery, LotteryBatchPO batch, List<LotteryResultDetailPO> detailList,
 			List<UserSpacePO> spaceList, List<UserVerifyPO> verifyList) {
 		log.info("结果确认：batch={},detailList ={},spaceList = {}",JSON.toJSONString(batch),JSON.toJSONString(detailList),JSON.toJSONString(spaceList));
 		//已存在需要更新的
@@ -253,14 +255,16 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 		List<String> plateNoList = new ArrayList<>();
 		for(LotteryResultDetailPO detail : detailList) {
 			
+			//获取人员所拥有的车牌
 			plateNoList = verifyMap.get(detail.getUserId());
 			if (CollectionUtils.isEmpty(plateNoList)) {
 				continue;
 			}
 			for (String plateNo : plateNoList) {
 				if (userSpaceMap.containsKey(detail.getUserJobNumber())) { //说明当前有车位
+					//获取人员车位信息
 					parkMap = userSpaceMap.get(detail.getUserJobNumber());
-					UserSpacePO space = initUserSpace(batch,detail,parkMap.get(plateNo),plateNo);
+					UserSpacePO space = initUserSpace(lottery,batch,detail,parkMap.get(plateNo),plateNo);
 					if (parkMap.get(plateNo) != null && 
 							parkMap.get(plateNo).getParkingLot().equals(detail.getParkingLotCode())) { //说明该车牌存在同一车库的有效车位，
 						existSpaceList.add(space);
@@ -268,7 +272,7 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 						initSpaceList.add(space);
 					}
 				} else {//无车位
-					UserSpacePO space = initUserSpace(batch,detail,plateNo);
+					UserSpacePO space = initUserSpace(lottery,batch,detail,plateNo);
 					initSpaceList.add(space);
 				}
 			}
@@ -287,18 +291,22 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 
 	/**
 	 * 初始化车位对象
+	 * @param lottery 
 	 * @param batch
 	 * @param detail
 	 * @param plateNo 
 	 * @return
 	 */
-	private UserSpacePO initUserSpace(LotteryBatchPO batch, LotteryResultDetailPO detail, UserSpacePO userSpacePO, String plateNo) {
+	private UserSpacePO initUserSpace(LotteryResultPO lottery, LotteryBatchPO batch, LotteryResultDetailPO detail, UserSpacePO userSpacePO, String plateNo) {
 		//userSpacePO不为空的时候，代表该车牌已有未过期车位。需要判断车库是否是同一个
 		 if (userSpacePO != null && userSpacePO.getParkingLot().equals(detail.getParkingLotCode())) {
 			//同一个车牌且同一个车库
 			userSpacePO.setEndDate(batch.getValidEndDate());
 			userSpacePO.setState(UserSpaceStateEnum.UNSYNC.getState());
 			userSpacePO.setScheduleDate(null);
+			userSpacePO.setBatchId(lottery.getBatchId());
+			userSpacePO.setBatchNum(lottery.getBatchNum());
+			userSpacePO.setRoundId(lottery.getRoundId());
 			return userSpacePO;
 		 } 
 			 //同一个车牌 但是不是同一个车库
@@ -313,6 +321,9 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 						.setEndDate(batch.getValidEndDate())
 						.setStartDate(batch.getValidStartDate())
 						.setPlateNo(plateNo)
+						.setBatchId(lottery.getBatchId())
+						.setBatchNum(lottery.getBatchNum())
+						.setRoundId(lottery.getRoundId())
 						//到这一步且userSpacePO不为空，代表目前该车牌存在其它车库的车位，所以定时时间这里应该是车位生效的有效期，到时间后会有定时任务去下发闸机系统
 			 			.setScheduleDate(userSpacePO == null ?  null : DateUtil.format(batch.getValidStartDate(), DATE_FORMAT_STR) );
 			 return userSpace;
@@ -321,11 +332,12 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 
 	/**
 	 * 初始化车位对象
+	 * @param lottery 
 	 * @param batch
 	 * @param detail
 	 * @return
 	 */
-	private UserSpacePO initUserSpace(LotteryBatchPO batch, LotteryResultDetailPO detail, String plateNo) {
+	private UserSpacePO initUserSpace(LotteryResultPO lottery, LotteryBatchPO batch, LotteryResultDetailPO detail, String plateNo) {
 		UserSpacePO userSpace = new UserSpacePO()
 						.setCreateTm(new Date())
 						.setEndDate(batch.getValidEndDate())
@@ -337,6 +349,9 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 						.setUpdateTm(new Date())
 						.setPlateNo(plateNo)
 						.setScheduleDate(null)
+						.setBatchId(lottery.getBatchId())
+						.setBatchNum(lottery.getBatchNum())
+						.setRoundId(lottery.getRoundId())
 						.setUserSpaceId(IdWorker.getId());
 		return userSpace;
 	}
@@ -412,6 +427,19 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 
 		List<UserSpaceBO> userSpaceBOS = BeanConvertorUtils.copyList(poPage.getRecords(), UserSpaceBO.class);
 		return PageUtils.toResponseList(page,userSpaceBOS);
+	}
+
+
+	/**
+	 * 根据批次查询以中签的工号
+	 * @param batchId
+	 * @return
+	 */
+	public List<String> querySpaceListByBatchId(Long batchId) {
+		return userSpaceMapper.selectList(new LambdaQueryWrapper<UserSpacePO>()
+					.eq(UserSpacePO::getBatchId, batchId))
+				.stream().map(space -> space.getJobNumber())
+				.collect(Collectors.toList());
 	}
 }
 

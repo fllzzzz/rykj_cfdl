@@ -1,5 +1,7 @@
 package com.cf.parking.services.facade.impl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -25,6 +27,8 @@ import com.cf.parking.facade.dto.ParkingSpaceTransferRecordDTO;
 import com.cf.parking.services.utils.PageUtils;
 import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
+
+import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -74,8 +78,8 @@ public class ParkingSpaceTransferRecordFacadeImpl implements ParkingSpaceTransfe
 		AssertUtil.checkTrue(!CollectionUtils.isEmpty(spaceList), "该用户车位为当天到期或已到期，无法进行转赠");
 		
 		UserPO user = userService.selectByOpenId(inJobNum);
-		AssertUtil.checkNull(user, "受让人不存在");
-		List<UserVerifyPO> verifyList = userVerifyService.queryVerifyListByUserIdList(List.of(user.getUserId()));
+		AssertUtil.checkNull(user, "受让人不存在"); 
+		List<UserVerifyPO> verifyList = userVerifyService.queryVerifyListByUserIdList(Arrays.asList(user.getUserId()));
 		AssertUtil.checkTrue(!CollectionUtils.isEmpty(verifyList), "受让人未绑定车辆,无法转赠");
 		
 		LotteryBlackListPO black =  lotteryBlackListService.queryBlackUserInfo(user.getUserId());

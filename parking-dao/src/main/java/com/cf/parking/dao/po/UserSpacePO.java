@@ -80,4 +80,9 @@ public class UserSpacePO {
      * 摇号轮数id
      */
     private Long roundId;
+    
+    /**
+     * 批次ID
+     */
+    private Long batchId;
 }

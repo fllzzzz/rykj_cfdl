@@ -158,3 +158,5 @@ alter table lottery_rule_assign add index code_idx(code,type);
 alter table user_space add schedule_date varchar(10) default '' comment '定时器执行时间';
 
 alter table user_space add column batch_num date comment '期号',add column round_id bigint default 0 comment '摇号轮数id';
+
+alter table user_space  add column batch_id BIGINT comment '批次ID';

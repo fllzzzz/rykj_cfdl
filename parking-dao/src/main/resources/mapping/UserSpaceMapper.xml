@@ -17,6 +17,7 @@
         <result column="schedule_date" property="scheduleDate"/>
         <result column="batch_num" property="batchNum"/>
         <result column="round_id" property="roundId"/>
+        <result column="batch_id" property="batchId"/>
     </resultMap>
 
     <delete id="deleteAll">
@@ -25,7 +26,6 @@
     
     <select id="querySpaceGroupByExpireDate" resultMap="userSpaceMap">
     	select job_number,parking_lot ,start_date,end_date from user_space where job_number = #{jobNum} GROUP BY parking_lot ,start_date,end_date
-    
     </select>
     
 </mapper>

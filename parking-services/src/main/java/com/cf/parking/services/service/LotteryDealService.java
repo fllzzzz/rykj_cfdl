@@ -4,16 +4,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
-
 import javax.annotation.Resource;
-
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import com.alibaba.fastjson.JSON;
@@ -154,7 +148,9 @@ public class LotteryDealService {
 								.setStartDate(outSpace.getStartDate())
 								.setEndDate(outSpace.getEndDate())
 								.setState(UserSpaceStateEnum.UNSYNC.getState())
-								;
+								.setBatchId(outSpace.getBatchId())
+								.setBatchNum(outSpace.getBatchNum())
+								.setRoundId(outSpace.getRoundId());
 						addList.add(po);
 					});
 			}
@@ -208,6 +204,9 @@ public class LotteryDealService {
 									.setScheduleDate(outSpace.getStartDate().compareTo(DateUtil.endOfDay(new Date())) > 0 ? DateUtil.format(outSpace.getStartDate(), "yyyy-MM-dd")  :  DateUtil.format(DateUtil.beginOfDay( DateUtil.tomorrow()), "yyyy-MM-dd"))
 									.setStartDate(outSpace.getStartDate())
 									.setState(UserSpaceStateEnum.UNSYNC.getState())
+									.setBatchId(outSpace.getBatchId())
+									.setBatchNum(outSpace.getBatchNum())
+									.setRoundId(outSpace.getRoundId())
 									;
 							updateList.add(park);
 						}
@@ -218,6 +217,9 @@ public class LotteryDealService {
 									.setScheduleDate(outSpace.getStartDate().compareTo(DateUtil.endOfDay(new Date())) > 0 ? DateUtil.format(outSpace.getStartDate(), "yyyy-MM-dd")  :  DateUtil.format(DateUtil.beginOfDay( DateUtil.tomorrow()), "yyyy-MM-dd"))
 									.setEndDate(outSpace.getEndDate())
 									.setState(UserSpaceStateEnum.UNSYNC.getState())
+									.setBatchId(outSpace.getBatchId())
+									.setBatchNum(outSpace.getBatchNum())
+									.setRoundId(outSpace.getRoundId())
 									;
 							updateList.add(park);
 						}
@@ -237,6 +239,9 @@ public class LotteryDealService {
 									.setStartDate(outSpace.getStartDate())
 									.setEndDate(outSpace.getEndDate())
 									.setState(UserSpaceStateEnum.UNSYNC.getState())
+									.setBatchId(outSpace.getBatchId())
+									.setBatchNum(outSpace.getBatchNum())
+									.setRoundId(outSpace.getRoundId())
 									;
 							addList.add(po);
 						});
@@ -260,6 +265,9 @@ public class LotteryDealService {
 								.setStartDate(outSpace.getStartDate())
 								.setEndDate(outSpace.getEndDate())
 								.setState(UserSpaceStateEnum.UNSYNC.getState())
+								.setBatchId(outSpace.getBatchId())
+								.setBatchNum(outSpace.getBatchNum())
+								.setRoundId(outSpace.getRoundId())
 								;
 						addList.add(po);
 					});

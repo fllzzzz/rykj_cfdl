@@ -137,6 +137,11 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 		//过滤掉离职人员和黑名单人员
 		applyList = applyList.stream().filter(item -> (employeeJobNumList.contains(item.getJobNumber()) && !blackJobNumList.contains(item.getJobNumber()) ) ).collect(Collectors.toList());
 		log.info("过滤掉离职和黑名单后的报名摇号的人员信息：{}",JSON.toJSONString(applyList));
+		//查询当前批次已中签的人员工号
+		List<String> spaceJobNumList = userSpaceService.querySpaceListByBatchId(lottery.getBatchId());
+		//过滤掉已中奖的
+		applyList = applyList.stream().filter(item -> (!spaceJobNumList.contains(item.getJobNumber())  ) ).collect(Collectors.toList());
+
 		//释放数据
 		jobNumberList.clear();
 		blackJobNumList.clear();
@@ -171,7 +176,7 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 		LambdaQueryWrapper<LotteryResultPO> queryWrapper = new LambdaQueryWrapper<LotteryResultPO>()
 				.le(!ObjectUtils.isEmpty(dto.getEndDate()), LotteryResultPO::getBatchNum, dto.getEndDate())
 				.ge(!ObjectUtils.isEmpty(dto.getStartDate()) , LotteryResultPO::getBatchNum, dto.getStartDate())
-				.like(!ObjectUtils.isEmpty(dto.getRoundId()) , LotteryResultPO::getRoundId, dto.getRoundId())
+				.eq(!ObjectUtils.isEmpty(dto.getRoundId()) , LotteryResultPO::getRoundId, dto.getRoundId())
 				.eq(StringUtils.isNotEmpty(dto.getState()), LotteryResultPO::getState, dto.getState())
 				.ne(LotteryResultPO::getState,"5")
 				.orderByDesc(LotteryResultPO::getBatchNum);
@@ -232,7 +237,7 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 		List<Long> userIdList = detailList.stream().map(item -> item.getUserId()).collect(Collectors.toList());
 		List<UserVerifyPO> verifyList = userVerifyService.queryVerifyListByUserIdList(userIdList);
 		userIdList.clear();
-		userSpaceService.initLotteryDetailIntoSpace(batch,detailList,spaceList,verifyList);
+		userSpaceService.initLotteryDetailIntoSpace(lottery,batch,detailList,spaceList,verifyList);
 	
 	}
 
