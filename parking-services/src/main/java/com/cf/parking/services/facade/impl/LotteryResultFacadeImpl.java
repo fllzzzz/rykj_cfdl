@@ -1,6 +1,4 @@
 package com.cf.parking.services.facade.impl;
-
-
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -15,7 +13,9 @@ import com.cf.parking.dao.po.UserSpacePO;
 import com.cf.parking.dao.po.UserVerifyPO;
 import com.cf.parking.facade.bo.LotteryResultBO;
 import com.cf.parking.facade.bo.LotteryResultDetailBO;
+import com.cf.parking.facade.bo.UserSpaceBO;
 import com.cf.parking.facade.dto.LotteryResultDTO;
+import com.cf.parking.facade.dto.UserSpaceDTO;
 import com.cf.parking.facade.facade.LotteryResultFacade;
 import com.cf.parking.services.enums.EnableStateEnum;
 import com.cf.parking.services.enums.LotteryResultStateEnum;
@@ -244,4 +244,15 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 
 
 	
+	/**
+	 * 确认结果查询（用户车位表中的记录）
+	 * @param dto
+	 * @return
+	 */
+	@Override
+	public PageResponse<UserSpaceBO> confirmResult(UserSpaceDTO dto) {
+		return userSpaceService.pageSelectListByBatchAndRound(dto);
+	}
+
+
 }

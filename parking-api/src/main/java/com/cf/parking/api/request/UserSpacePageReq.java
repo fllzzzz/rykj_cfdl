@@ -36,4 +36,13 @@ public class UserSpacePageReq extends PageRequest {
     @ApiModelProperty(value = "状态（0：未同步；1：同步成功；2：同步失败）")
     private String state;
 
+    /** 期号 */
+    @ApiModelProperty(value = "期号")
+    private Date batchNum;
+
+    /** 摇号轮数id */
+    @ApiModelProperty(value = "摇号轮数id")
+    private Long roundId;
+
+
 }

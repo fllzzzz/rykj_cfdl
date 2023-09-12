@@ -4,17 +4,29 @@ import javax.annotation.Resource;
 
 import com.cf.parking.api.request.LotteryRuleAssignOptReq;
 import com.cf.parking.api.request.LotteryRuleAssignReq;
+import com.cf.parking.api.response.LotteryBlackListRsp;
 import com.cf.parking.api.response.LotteryRuleAssignRsp;
+import com.cf.parking.facade.bo.LotteryBlackListBO;
+import com.cf.parking.facade.bo.LotteryRuleAssignBO;
+import com.cf.parking.facade.dto.LotteryBlackListDTO;
+import com.cf.parking.facade.dto.LotteryBlackListOptDTO;
+import com.cf.parking.facade.dto.LotteryRuleAssignDTO;
+import com.cf.parking.facade.dto.LotteryRuleAssignOptDTO;
 import com.cf.parking.facade.facade.LotteryRuleAssignFacade;
+import com.cf.parking.services.utils.AssertUtil;
 import com.cf.support.result.PageResponse;
 import com.cf.support.result.Result;
+import com.cf.support.utils.BeanConvertorUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * 摇号规则-停车场分配Controller
@@ -38,19 +50,14 @@ public class LotteryRuleAssignController
     @PostMapping("/list")
     public Result<PageResponse<LotteryRuleAssignRsp>> list(@RequestBody LotteryRuleAssignReq param)
     {
-        return null;
+        LotteryRuleAssignDTO dto = new LotteryRuleAssignDTO();
+        BeanUtils.copyProperties(param,dto);
+
+        PageResponse<LotteryRuleAssignBO> result = lotteryRuleAssignFacade.getLotteryRuleAssignList(dto);
+        List<LotteryRuleAssignRsp> lotteryRuleAssignRsps = BeanConvertorUtils.copyList(result.getList(), LotteryRuleAssignRsp.class);
+        return Result.buildSuccessResult(new PageResponse(lotteryRuleAssignRsps,result.getPageNo(),result.getTotal(),result.getPageSize()));
     }
 
-
-    /**
-     * 获取摇号规则-停车场分配详细信息
-     */
-    @ApiOperation(value = "停车场分配详细信息", notes = "点击修改，根据id查询")
-    @PostMapping("/info")
-    public Result<LotteryRuleAssignRsp> getInfo(@RequestBody LotteryRuleAssignReq param)
-    {
-        return null;
-    }
 
     /**
      * 新增摇号规则-停车场分配
@@ -59,7 +66,16 @@ public class LotteryRuleAssignController
     @PostMapping("/add")
     public Result add(@RequestBody LotteryRuleAssignOptReq param)
     {
-        return Result.buildSuccessResult("接口暂未开发");
+        //1.参数校验
+        paramVerify(param);
+
+        //2.参数转换
+        LotteryRuleAssignOptDTO dto = new LotteryRuleAssignOptDTO();
+        BeanUtils.copyProperties(param,dto);
+
+        //3.新增处理
+        Integer result = lotteryRuleAssignFacade.add(dto);
+        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult();
     }
 
     /**
@@ -67,9 +83,24 @@ public class LotteryRuleAssignController
      */
     @ApiOperation(value = "修改摇号规则-停车场分配", notes = "点击修改按钮")
     @PostMapping("/update")
-    public Result edit(@RequestBody LotteryRuleAssignOptReq param)
-    {
-        return Result.buildSuccessResult("接口暂未开发");
+    public Result update(@RequestBody LotteryRuleAssignOptReq param) {
+        //1.参数校验
+        paramVerify(param);
+
+        //2.参数转换
+        LotteryRuleAssignOptDTO dto = new LotteryRuleAssignOptDTO();
+        BeanUtils.copyProperties(param, dto);
+
+        //3.新增处理
+        Integer result = lotteryRuleAssignFacade.update(dto);
+        return result > 0 ? Result.buildSuccessResult() : Result.buildErrorResult();
+
+    }
+
+    private void paramVerify(@RequestBody LotteryRuleAssignOptReq param) {
+        AssertUtil.checkNull(param.getType(), "请选择分配类型！");
+        AssertUtil.checkNull(param.getName(), "请选择名称！");
+        AssertUtil.checkNull(param.getParkingLotCode(), "请选择停车场！");
     }
 
     /**
@@ -77,8 +108,10 @@ public class LotteryRuleAssignController
      */
     @ApiOperation(value = "删除摇号规则-停车场分配", notes = "点击删除按钮")
     @PostMapping("/delete")
-    public Result remove(@RequestBody LotteryRuleAssignReq param)
+    public Result delete(@RequestBody LotteryRuleAssignReq param)
     {
-        return Result.buildSuccessResult("接口暂未开发");
+        AssertUtil.checkNull(param.getId(),"请选择要删除的分配记录！");
+        Integer result = lotteryRuleAssignFacade.deleteById(param.getId());
+        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult();
     }
 }

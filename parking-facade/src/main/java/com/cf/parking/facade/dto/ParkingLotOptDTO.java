@@ -1,17 +1,19 @@
 package com.cf.parking.facade.dto;
 
-import com.cf.support.result.PageRequest;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.util.Date;
+
 /**
- * 停车场
  * @author
- * @date 2023/9/5
+ * @date 2023/9/11
  */
 @Data
 @Accessors(chain = true)
-public class ParkingLotDTO  extends PageRequest {
+public class ParkingLotOptDTO {
+
     /** id */
     private Long id;
 
@@ -21,6 +23,15 @@ public class ParkingLotDTO  extends PageRequest {
     /** 区域编号 */
     private String regionCode;
 
+    /** 车位数量 */
+    private Long amount;
+
     /** 类型(0：不可摇号，1：可摇号) */
     private String type;
+
+    /** 创建时间 */
+    private Date createTm;
+
+    /** 更新时间 */
+    private Date updateTm;
 }

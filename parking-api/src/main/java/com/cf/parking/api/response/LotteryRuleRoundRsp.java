@@ -12,11 +12,11 @@ import java.util.Date;
  * @date 2023/09/05
  */
 @Data
-@ApiModel(description = "摇号规则-停车场分配查询对象（单个/批量）")
+@ApiModel(description = "摇号规则-轮数查询结果")
 public class LotteryRuleRoundRsp {
 
     /** id */
-    @ApiModelProperty(value = "id，单个查询或删除时使用此字段")
+    @ApiModelProperty(value = "id")
     private Long id;
 
     /** 轮数名称 */

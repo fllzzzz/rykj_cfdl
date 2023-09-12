@@ -3,9 +3,7 @@ package com.cf.parking.services.facade.impl;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-
 import javax.annotation.Resource;
-
 import com.cf.parking.dao.mapper.ParkingSpaceTransferRecordMapper;
 import com.cf.parking.dao.po.LotteryBlackListPO;
 import com.cf.parking.dao.po.UserPO;
@@ -18,10 +16,16 @@ import com.cf.parking.services.service.UserService;
 import com.cf.parking.services.service.UserSpaceService;
 import com.cf.parking.services.service.UserVerifyService;
 import com.cf.parking.services.utils.AssertUtil;
-import com.cf.support.exception.BusinessException;
-
 import cn.hutool.core.date.DateUtil;
-
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.cf.parking.dao.po.ParkingSpaceTransferRecordPO;
+import com.cf.parking.facade.bo.ParkingSpaceTransferRecordBO;
+import com.cf.parking.facade.dto.ParkingSpaceTransferRecordDTO;
+import com.cf.parking.services.utils.PageUtils;
+import com.cf.support.result.PageResponse;
+import com.cf.support.utils.BeanConvertorUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -29,7 +33,7 @@ import org.springframework.util.CollectionUtils;
 /**
  * 车位转赠记录Service业务层处理
  * 
- * @author ruoyi
+ * @author
  * @date 2023-09-05
  */
 @Service
@@ -91,64 +95,25 @@ public class ParkingSpaceTransferRecordFacadeImpl implements ParkingSpaceTransfe
 //    {
 //        return parkingSpaceTransferRecordMapper.selectParkingSpaceTransferRecordById(id);
 //    }
+    
 
     /**
      * 查询车位转赠记录列表
-     * 
-     * @param parkingSpaceTransferRecord 车位转赠记录
-     * @return 车位转赠记录
+     * @param dto
+     * @return
      */
-//    @Override
-//    public List<ParkingSpaceTransferRecord> selectParkingSpaceTransferRecordList(ParkingSpaceTransferRecord parkingSpaceTransferRecord)
-//    {
-//        return parkingSpaceTransferRecordMapper.selectParkingSpaceTransferRecordList(parkingSpaceTransferRecord);
-//    }
+    @Override
+    public PageResponse<ParkingSpaceTransferRecordBO> getParkingSpaceTransferRecordList(ParkingSpaceTransferRecordDTO dto) {
+        Page<ParkingSpaceTransferRecordPO> page = PageUtils.toPage(dto);
 
-    /**
-     * 新增车位转赠记录
-     * 
-     * @param parkingSpaceTransferRecord 车位转赠记录
-     * @return 结果
-     */
-//    @Override
-//    public int insertParkingSpaceTransferRecord(ParkingSpaceTransferRecord parkingSpaceTransferRecord)
-//    {
-//        return parkingSpaceTransferRecordMapper.insertParkingSpaceTransferRecord(parkingSpaceTransferRecord);
-//    }
+        Page<ParkingSpaceTransferRecordPO> poPage = parkingSpaceTransferRecordMapper.selectPage(page, new LambdaQueryWrapper<ParkingSpaceTransferRecordPO>()
+                .eq(ObjectUtils.isNotEmpty(dto.getUserId()), ParkingSpaceTransferRecordPO::getUserId, dto.getUserId())
+                .le(ObjectUtils.isNotEmpty(dto.getValidEndDate()), ParkingSpaceTransferRecordPO::getValidEndDate, dto.getValidEndDate())
+                .ge(ObjectUtils.isNotEmpty(dto.getValidStartDate()), ParkingSpaceTransferRecordPO::getValidStartDate, dto.getValidStartDate())
+                .orderByDesc(ParkingSpaceTransferRecordPO::getCreateTm));
 
-    /**
-     * 修改车位转赠记录
-     * 
-     * @param parkingSpaceTransferRecord 车位转赠记录
-     * @return 结果
-     */
-//    @Override
-//    public int updateParkingSpaceTransferRecord(ParkingSpaceTransferRecord parkingSpaceTransferRecord)
-//    {
-//        return parkingSpaceTransferRecordMapper.updateParkingSpaceTransferRecord(parkingSpaceTransferRecord);
-//    }
+        List<ParkingSpaceTransferRecordBO> boList = BeanConvertorUtils.copyList(poPage.getRecords(), ParkingSpaceTransferRecordBO.class);
+        return PageUtils.toResponseList(page,boList);
+    }
 
-    /**
-     * 批量删除车位转赠记录
-     * 
-     * @param ids 需要删除的车位转赠记录主键
-     * @return 结果
-     */
-//    @Override
-//    public int deleteParkingSpaceTransferRecordByIds(Long[] ids)
-//    {
-//        return parkingSpaceTransferRecordMapper.deleteParkingSpaceTransferRecordByIds(ids);
-//    }
-
-    /**
-     * 删除车位转赠记录信息
-     * 
-     * @param id 车位转赠记录主键
-     * @return 结果
-     */
-//    @Override
-//    public int deleteParkingSpaceTransferRecordById(Long id)
-//    {
-//        return parkingSpaceTransferRecordMapper.deleteParkingSpaceTransferRecordById(id);
-//    }
 }

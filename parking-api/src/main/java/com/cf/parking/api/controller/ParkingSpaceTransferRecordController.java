@@ -1,23 +1,28 @@
 package com.cf.parking.api.controller;
 
 import javax.annotation.Resource;
-
-import com.aliyun.dingtalkexclusive_1_0.models.GetUserAppVersionSummaryHeaders;
 import com.cf.parking.api.request.ParkingSpaceTransferRecordReq;
 import com.cf.parking.api.response.ParkingSpaceTransferRecordRsp;
+import com.cf.parking.facade.bo.ParkingSpaceTransferRecordBO;
+import com.cf.parking.facade.dto.ParkingSpaceTransferRecordDTO;
 import com.cf.parking.facade.facade.ParkingSpaceTransferRecordFacade;
 import com.cf.support.authertication.UserAuthentication;
+import com.cf.parking.services.utils.PageUtils;
 import com.cf.support.authertication.UserAuthenticationServer;
 import com.cf.support.authertication.token.dto.UserSessionDTO;
 import com.cf.support.result.PageResponse;
 import com.cf.support.result.Result;
+import com.cf.support.utils.BeanConvertorUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * 车位转赠记录Controller
@@ -49,7 +54,18 @@ public class ParkingSpaceTransferRecordController
     @PostMapping("/list")
     public Result<PageResponse<ParkingSpaceTransferRecordRsp>> list(@RequestBody ParkingSpaceTransferRecordReq param)
     {
-        return null;
+        //1.获取当前登录用户的信息
+        Long userId = getUser().getUserId();
+        param.setUserId(userId);
+
+        //2.参数转换
+        ParkingSpaceTransferRecordDTO dto = new ParkingSpaceTransferRecordDTO();
+        BeanUtils.copyProperties(param,dto);
+
+        //3.列表查询
+        PageResponse<ParkingSpaceTransferRecordBO> result = parkingSpaceTransferRecordFacade.getParkingSpaceTransferRecordList(dto);
+        List<ParkingSpaceTransferRecordRsp> transferRecordRsps = BeanConvertorUtils.copyList(result.getList(), ParkingSpaceTransferRecordRsp.class);
+        return PageUtils.pageResult(result,transferRecordRsps);
     }
     
     
@@ -57,7 +73,7 @@ public class ParkingSpaceTransferRecordController
     @PostMapping("/transfer")
     public Result transfer(@RequestBody String jobNum){
     	String openId = getUser().getOpenId();
-    	parkingSpaceTransferRecordFacade.transfer(openId,jobNum)
+    	parkingSpaceTransferRecordFacade.transfer(openId,jobNum);
     	return Result.buildSuccessResult();
     }
 

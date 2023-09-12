@@ -14,7 +14,7 @@
     </resultMap>
 
     <sql id="selectLotteryBlackListVo">
-        select id, user_id,job_number,name, reason, create_tm, update_tm from lottery_balck_list
+        select id, user_id,job_number,name, reason, create_tm, update_tm from lottery_black_list
     </sql>
 
 

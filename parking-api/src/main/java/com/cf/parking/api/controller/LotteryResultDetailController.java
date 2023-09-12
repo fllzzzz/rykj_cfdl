@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author
  * @date 2023-09-05
  */
-@Api(tags = "摇号结果详情模块——摇号系统")
+@Api(tags = "摇号结果详情模块——摇号系统",description = "此查询模块已在批次和结果模块中执行")
 @Slf4j
 @RestController
 @RequestMapping("/lottery/resultDetail")
@@ -34,11 +34,11 @@ public class LotteryResultDetailController
     /**
      * 查询摇号结果详情列表
      */
-    @ApiOperation(value = "查询摇号结果详情列表", notes = "根据条件分页查询")
-    @PostMapping("/list")
-    public Result<PageResponse<LotteryResultDetailPageRsp>> list(@RequestBody LotteryResultDetailReq param)
-    {
-        return Result.buildSuccessResult();
-    }
+//    @ApiOperation(value = "查询摇号结果详情列表", notes = "根据条件分页查询")
+//    @PostMapping("/list")
+//    public Result<PageResponse<LotteryResultDetailPageRsp>> list(@RequestBody LotteryResultDetailReq param)
+//    {
+//        return Result.buildSuccessResult();
+//    }
 
 }

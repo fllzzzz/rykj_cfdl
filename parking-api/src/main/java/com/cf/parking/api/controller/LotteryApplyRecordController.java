@@ -7,6 +7,8 @@ import com.cf.parking.api.response.LotteryApplyRecordPageRsp;
 import com.cf.parking.facade.bo.LotteryApplyRecordBO;
 import com.cf.parking.facade.dto.LotteryApplyRecordDTO;
 import com.cf.parking.facade.facade.LotteryApplyRecordFacade;
+import com.cf.support.authertication.UserAuthenticationServer;
+import com.cf.support.authertication.token.dto.UserSessionDTO;
 import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
 import io.swagger.annotations.Api;
@@ -36,6 +38,12 @@ public class LotteryApplyRecordController
     @Resource
     private LotteryApplyRecordFacade lotteryApplyRecordFacade;
 
+    @Resource
+    private UserAuthenticationServer userAuthenticationServer;
+
+    private UserSessionDTO getUser() {
+        return userAuthenticationServer.getCurrentUser();
+    }
     /**
      * 查询摇号申请记录列表
      */
@@ -43,9 +51,15 @@ public class LotteryApplyRecordController
     @PostMapping("/list")
     public Result<PageResponse<LotteryApplyRecordPageRsp>>  getApplyRecordList(@RequestBody LotteryApplyRecordReq param)
     {
+        //1.获取当前登录用户的信息
+        Long userId = getUser().getUserId();
+        param.setUserId(userId);
+
+        //2.参数转换
         LotteryApplyRecordDTO dto = new LotteryApplyRecordDTO();
         BeanUtils.copyProperties(param,dto);
 
+        //3.列表查询
         PageResponse<LotteryApplyRecordBO> result = lotteryApplyRecordFacade.getApplyRecordList(dto);
         List<LotteryApplyRecordPageRsp> applyRecordPageRsps = BeanConvertorUtils.copyList(result.getList(), LotteryApplyRecordPageRsp.class);
         return Result.buildSuccessResult(new PageResponse(applyRecordPageRsps,result.getPageNo(),result.getTotal(),result.getPageSize()));
