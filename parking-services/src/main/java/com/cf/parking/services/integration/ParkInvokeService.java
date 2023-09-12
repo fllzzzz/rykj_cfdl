@@ -12,11 +12,13 @@ import com.cf.parking.facade.bo.YardDetailBO;
 import com.cf.parking.facade.bo.YardPageBO;
 import com.cf.parking.facade.dto.Carmanagement;
 import com.cf.parking.facade.dto.QueryYardDTO;
+import com.cf.parking.facade.dto.UserSpaceDTO;
 import com.cf.parking.services.enums.ParkingRemoteCodeEnum;
 import com.cf.parking.services.properties.ParkingProperties;
 import com.cf.parking.services.utils.AssertUtil;
 import com.cf.support.utils.HttpClientUtil;
 
+import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -32,7 +34,14 @@ public class ParkInvokeService {
 	 * @param info
 	 * @return
 	 */
-	public boolean replaceCarInfo(Carmanagement info) {
+	public boolean replaceCarInfo(UserSpaceDTO space) {
+		Carmanagement info = new Carmanagement();
+		info.setLicensePlate(space.getPlateNo())
+			.setJobNo(space.getJobNumber())
+			.setParkIndexCode(new String[] {space.getParkingLot()})
+			.setCarOwner(space.getName())
+			.setPermissStart(DateUtil.beginOfDay(space.getStartDate()))
+			.setPermissEnd(DateUtil.endOfDay(space.getEndDate()));
 		try {
 			AssertUtil.checkNull(info, "参数不能为空");
 			AssertUtil.checkNull(info.getLicensePlate(), "车牌号不能为空");

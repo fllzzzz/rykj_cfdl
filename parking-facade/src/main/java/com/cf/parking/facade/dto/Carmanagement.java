@@ -30,7 +30,7 @@ public class Carmanagement {
 	/**
 	 * 车场code数组 必填 
 	 */
-	private String parkIndexCode;
+	private String[] parkIndexCode;
 	/**
 	 * 车主  必填
 	 */

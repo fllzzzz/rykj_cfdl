@@ -19,16 +19,20 @@ import com.cf.parking.dao.po.LotteryResultDetailPO;
 import com.cf.parking.dao.po.LotteryResultPO;
 import com.cf.parking.dao.po.UserSpacePO;
 import com.cf.parking.dao.po.UserVerifyPO;
+import com.cf.parking.facade.dto.Carmanagement;
 import com.cf.parking.facade.dto.UserSpaceDTO;
 import com.cf.parking.facade.dto.UserSpaceFuncTimeDTO;
 import com.cf.parking.facade.dto.UserSpacePageDTO;
 import com.cf.parking.facade.dto.UserSpaceValidityDTO;
 import com.cf.parking.services.enums.UserSpaceStateEnum;
+import com.cf.parking.services.integration.ParkInvokeService;
 import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeansException;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.*;
@@ -51,6 +55,10 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
     @Resource
     private UserSpaceMapper userSpaceMapper;
 
+    @Resource
+    private ParkInvokeService parkInvokeService;
+    
+    
     /**
      * 获取请求数据，返回数据总大小
      *
@@ -375,9 +383,22 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 	public void parkingDownOnStartTtime(String time) {
 		List<UserSpacePO> spaceList = userSpaceMapper.selectList(new LambdaQueryWrapper<UserSpacePO>()
 					.le(UserSpacePO::getScheduleDate, time)
-					.eq(UserSpacePO::getState, UserSpaceStateEnum.UNSYNC.getState())
+					.ne(UserSpacePO::getState, UserSpaceStateEnum.SUCCESS.getState())
 				);
-		//TODO 调闸机接口
+		log.info("获取定时任务列表：{}",JSON.toJSONString(spaceList));
+		UserSpaceDTO dto = new UserSpaceDTO();
+		spaceList.forEach(space->{
+			try {
+				BeanUtils.copyProperties(space, dto);;
+				boolean flag = parkInvokeService.replaceCarInfo(dto);
+				log.info("定时任务车位同步id={}结果{}",space.getUserSpaceId(),flag);
+				space.setState(flag ? UserSpaceStateEnum.SUCCESS.getState() : UserSpaceStateEnum.FAIL.getState());
+				userSpaceMapper.updateById(space);
+				Thread.sleep(5000);
+			} catch (Exception e) {
+				log.info("定时任务车位同步id={}出错{}",space.getUserSpaceId(),e);
+			}
+		});
 	}
 
 
@@ -386,8 +407,8 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 	 */
 	public void syncSpace() {
 		UserSpacePO space = userSpaceMapper.selectOne(new LambdaQueryWrapper<UserSpacePO>()
-					.eq(UserSpacePO::getState, UserSpaceStateEnum.UNSYNC.getState())
-					.le(UserSpacePO::getEndDate, DateUtil.format(DateUtil.endOfDay(new Date()), "yyyy-MM-dd HH:mm:ss"))
+					.ne(UserSpacePO::getState, UserSpaceStateEnum.SUCCESS.getState())
+					.le(UserSpacePO::getEndDate, DateUtil.format(new Date(), "yyyy-MM-dd"))
 					.isNull(UserSpacePO::getScheduleDate)
 					.orderByAsc(UserSpacePO::getUserSpaceId)
 					.last(" limit 1 ")
@@ -397,7 +418,12 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 			return ;
 		}
 		
-		//TODO 调闸机接口
+		UserSpaceDTO dto = new UserSpaceDTO();
+		BeanUtils.copyProperties(space, dto);;
+		boolean flag = parkInvokeService.replaceCarInfo(dto);
+		log.info("车位同步id={}结果{}",space.getUserSpaceId(),flag);;
+		space.setState(flag ? UserSpaceStateEnum.SUCCESS.getState() : UserSpaceStateEnum.FAIL.getState());
+		userSpaceMapper.updateById(space);
 	}
 
 
