@@ -30,16 +30,16 @@ public class LotteryBatchOptReq {
 
     /** 摇号轮数，多个间逗号间隔 */
     @ApiModelProperty(value = "摇号轮数")
-    private String roundId;
+    private Long[] roundIdArr;
 
     /** 报名开始时间 */
     @ApiModelProperty(value = "报名开始时间")
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date applyStartTime;
 
     /** 报名结束时间 */
     @ApiModelProperty(value = "报名结束时间")
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date applyEndTime;
 
     /** 车位有效开始日期 */
@@ -66,4 +66,8 @@ public class LotteryBatchOptReq {
     /** 更新时间 */
     private Date updateTm;
 
+    //前端传入的时间数组
+    private Date[] dialogApplyTime;
+
+    private Date[] validityDate;
 }

@@ -17,6 +17,7 @@ import com.cf.support.result.Result;
 import com.cf.support.utils.BeanConvertorUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -42,6 +43,19 @@ public class LotteryBatchController
     private LotteryBatchFacade lotteryBatchFacade;
 
     /**
+     * 根据摇号轮数查询车位数量
+     */
+    @ApiOperation(value = "根据摇号轮数查询车位数量", notes = "根据摇号轮数查询车位数量")
+    @PostMapping("/parkingAmountByRound")
+    public Result<Long> parkingAmountByRound(@RequestBody LotteryBatchOptReq param)
+    {
+        AssertUtil.checkNull(param.getRoundIdArr(),"请选择摇号轮数！");
+
+        Long parkingAmount = lotteryBatchFacade.getParkingAmountByRound(param.getRoundIdArr());
+        return Result.buildSuccessResult(parkingAmount);
+    }
+
+    /**
      * 查询摇号批次列表
      */
     @ApiOperation(value = "查询摇号批次列表", notes = "根据条件分页查询")
@@ -54,24 +68,6 @@ public class LotteryBatchController
         PageResponse<LotteryBatchBO> result = lotteryBatchFacade.getLotteryBatchList(dto);
         List<LotteryBatchRsp> lotteryBatchRsps = BeanConvertorUtils.copyList(result.getList(), LotteryBatchRsp.class);
         return Result.buildSuccessResult(new PageResponse(lotteryBatchRsps,result.getPageNo(),result.getTotal(),result.getPageSize()));
-    }
-
-
-    /**
-     * 获取摇号批次详细信息
-     */
-    @ApiOperation(value = "获取摇号批次详细信息", notes = "点击修改，根据id查询")
-    @PostMapping("/info")
-    public Result<LotteryBatchRsp> getInfo(@RequestBody LotteryBatchReq param)
-    {
-        AssertUtil.checkNull(param.getId(),"请选择要查看的批次！");
-        LotteryBatchDTO dto = new LotteryBatchDTO();
-        BeanUtils.copyProperties(param,dto);
-
-        LotteryBatchBO bo = lotteryBatchFacade.getInfo(dto);
-        LotteryBatchRsp lotteryBatchRsp = new LotteryBatchRsp();
-        BeanUtils.copyProperties(bo,lotteryBatchRsp);
-        return Result.buildSuccessResult(lotteryBatchRsp);
     }
 
     /**

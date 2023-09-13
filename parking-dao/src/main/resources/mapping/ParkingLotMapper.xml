@@ -5,6 +5,7 @@
     
     <resultMap type="com.cf.parking.dao.po.ParkingLotPO" id="ParkingLotResult">
         <result property="id"    column="id"    />
+        <result property="parentId"    column="parent_id"    />
         <result property="region"    column="region"    />
         <result property="regionCode"    column="region_code"    />
         <result property="amount"    column="amount"    />
@@ -15,7 +16,7 @@
     </resultMap>
 
     <sql id="selectParkingLotVo">
-        select id, region, region_code, amount, type, create_tm, update_tm ,remark from parking_lot
+        select id, parent_id,region, region_code, amount, type, create_tm, update_tm ,remark from parking_lot
     </sql>
 
 

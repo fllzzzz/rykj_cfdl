@@ -8,6 +8,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cf.parking.dao.mapper.ParkingLotMapper;
 import com.cf.parking.dao.po.ParkingLotPO;
 import com.cf.parking.facade.bo.ParkingLotBO;
+import com.cf.parking.facade.dto.ParkingLotAreaEntranceOptDTO;
+import com.cf.parking.facade.dto.ParkingLotAreaOptDTO;
 import com.cf.parking.facade.dto.ParkingLotDTO;
 import com.cf.parking.facade.dto.ParkingLotOptDTO;
 import com.cf.parking.facade.facade.ParkingLotFacade;
@@ -15,6 +17,7 @@ import com.cf.parking.services.utils.PageUtils;
 import com.cf.support.bean.IdWorker;
 import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
+import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -113,6 +116,32 @@ public class ParkingLotFacadeImpl implements ParkingLotFacade
             return result;
         }catch (Exception e){
             log.error("停车场删除失败，id：{}，失败原因：{}",id,e);
+            return 0;
+        }
+    }
+
+    /**
+     * 新增园区
+     * @param dto
+     * @return
+     */
+    @Override
+    public Integer addArea(ParkingLotAreaOptDTO dto) {
+        //1.根据传入的入口信息转成区域编号
+        List<ParkingLotAreaEntranceOptDTO> entranceList = dto.getEntranceList();
+        Gson gson = new Gson();
+        String regionCode = gson.toJson(entranceList);
+
+        //2.生成对象
+        ParkingLotPO po = new ParkingLotPO();
+        po.setId(idWorker.nextId()).setCreateTm(new Date()).setUpdateTm(new Date()).setParentId(0L).setRegion(dto.getName()).setRegionCode(regionCode);
+
+        try{
+            int result = mapper.insert(po);
+            log.info("新增停车场园区成功  ——  {}",po);
+            return result;
+        }catch (Exception e){
+            log.error("新增停车场园区失败：{}，失败原因：{}",po,e);
             return 0;
         }
     }

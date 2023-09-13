@@ -22,8 +22,9 @@ create table lottery_black_list(
 drop table if exists parking_lot;
 create table parking_lot(
   id           bigint(0)            not null           comment 'id',
-  region      varchar(64)           default ''         comment '区域',
-  region_code varchar(32)           default ''         comment '区域编号',
+  parent_id    bigint(0)            default 0          comment '上级id',
+  region      varchar(64)           default ''         comment '区域（园区名称、停车场名称）',
+  region_code varchar(512)           default ''         comment '区域编号（园区的话区域编号为json数组，停车场的话为单个闸机的编号）',
   amount        int(0)              default 0          comment '车位数量',
   type          char(1)             default 0         comment '类型(0：不可摇号，1：可摇号)',
   remark      varchar(128)          default ''         comment '备注',
@@ -31,7 +32,7 @@ create table parking_lot(
   update_tm     timestamp(3)                          comment '更新时间',
   primary key (id) USING BTREE,
   UNIQUE INDEX `udx_region_code`(`region_code`) USING BTREE
-)engine=innodb  comment ='停车场主表' ROW_FORMAT = Dynamic;
+)engine=innodb  comment ='停车场表' ROW_FORMAT = Dynamic;
 
 
 

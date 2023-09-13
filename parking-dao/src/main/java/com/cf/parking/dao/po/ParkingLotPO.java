@@ -23,6 +23,9 @@ public class ParkingLotPO
     @TableId(value = "id", type =  IdType.INPUT )
     private Long id;
 
+    /** id */
+    private Long parentId;
+
     /** 区域 */
     private String region;
 

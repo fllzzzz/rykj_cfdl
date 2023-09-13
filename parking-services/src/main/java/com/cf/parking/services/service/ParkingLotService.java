@@ -28,5 +28,14 @@ public class ParkingLotService extends ServiceImpl<ParkingLotMapper, ParkingLotP
 				);
 	}
 
-	
+
+	/**
+	 * 根据停车场编码查询停车场
+	 * @param regionCode
+	 * @return
+	 */
+	public ParkingLotPO selectParkingLotByCode(String regionCode) {
+		return parkingLotMapper.selectOne(new LambdaQueryWrapper<ParkingLotPO>()
+												.eq(ParkingLotPO::getRegionCode,regionCode));
+	}
 }

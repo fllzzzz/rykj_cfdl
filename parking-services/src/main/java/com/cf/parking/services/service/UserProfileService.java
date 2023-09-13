@@ -186,4 +186,8 @@ public class UserProfileService extends ServiceImpl<UserProfilePOMapper, UserPro
             }
         }
     }
+
+    public List<UserProfilePO> queryBaseList() {
+        return userProfilePOMapper.selectList(new LambdaQueryWrapper<>());
+    }
 }
