@@ -4,8 +4,10 @@ import javax.annotation.Resource;
 
 import com.cf.parking.api.request.ParkingLotOptReq;
 import com.cf.parking.api.request.ParkingLotReq;
+import com.cf.parking.api.response.ParkingLotBaseRsp;
 import com.cf.parking.api.response.ParkingLotRsp;
 import com.cf.parking.facade.bo.ParkingLotBO;
+import com.cf.parking.facade.constant.ParkingSysCodeConstant;
 import com.cf.parking.facade.dto.ParkingLotDTO;
 import com.cf.parking.facade.dto.ParkingLotOptDTO;
 import com.cf.parking.facade.facade.ParkingLotFacade;
@@ -24,6 +26,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 停车场Controller
@@ -39,6 +43,19 @@ public class ParkingLotController
 {
     @Resource
     private ParkingLotFacade parkingLotFacade;
+
+    /**
+     * 停车场基础信息列表
+     */
+    @ApiOperation(value = "停车场基础信息列表", notes = "其他模块中需要使用停车场信息时调用此方法")
+    @PostMapping("/baseList")
+    public Result<List<ParkingLotBaseRsp>> baseList()
+    {
+        Map<String, String> parkingSysCodeMap = ParkingSysCodeConstant.parkingSysCodeMap;
+
+        List<ParkingLotBaseRsp> list = parkingSysCodeMap.entrySet().stream().map(x -> new ParkingLotBaseRsp().setRegion(x.getKey()).setRegionCode(x.getValue())).collect(Collectors.toList());
+        return Result.buildSuccessResult(list);
+    }
 
     /**
      * 查询停车场列表
