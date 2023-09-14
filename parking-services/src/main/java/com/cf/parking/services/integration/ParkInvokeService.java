@@ -38,7 +38,7 @@ public class ParkInvokeService {
 		Carmanagement info = new Carmanagement();
 		info.setLicensePlate(space.getPlateNo())
 			.setJobNo(space.getJobNumber())
-			.setParkIndexCode(new String[] {space.getParkingLot()})
+			.setParkIndexCode(space.getParkingLot().split(","))
 			.setCarOwner(space.getName())
 			.setPermissStart(DateUtil.beginOfDay(space.getStartDate()))
 			.setPermissEnd(DateUtil.endOfDay(space.getEndDate()));

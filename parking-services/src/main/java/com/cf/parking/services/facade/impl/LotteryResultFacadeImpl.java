@@ -114,14 +114,12 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 		AssertUtil.checkNull(batch, "批次数据不存在");
 		//获取停车场信息
 		String parklotCode = round.getParkingLotCode();
-		List<String> parkingList = Arrays.asList(parklotCode.split(","));
-		List<ParkingLotPO> parkingLotList = parkingLotService.selectParkingLotByCodes(parkingList);
-		log.info("初步获取到摇号停车场信息：{}",JSON.toJSONString(parkingLotList));
-		AssertUtil.checkTrue(!CollectionUtils.isEmpty(parkingLotList), "停车场信息不存在，请检查设置");
-		parkingLotList = parkingLotList.stream().filter(item -> EnableStateEnum.ENABLE.getState().equals(item.getType())).collect(Collectors.toList());
-		AssertUtil.checkTrue(!CollectionUtils.isEmpty(parkingLotList), "停车场的配置为不可参加摇号，请检查设置");
+		ParkingLotPO parkingLot = parkingLotService.selectParkingLotByCode(parklotCode);
+		log.info("初步获取到摇号停车场信息：{}",JSON.toJSONString(parkingLot));
+		AssertUtil.checkNull(parkingLot, "停车场信息不存在，请检查设置");
+		AssertUtil.checkTrue(EnableStateEnum.ENABLE.getState().equals(parkingLot.getType()), "停车场的配置为不可参加摇号，请检查设置");
 		//获取报名的人员,要符合个人中心的车库在这次摇号的车库中这个条件
-		List<LotteryApplyRecordPO> applyList = lotteryApplyRecordService.queryLotteryApplyList(lottery.getBatchId(),parkingList);
+		List<LotteryApplyRecordPO> applyList = lotteryApplyRecordService.queryLotteryApplyList(lottery.getBatchId(),parklotCode);
 		log.info("获取到报名摇号的人员信息：{}",JSON.toJSONString(applyList));
 		if (CollectionUtils.isEmpty(applyList)) {
 			log.info("无报名摇号人员，程序退出");
@@ -148,22 +146,13 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 		employeeJobNumList.clear();
 		
 		List<LotteryApplyRecordPO> parkApplyList = new ArrayList<>();
-		for(ParkingLotPO parkLot : parkingLotList) {
-			/**
-			 * 对人员/部门停车场规则设置这块的逻辑是:
-			 * 1.根据上面查询到的报名人员工号，去查询对应的人员配置规则。
-			 * 2.然后按照人员---停车场维度进行分组，如果当前的人员配置的停车场不包含摇号的停车场，就剔除该摇号人员
-			 * 3.根据报名人员的部门去查询对应的部门配置规则
-			 * 4.然后按照部门---停车场维度进行分组，如果当前的部门配置的停车场不包含摇号的停车场，就剔除该部门的摇号人员
-			 * 5.留下的最终结果即为摇号人员
-			 */
-			parkApplyList = lotteryRuleAssignService.dealApplyByRule(parkLot, applyList);
-			lotteryDealService.doLottery(batch,lottery,parkLot,parkApplyList);
-			parkApplyList.clear();
-		}
+		parkApplyList = lotteryRuleAssignService.dealApplyByRule(parkingLot, applyList);
+		lotteryDealService.doLottery(batch,lottery,parkingLot,parkApplyList);
+		parkApplyList.clear();
 		
 	}
 
+    
 	/**
 	 * 查询摇号结果列表
 	 * @param dto

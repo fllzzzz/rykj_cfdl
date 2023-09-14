@@ -19,7 +19,6 @@ import com.cf.parking.dao.po.LotteryResultDetailPO;
 import com.cf.parking.dao.po.LotteryResultPO;
 import com.cf.parking.dao.po.UserSpacePO;
 import com.cf.parking.dao.po.UserVerifyPO;
-import com.cf.parking.facade.dto.Carmanagement;
 import com.cf.parking.facade.dto.UserSpaceDTO;
 import com.cf.parking.facade.dto.UserSpaceFuncTimeDTO;
 import com.cf.parking.facade.dto.UserSpacePageDTO;
@@ -32,7 +31,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.BeansException;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.*;
@@ -244,10 +242,10 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 		verifyList.clear();;
 		//车位信息映射成Map形式  {jobNum:{plateNo:UserSpacePO}}
 		Map<String/**工号*/, Map<String/**车牌*/, UserSpacePO>> userSpaceMap = (Map<String, Map<String, UserSpacePO>>) spaceList.stream()
-		        .collect(Collectors.toMap(UserSpacePO::getJobNumber, // 作为外层Map的键
+		        .collect(Collectors.toMap(UserSpacePO::getJobNumber, // 工号作为外层Map的键
 		                userSpacePO -> {
 		                    Map<String, UserSpacePO> innerMap = new HashMap<>();
-		                    innerMap.put(userSpacePO.getPlateNo(), userSpacePO); // 使用地址作为内层Map的键
+		                    innerMap.put(userSpacePO.getPlateNo(), userSpacePO); // 使用车牌作为内层Map的键
 		                    return innerMap;
 		                },
 		                (existingMap, newMap) -> {
@@ -266,6 +264,7 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 			//获取人员所拥有的车牌
 			plateNoList = verifyMap.get(detail.getUserId());
 			if (CollectionUtils.isEmpty(plateNoList)) {
+				log.error("工号为：{}的用户无车牌",detail.getUserJobNumber());
 				continue;
 			}
 			for (String plateNo : plateNoList) {
@@ -306,35 +305,39 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 	 * @return
 	 */
 	private UserSpacePO initUserSpace(LotteryResultPO lottery, LotteryBatchPO batch, LotteryResultDetailPO detail, UserSpacePO userSpacePO, String plateNo) {
-		//userSpacePO不为空的时候，代表该车牌已有未过期车位。需要判断车库是否是同一个
+		
+		//userSpacePO不为空的时候，代表该车牌已有未过期车位。需要判断车库是否是同一个,
 		 if (userSpacePO != null && userSpacePO.getParkingLot().equals(detail.getParkingLotCode())) {
 			//同一个车牌且同一个车库
-			userSpacePO.setEndDate(batch.getValidEndDate());
-			userSpacePO.setState(UserSpaceStateEnum.UNSYNC.getState());
-			userSpacePO.setScheduleDate(null);
-			userSpacePO.setBatchId(lottery.getBatchId());
-			userSpacePO.setBatchNum(lottery.getBatchNum());
-			userSpacePO.setRoundId(lottery.getRoundId());
+			userSpacePO.setEndDate(batch.getValidEndDate())
+			.setState(UserSpaceStateEnum.UNSYNC.getState())
+			.setScheduleDate(null)
+			.setUpdateTm(new Date())
+			.setBatchId(lottery.getBatchId())
+			.setBatchNum(lottery.getBatchNum())
+			.setRoundId(lottery.getRoundId());
 			return userSpacePO;
 		 } 
-			 //同一个车牌 但是不是同一个车库
-			 UserSpacePO userSpace = new UserSpacePO()
-						.setCreateTm(new Date())
-						.setJobNumber(detail.getUserJobNumber())
-						.setName(detail.getUserName())
-						.setParkingLot(detail.getParkingLotCode())
-						.setState(UserSpaceStateEnum.UNSYNC.getState())
-						.setUpdateTm(new Date())
-						.setUserSpaceId(IdWorker.getId())
-						.setEndDate(batch.getValidEndDate())
-						.setStartDate(batch.getValidStartDate())
-						.setPlateNo(plateNo)
-						.setBatchId(lottery.getBatchId())
-						.setBatchNum(lottery.getBatchNum())
-						.setRoundId(lottery.getRoundId())
-						//到这一步且userSpacePO不为空，代表目前该车牌存在其它车库的车位，所以定时时间这里应该是车位生效的有效期，到时间后会有定时任务去下发闸机系统
-			 			.setScheduleDate(userSpacePO == null ?  null : DateUtil.format(batch.getValidStartDate(), DATE_FORMAT_STR) );
-			 return userSpace;
+		 
+		//两种情况：1.同一个车牌 但是不是同一个车库，2.userSpacePO为空则代表无该车牌车位
+		 UserSpacePO userSpace = new UserSpacePO()
+					.setCreateTm(new Date())
+					.setJobNumber(detail.getUserJobNumber())
+					.setName(detail.getUserName())
+					.setParkingLot(detail.getParkingLotCode())
+					.setState(UserSpaceStateEnum.UNSYNC.getState())
+					.setUpdateTm(new Date())
+					.setUserSpaceId(IdWorker.getId())
+					.setEndDate(batch.getValidEndDate())
+					.setStartDate(batch.getValidStartDate())
+					.setPlateNo(plateNo)
+					.setBatchId(lottery.getBatchId())
+					.setBatchNum(lottery.getBatchNum())
+					.setRoundId(lottery.getRoundId())
+					//到这一步且userSpacePO不为空，代表目前该车牌存在其它车库的车位，所以定时时间这里应该是车位生效的有效期，到时间后会有定时任务去下发闸机系统
+		 			.setScheduleDate(userSpacePO == null ? null : DateUtil.format(batch.getValidStartDate(), DATE_FORMAT_STR) );
+		 return userSpace;
+			 
 	}
 
 
