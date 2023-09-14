@@ -56,6 +56,9 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
     @Resource
     private ParkInvokeService parkInvokeService;
     
+    @Resource
+    private ParkingLotService parkingLotService;
+    
     
     /**
      * 获取请求数据，返回数据总大小
@@ -393,6 +396,7 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 		spaceList.forEach(space->{
 			try {
 				BeanUtils.copyProperties(space, dto);;
+				dto.setParkingLot(StringUtils.join( parkingLotService.queryParentListViaSelf(dto.getParkingLot()),"," ));
 				boolean flag = parkInvokeService.replaceCarInfo(dto);
 				log.info("定时任务车位同步id={}结果{}",space.getUserSpaceId(),flag);
 				space.setState(flag ? UserSpaceStateEnum.SUCCESS.getState() : UserSpaceStateEnum.FAIL.getState());
@@ -404,7 +408,7 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 		});
 	}
 
-
+	
 	/**
 	 * 同步车位信息到闸机系统
 	 */
@@ -413,7 +417,6 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 					.ne(UserSpacePO::getState, UserSpaceStateEnum.SUCCESS.getState())
 					.le(UserSpacePO::getEndDate, DateUtil.format(new Date(), "yyyy-MM-dd"))
 					.isNull(UserSpacePO::getScheduleDate)
-					.orderByAsc(UserSpacePO::getUserSpaceId)
 					.last(" limit 1 ")
 				);
 		log.info("获取到待同步车位信息：{}",JSON.toJSONString(space));
@@ -422,7 +425,8 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 		}
 		
 		UserSpaceDTO dto = new UserSpaceDTO();
-		BeanUtils.copyProperties(space, dto);;
+		BeanUtils.copyProperties(space, dto);
+		dto.setParkingLot(StringUtils.join( parkingLotService.queryParentListViaSelf(dto.getParkingLot()),"," ));
 		boolean flag = parkInvokeService.replaceCarInfo(dto);
 		log.info("车位同步id={}结果{}",space.getUserSpaceId(),flag);;
 		space.setState(flag ? UserSpaceStateEnum.SUCCESS.getState() : UserSpaceStateEnum.FAIL.getState());

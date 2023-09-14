@@ -1,7 +1,14 @@
 package com.cf.parking.services.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -18,6 +25,8 @@ public class ParkingLotService extends ServiceImpl<ParkingLotMapper, ParkingLotP
 	@Resource
 	private ParkingLotMapper parkingLotMapper;
 	
+	private final String REGIONCODE = "regionCode";
+	
 	/**
 	 * 根据停车场编码查询停车场
 	 * @param parkCode
@@ -31,13 +40,33 @@ public class ParkingLotService extends ServiceImpl<ParkingLotMapper, ParkingLotP
 	}
 
 
+	public List<String> queryParentListViaSelf(String parkCode) {
+		List<String> list = new ArrayList<>();
+		ParkingLotPO parking = selectParkingLotByCode(parkCode);
+		recursionParking(list, parking.getId());
+		return list;
+	}
+	
+	
 	/**
-	 * 根据停车场编码查询停车场
-	 * @param regionCode
-	 * @return
+	 * 递归获取上级停车场编码和园区编码
+	 * @param result
+	 * @param parkId
 	 */
-	public ParkingLotPO selectParkingLotByCode(String regionCode) {
-		return parkingLotMapper.selectOne(new LambdaQueryWrapper<ParkingLotPO>()
-												.eq(ParkingLotPO::getRegionCode,regionCode));
+	private void recursionParking(List<String> result ,Long parkId){
+		ParkingLotPO parking = parkingLotMapper.selectById(parkId);
+		if (parking == null) {
+			return;
+		}
+		result.add(parking.getRegionCode());
+		
+		if (parking.getParentId() == 0) {
+			List<JSONObject> jsonList = JSON.parseArray(parking.getRegionCode(), JSONObject.class);
+			if(!CollectionUtils.isEmpty(jsonList)) {
+				jsonList.forEach(item -> result.add(item.getString(REGIONCODE)));
+			}
+		} else {
+			recursionParking(result,parking.getParentId());
+		}
 	}
 }
