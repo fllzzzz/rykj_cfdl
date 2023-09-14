@@ -23,13 +23,13 @@ public class LotteryApplyRecordService extends ServiceImpl<LotteryApplyRecordMap
 	/**
 	 * 根据批次号和车库查询申请人员
 	 * @param batchId
-	 * @param parkingList 
+	 * @param parkingLot 
 	 * @return
 	 */
-	public List<LotteryApplyRecordPO> queryLotteryApplyList(Long batchId, List<String> parkingList) {
+	public List<LotteryApplyRecordPO> queryLotteryApplyList(Long batchId, String parkingLot) {
 		return applyRecordMapper.selectList(new LambdaQueryWrapper<LotteryApplyRecordPO>()
 				.eq(LotteryApplyRecordPO::getBatchId, batchId)
-				.in(LotteryApplyRecordPO::getParkingLotCode, parkingList)
+				.eq(LotteryApplyRecordPO::getParkingLotCode, parkingLot)
 				);
 	}
 

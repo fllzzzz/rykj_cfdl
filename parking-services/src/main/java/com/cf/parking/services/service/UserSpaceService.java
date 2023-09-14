@@ -19,7 +19,6 @@ import com.cf.parking.dao.po.LotteryResultDetailPO;
 import com.cf.parking.dao.po.LotteryResultPO;
 import com.cf.parking.dao.po.UserSpacePO;
 import com.cf.parking.dao.po.UserVerifyPO;
-import com.cf.parking.facade.dto.Carmanagement;
 import com.cf.parking.facade.dto.UserSpaceDTO;
 import com.cf.parking.facade.dto.UserSpaceFuncTimeDTO;
 import com.cf.parking.facade.dto.UserSpacePageDTO;
@@ -32,7 +31,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.BeansException;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.*;
@@ -57,6 +55,9 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 
     @Resource
     private ParkInvokeService parkInvokeService;
+    
+    @Resource
+    private ParkingLotService parkingLotService;
     
     
     /**
@@ -164,8 +165,6 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
         }
     }
 
-    // 四楼
-    //  四楼，五楼，产品
 
     /**
      * 将车牌号多个车场去重合并  (1:四楼，五楼，产品 2:五楼，产品 3：老院区）
@@ -244,10 +243,10 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 		verifyList.clear();;
 		//车位信息映射成Map形式  {jobNum:{plateNo:UserSpacePO}}
 		Map<String/**工号*/, Map<String/**车牌*/, UserSpacePO>> userSpaceMap = (Map<String, Map<String, UserSpacePO>>) spaceList.stream()
-		        .collect(Collectors.toMap(UserSpacePO::getJobNumber, // 作为外层Map的键
+		        .collect(Collectors.toMap(UserSpacePO::getJobNumber, // 工号作为外层Map的键
 		                userSpacePO -> {
 		                    Map<String, UserSpacePO> innerMap = new HashMap<>();
-		                    innerMap.put(userSpacePO.getPlateNo(), userSpacePO); // 使用地址作为内层Map的键
+		                    innerMap.put(userSpacePO.getPlateNo(), userSpacePO); // 使用车牌作为内层Map的键
 		                    return innerMap;
 		                },
 		                (existingMap, newMap) -> {
@@ -266,6 +265,7 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 			//获取人员所拥有的车牌
 			plateNoList = verifyMap.get(detail.getUserId());
 			if (CollectionUtils.isEmpty(plateNoList)) {
+				log.error("工号为：{}的用户无车牌",detail.getUserJobNumber());
 				continue;
 			}
 			for (String plateNo : plateNoList) {
@@ -306,35 +306,39 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 	 * @return
 	 */
 	private UserSpacePO initUserSpace(LotteryResultPO lottery, LotteryBatchPO batch, LotteryResultDetailPO detail, UserSpacePO userSpacePO, String plateNo) {
-		//userSpacePO不为空的时候，代表该车牌已有未过期车位。需要判断车库是否是同一个
+		
+		//userSpacePO不为空的时候，代表该车牌已有未过期车位。需要判断车库是否是同一个,
 		 if (userSpacePO != null && userSpacePO.getParkingLot().equals(detail.getParkingLotCode())) {
 			//同一个车牌且同一个车库
-			userSpacePO.setEndDate(batch.getValidEndDate());
-			userSpacePO.setState(UserSpaceStateEnum.UNSYNC.getState());
-			userSpacePO.setScheduleDate(null);
-			userSpacePO.setBatchId(lottery.getBatchId());
-			userSpacePO.setBatchNum(lottery.getBatchNum());
-			userSpacePO.setRoundId(lottery.getRoundId());
+			userSpacePO.setEndDate(batch.getValidEndDate())
+			.setState(UserSpaceStateEnum.UNSYNC.getState())
+			.setScheduleDate(null)
+			.setUpdateTm(new Date())
+			.setBatchId(lottery.getBatchId())
+			.setBatchNum(lottery.getBatchNum())
+			.setRoundId(lottery.getRoundId());
 			return userSpacePO;
 		 } 
-			 //同一个车牌 但是不是同一个车库
-			 UserSpacePO userSpace = new UserSpacePO()
-						.setCreateTm(new Date())
-						.setJobNumber(detail.getUserJobNumber())
-						.setName(detail.getUserName())
-						.setParkingLot(detail.getParkingLotCode())
-						.setState(UserSpaceStateEnum.UNSYNC.getState())
-						.setUpdateTm(new Date())
-						.setUserSpaceId(IdWorker.getId())
-						.setEndDate(batch.getValidEndDate())
-						.setStartDate(batch.getValidStartDate())
-						.setPlateNo(plateNo)
-						.setBatchId(lottery.getBatchId())
-						.setBatchNum(lottery.getBatchNum())
-						.setRoundId(lottery.getRoundId())
-						//到这一步且userSpacePO不为空，代表目前该车牌存在其它车库的车位，所以定时时间这里应该是车位生效的有效期，到时间后会有定时任务去下发闸机系统
-			 			.setScheduleDate(userSpacePO == null ?  null : DateUtil.format(batch.getValidStartDate(), DATE_FORMAT_STR) );
-			 return userSpace;
+		 
+		//两种情况：1.同一个车牌 但是不是同一个车库，2.userSpacePO为空则代表无该车牌车位
+		 UserSpacePO userSpace = new UserSpacePO()
+					.setCreateTm(new Date())
+					.setJobNumber(detail.getUserJobNumber())
+					.setName(detail.getUserName())
+					.setParkingLot(detail.getParkingLotCode())
+					.setState(UserSpaceStateEnum.UNSYNC.getState())
+					.setUpdateTm(new Date())
+					.setUserSpaceId(IdWorker.getId())
+					.setEndDate(batch.getValidEndDate())
+					.setStartDate(batch.getValidStartDate())
+					.setPlateNo(plateNo)
+					.setBatchId(lottery.getBatchId())
+					.setBatchNum(lottery.getBatchNum())
+					.setRoundId(lottery.getRoundId())
+					//到这一步且userSpacePO不为空，代表目前该车牌存在其它车库的车位，所以定时时间这里应该是车位生效的有效期，到时间后会有定时任务去下发闸机系统
+		 			.setScheduleDate(userSpacePO == null ? null : DateUtil.format(batch.getValidStartDate(), DATE_FORMAT_STR) );
+		 return userSpace;
+			 
 	}
 
 
@@ -390,6 +394,7 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 		spaceList.forEach(space->{
 			try {
 				BeanUtils.copyProperties(space, dto);;
+				dto.setParkingLot(StringUtils.join( parkingLotService.queryParentListViaSelf(dto.getParkingLot()),"," ));
 				boolean flag = parkInvokeService.replaceCarInfo(dto);
 				log.info("定时任务车位同步id={}结果{}",space.getUserSpaceId(),flag);
 				space.setState(flag ? UserSpaceStateEnum.SUCCESS.getState() : UserSpaceStateEnum.FAIL.getState());
@@ -401,7 +406,7 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 		});
 	}
 
-
+	
 	/**
 	 * 同步车位信息到闸机系统
 	 */
@@ -410,7 +415,6 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 					.ne(UserSpacePO::getState, UserSpaceStateEnum.SUCCESS.getState())
 					.le(UserSpacePO::getEndDate, DateUtil.format(new Date(), "yyyy-MM-dd"))
 					.isNull(UserSpacePO::getScheduleDate)
-					.orderByAsc(UserSpacePO::getUserSpaceId)
 					.last(" limit 1 ")
 				);
 		log.info("获取到待同步车位信息：{}",JSON.toJSONString(space));
@@ -419,7 +423,8 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 		}
 		
 		UserSpaceDTO dto = new UserSpaceDTO();
-		BeanUtils.copyProperties(space, dto);;
+		BeanUtils.copyProperties(space, dto);
+		dto.setParkingLot(StringUtils.join( parkingLotService.queryParentListViaSelf(dto.getParkingLot()),"," ));
 		boolean flag = parkInvokeService.replaceCarInfo(dto);
 		log.info("车位同步id={}结果{}",space.getUserSpaceId(),flag);;
 		space.setState(flag ? UserSpaceStateEnum.SUCCESS.getState() : UserSpaceStateEnum.FAIL.getState());
@@ -427,11 +432,22 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 	}
 
 
-	public List<UserSpacePO> querySpaceGroupByExpireDate(String outJobNum) {
-		return userSpaceMapper.querySpaceGroupByExpireDate(outJobNum);
+	/**
+	 * 根据工号查询车位并根据车库和有效期进行分组
+	 * @param jobNum 工号
+	 * @return
+	 */
+	public List<UserSpacePO> querySpaceGroupByExpireDate(String jobNum) {
+		return userSpaceMapper.querySpaceGroupByExpireDate(jobNum);
 	}
 
 
+	/**
+	 * 根据工号和停车库查询车位信息
+	 * @param jobNum 工号
+	 * @param parkingLot 车库编码
+	 * @return
+	 */
 	public List<UserSpacePO> querySpaceByJobNumAndParkLot(String jobNum, String parkingLot) {
 		return userSpaceMapper.selectList(new LambdaQueryWrapper<UserSpacePO>()
 				.eq(UserSpacePO::getJobNumber,jobNum)
