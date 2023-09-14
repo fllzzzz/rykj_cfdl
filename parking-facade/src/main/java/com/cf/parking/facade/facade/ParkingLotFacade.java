@@ -1,5 +1,6 @@
 package com.cf.parking.facade.facade;
 
+import com.cf.parking.facade.bo.ParkingLotAreaBO;
 import com.cf.parking.facade.bo.ParkingLotBO;
 import com.cf.parking.facade.dto.ParkingLotAreaOptDTO;
 import com.cf.parking.facade.dto.ParkingLotDTO;
@@ -47,9 +48,22 @@ public interface ParkingLotFacade
     Integer deleteById(Long id);
 
     /**
+     * 查询园区列表
+     * @return
+     */
+    List<ParkingLotAreaBO> getAreaList();
+
+    /**
      * 新增园区
      * @param dto
      * @return
      */
     Integer addArea(ParkingLotAreaOptDTO dto);
+
+    /**
+     * 修改园区
+     * @param dto
+     * @return
+     */
+    Integer updateArea(ParkingLotAreaOptDTO dto);
 }

@@ -23,7 +23,7 @@ public class ParkingLotPO
     @TableId(value = "id", type =  IdType.INPUT )
     private Long id;
 
-    /** id */
+    /** parentId */
     private Long parentId;
 
     /** 区域 */
@@ -35,7 +35,7 @@ public class ParkingLotPO
     /** 车位数量 */
     private Long amount;
 
-    /** 类型(0：不可摇号，1：可摇号) */
+    /** 类型(0：可摇号，1：不可摇号) */
     private String type;
 
     /** 创建时间 */

@@ -1,12 +1,18 @@
 package com.cf.parking.services.facade.impl;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cf.parking.dao.mapper.ParkingLotMapper;
 import com.cf.parking.dao.po.ParkingLotPO;
+import com.cf.parking.facade.bo.ParkingLotAreaBO;
+import com.cf.parking.facade.bo.ParkingLotAreaEntranceBO;
 import com.cf.parking.facade.bo.ParkingLotBO;
 import com.cf.parking.facade.dto.ParkingLotAreaEntranceOptDTO;
 import com.cf.parking.facade.dto.ParkingLotAreaOptDTO;
@@ -18,7 +24,9 @@ import com.cf.support.bean.IdWorker;
 import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -43,7 +51,7 @@ public class ParkingLotFacadeImpl implements ParkingLotFacade
     private IdWorker idWorker;
 
     /**
-     * 查询停车场列表
+     * 查询停车场列表（层级结构）
      * @param dto
      * @return
      */
@@ -51,15 +59,55 @@ public class ParkingLotFacadeImpl implements ParkingLotFacade
     public PageResponse<ParkingLotBO> getParkingLotList(ParkingLotDTO dto) {
         Page<ParkingLotPO> page = PageUtils.toPage(dto);
 
-        Page<ParkingLotPO> poPage = mapper.selectPage(page, new LambdaQueryWrapper<ParkingLotPO>()
-                .eq(ObjectUtils.isNotEmpty(dto.getId()), ParkingLotPO::getId, dto.getId())
-                .like(StringUtils.isNotBlank(dto.getRegion()), ParkingLotPO::getRegion, dto.getRegion())
-                .eq(StringUtils.isNotBlank(dto.getType()), ParkingLotPO::getType, dto.getType())
-                .orderByAsc(ParkingLotPO::getCreateTm));
+        //1.如果parentId不为空，查询直接下级；然后对直接下级设置子记录
+        if (ObjectUtils.isNotEmpty(dto.getParentId())){
+            //1.1直接下级
+            Page<ParkingLotPO> poPage = mapper.selectPage(page, new LambdaQueryWrapper<ParkingLotPO>()
+                    .eq(ObjectUtils.isNotEmpty(dto.getId()), ParkingLotPO::getId, dto.getId())
+                    .eq(ParkingLotPO::getParentId, dto.getParentId())
+                    .like(StringUtils.isNotBlank(dto.getRegion()), ParkingLotPO::getRegion, dto.getRegion())
+                    .eq(StringUtils.isNotBlank(dto.getType()), ParkingLotPO::getType, dto.getType())
+                    .orderByAsc(ParkingLotPO::getCreateTm));
 
-        List<ParkingLotBO> boList = BeanConvertorUtils.copyList(poPage.getRecords(), ParkingLotBO.class);
-        return PageUtils.toResponseList(page,boList);
+            List<ParkingLotBO> boList = getParkingLotBOList(poPage.getRecords());
+            return PageUtils.toResponseList(page,boList);
+        }else {
+            //2.如果parentId为空，先查询所有第一级（园区）的子记录，然后查询子记录
+            List<ParkingLotPO> areaPOList = mapper.selectList(new LambdaQueryWrapper<ParkingLotPO>().eq(ParkingLotPO::getParentId, 0));
+            if (CollectionUtils.isNotEmpty(areaPOList)){
+                List<Long> parentIdList = areaPOList.stream().map(ParkingLotPO::getId).collect(Collectors.toList());
+                Page<ParkingLotPO> poPage = mapper.selectPage(page, new LambdaQueryWrapper<ParkingLotPO>()
+                        .eq(ObjectUtils.isNotEmpty(dto.getId()), ParkingLotPO::getId, dto.getId())
+                        .in(ParkingLotPO::getParentId, parentIdList)
+                        .like(StringUtils.isNotBlank(dto.getRegion()), ParkingLotPO::getRegion, dto.getRegion())
+                        .eq(StringUtils.isNotBlank(dto.getType()), ParkingLotPO::getType, dto.getType())
+                        .orderByAsc(ParkingLotPO::getCreateTm));
+
+                List<ParkingLotBO> boList = getParkingLotBOList(poPage.getRecords());
+                return PageUtils.toResponseList(page,boList);
+            }
+        }
+        return PageUtils.toResponseList(page,new ArrayList<>());
     }
+
+    private List<ParkingLotBO> getParkingLotBOList(List<ParkingLotPO> list) {
+        List<ParkingLotBO> boList = BeanConvertorUtils.copyList(list, ParkingLotBO.class);
+        for (ParkingLotBO parkingLotBO : boList) {
+            parkingLotBO.setChildren(getChildren(parkingLotBO));
+        }
+        return boList;
+    }
+
+    private List<ParkingLotBO> getChildren(ParkingLotBO parkingLotBO) {
+        List<ParkingLotPO> childPOList = mapper.selectList(new LambdaQueryWrapper<ParkingLotPO>().eq(ParkingLotPO::getParentId, parkingLotBO.getId()));
+        List<ParkingLotBO> childBoList = BeanConvertorUtils.copyList(childPOList, ParkingLotBO.class);
+        List<ParkingLotBO> result = childBoList.stream().map(bo -> {
+            bo.setChildren(getChildren(bo));
+            return bo;
+        }).collect(Collectors.toList());
+        return result;
+    }
+
 
     /**
      * 新增停车场
@@ -144,6 +192,53 @@ public class ParkingLotFacadeImpl implements ParkingLotFacade
             log.error("新增停车场园区失败：{}，失败原因：{}",po,e);
             return 0;
         }
+    }
+
+    /**
+     * 修改园区
+     * @param dto
+     * @return
+     */
+    @Override
+    public Integer updateArea(ParkingLotAreaOptDTO dto) {
+        //1.根据传入的入口信息转成区域编号
+        List<ParkingLotAreaEntranceOptDTO> entranceList = dto.getEntranceList();
+        Gson gson = new Gson();
+        String regionCode = gson.toJson(entranceList);
+
+        //2.生成对象
+        ParkingLotPO po = new ParkingLotPO().setId(dto.getId()).setRegion(dto.getName()).setRegionCode(regionCode).setUpdateTm(new Date());
+
+        try{
+            int result = mapper.updateById(po);
+            log.info("修改停车场园区成功  ——  {}",po);
+            return result;
+        }catch (Exception e){
+            log.error("修改停车场园区失败：{}，失败原因：{}",po,e);
+            return 0;
+        }
+    }
+
+    /**
+     * 查询园区列表
+     * @return
+     */
+    @Override
+    public List<ParkingLotAreaBO> getAreaList() {
+        List<ParkingLotPO> poList = mapper.selectList(new LambdaQueryWrapper<ParkingLotPO>()
+                .eq(ParkingLotPO::getParentId, 0));
+        List<ParkingLotAreaBO> boList = poList.stream().map(po -> {
+            ParkingLotAreaBO bo = new ParkingLotAreaBO().setId(po.getId()).setName(po.getRegion());
+            if (StringUtils.isNotBlank(po.getRegionCode())) {
+                Gson gson = new Gson();
+                Type type = new TypeToken<List<ParkingLotAreaEntranceBO>>() {
+                }.getType();
+                List<ParkingLotAreaEntranceBO> entranceBOList = gson.fromJson(po.getRegionCode(), type);
+                bo.setEntranceList(entranceBOList);
+            }
+            return bo;
+        }).collect(Collectors.toList());
+        return boList;
     }
 
 }

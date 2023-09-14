@@ -5,7 +5,9 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.util.Date;
 import java.util.List;
 
@@ -50,19 +52,19 @@ public class UserVerifyOptReq {
      * 车辆照片
      */
     @ApiModelProperty(value = "车辆照片")
-    private String vehicleImg;
+    private MultipartFile vehicleImg;
 
     /**
      * 行驶证照片path
      */
     @ApiModelProperty(value = "行驶证照片")
-    private String drivingPermitImg;
+    private MultipartFile drivingPermitImg;
 
     /**
      * 驾驶证照片path
      */
     @ApiModelProperty(value = "驾驶证照片")
-    private String drivingLicenseImg;
+    private MultipartFile drivingLicenseImg;
 
     /**
      * 状态(0:默认，1:待审核，2:审核不通过,3:审核通过)

@@ -5,8 +5,10 @@ import javax.annotation.Resource;
 import com.cf.parking.api.request.ParkingLotAreaOptReq;
 import com.cf.parking.api.request.ParkingLotOptReq;
 import com.cf.parking.api.request.ParkingLotReq;
+import com.cf.parking.api.response.ParkingLotAreaRsp;
 import com.cf.parking.api.response.ParkingLotBaseRsp;
 import com.cf.parking.api.response.ParkingLotRsp;
+import com.cf.parking.facade.bo.ParkingLotAreaBO;
 import com.cf.parking.facade.bo.ParkingLotBO;
 import com.cf.parking.facade.constant.ParkingSysCodeConstant;
 import com.cf.parking.facade.dto.ParkingLotAreaOptDTO;
@@ -51,7 +53,7 @@ public class ParkingLotController
     /**
      * 停车场基础信息列表
      */
-    @ApiOperation(value = "停车场基础列表", notes = "其他模块中需要使用停车场信息时调用此方法")
+    @ApiOperation(value = "停车场'区域-区域编号'列表", notes = "其他模块中需要使用停车场信息时调用此方法")
     @PostMapping("/baseList")
     public Result<List<ParkingLotBaseRsp>> baseList()
     {
@@ -59,6 +61,18 @@ public class ParkingLotController
 
         List<ParkingLotBaseRsp> list = parkingSysCodeMap.entrySet().stream().map(x -> new ParkingLotBaseRsp().setRegion(x.getKey()).setRegionCode(x.getValue())).collect(Collectors.toList());
         return Result.buildSuccessResult(list);
+    }
+
+    /**
+     * 园区列表
+     */
+    @ApiOperation(value = "园区列表", notes = "页面左侧园区列表")
+    @PostMapping("/areaList")
+    public Result<List<ParkingLotAreaRsp>> areaList()
+    {
+        List<ParkingLotAreaBO> boList = parkingLotFacade.getAreaList();
+        List<ParkingLotAreaRsp> areaRsps = BeanConvertorUtils.copyList(boList, ParkingLotAreaRsp.class);
+        return Result.buildSuccessResult(areaRsps);
     }
 
     /**
@@ -82,7 +96,7 @@ public class ParkingLotController
     /**
      * 新增园区
      */
-    @ApiOperation(value = "新增园区", notes = "左侧点击新增按钮")
+    @ApiOperation(value = "新增园区", notes = "点击园区新增按钮")
     @PostMapping("/addArea")
     public Result addArea(@RequestBody ParkingLotAreaOptReq param)
     {
@@ -101,6 +115,30 @@ public class ParkingLotController
         //3.新增处理
         Integer result = parkingLotFacade.addArea(dto);
         return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult("新增失败，请重试！");
+    }
+
+    /**
+     * 修改园区
+     */
+    @ApiOperation(value = "修改园区", notes = "点击园区右侧的修改按钮")
+    @PostMapping("/updateArea")
+    public Result updateArea(@RequestBody ParkingLotAreaOptReq param)
+    {
+        //1.参数验证
+        if (StringUtils.isBlank(param.getName())){
+            return Result.buildErrorResult("园区名称不能为空！");
+        }
+        if (CollectionUtils.isEmpty(param.getEntranceList())){
+            return Result.buildErrorResult("入口不能为空！");
+        }
+
+        //2.参数转换
+        ParkingLotAreaOptDTO dto = new ParkingLotAreaOptDTO();
+        BeanUtils.copyProperties(param,dto);
+
+        //3.修改处理
+        Integer result = parkingLotFacade.updateArea(dto);
+        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult("修改失败，请重试！");
     }
 
     /**
@@ -142,6 +180,7 @@ public class ParkingLotController
     }
 
     private void paramVerify(@RequestBody ParkingLotOptReq param) {
+        AssertUtil.checkNull(param.getParentId(), "请选择上级停车场！");
         AssertUtil.checkNull(param.getRegion(), "区域不能为空！");
         AssertUtil.checkNull(param.getAmount(), "车位数量不能为空！");
         AssertUtil.checkNull(param.getType(), "类型不能为空！");

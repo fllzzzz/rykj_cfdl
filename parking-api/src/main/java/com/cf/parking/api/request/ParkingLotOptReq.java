@@ -20,6 +20,10 @@ public class ParkingLotOptReq {
     @ApiModelProperty(value = "id")
     private Long id;
 
+    /** parentId */
+    @ApiModelProperty(value = "parentId")
+    private Long parentId;
+
     /** 区域 */
     @ApiModelProperty(value = "区域")
     private String region;
@@ -32,7 +36,7 @@ public class ParkingLotOptReq {
     @ApiModelProperty(value = "车位数量")
     private Long amount;
 
-    /** 类型(0：不可摇号，1：可摇号) */
+    /** 类型(0：可摇号，1：不可摇号) */
     @ApiModelProperty(value = "类型")
     private String type;
 

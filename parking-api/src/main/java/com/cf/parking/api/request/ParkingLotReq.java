@@ -22,6 +22,10 @@ public class ParkingLotReq extends PageRequest {
     @ApiModelProperty(value = "id，单个查询或删除时使用此字段")
     private Long id;
 
+    /** parentId */
+    @ApiModelProperty(value = "parentId")
+    private Long parentId;
+
     /** 区域 */
     @ApiModelProperty(value = "区域")
     private String region;
@@ -30,8 +34,8 @@ public class ParkingLotReq extends PageRequest {
     @ApiModelProperty(value = "区域编号")
     private String regionCode;
 
-    /** 类型(0：不可摇号，1：可摇号) */
-    @ApiModelProperty(value = "类型(0：不可摇号，1：可摇号)")
+    /** 类型(0：可摇号，1：不可摇号) */
+    @ApiModelProperty(value = "类型(0：可摇号，1：不可摇号)")
     private String type;
 
 }

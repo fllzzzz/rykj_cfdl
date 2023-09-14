@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * 停车场
@@ -15,6 +16,9 @@ public class ParkingLotBO {
     /** id */
     private Long id;
 
+    /** parentId */
+    private Long parentId;
+
     /** 区域 */
     private String region;
 
@@ -24,7 +28,7 @@ public class ParkingLotBO {
     /** 车位数量 */
     private Long amount;
 
-    /** 类型(0：不可摇号，1：可摇号) */
+    /** 类型(0：可摇号，1：不可摇号) */
     private String type;
 
     /** 创建时间 */
@@ -35,4 +39,7 @@ public class ParkingLotBO {
 
     /** 备注 */
     private String remark;
+
+    /**子记录*/
+    private List<ParkingLotBO> children;
 }

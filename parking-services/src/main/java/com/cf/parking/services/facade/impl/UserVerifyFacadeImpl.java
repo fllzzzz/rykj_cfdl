@@ -10,6 +10,7 @@ import com.cf.parking.facade.bo.UserVerifyBO;
 import com.cf.parking.facade.dto.UserVerifyDTO;
 import com.cf.parking.facade.dto.UserVerifyOptDTO;
 import com.cf.parking.facade.facade.UserVerifyFacade;
+import com.cf.parking.services.enums.UserVerifyStateEnum;
 import com.cf.parking.services.utils.PageUtils;
 import com.cf.support.bean.IdWorker;
 import com.cf.support.result.PageResponse;
@@ -84,6 +85,7 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
         UserVerifyPO userVerifyPO = new UserVerifyPO();
         BeanUtils.copyProperties(dto,userVerifyPO);
         userVerifyPO.setId(idWorker.nextId());
+        userVerifyPO.setState(Integer.parseInt(UserVerifyStateEnum.UNAUDIT.getState()));
         userVerifyPO.setCreateTm(new Date());
         userVerifyPO.setUpdateTm(new Date());
         try{

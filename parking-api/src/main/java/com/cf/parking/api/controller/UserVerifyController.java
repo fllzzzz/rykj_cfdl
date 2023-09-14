@@ -9,12 +9,17 @@ import com.cf.parking.facade.dto.UserVerifyOptDTO;
 import com.cf.parking.facade.facade.UserVerifyFacade;
 import com.cf.parking.services.utils.AssertUtil;
 import com.cf.support.authertication.AdminUserAuthentication;
+import com.cf.support.authertication.UserAuthentication;
+import com.cf.support.authertication.UserAuthenticationServer;
+import com.cf.support.authertication.token.dto.UserSessionDTO;
 import com.cf.support.result.PageResponse;
 import com.cf.support.result.Result;
 import com.cf.support.utils.BeanConvertorUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Authorization;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.util.IOUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,6 +27,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.io.*;
+import java.util.Base64;
 import java.util.List;
 
 /**
@@ -38,6 +45,13 @@ public class UserVerifyController {
 
     @Resource
     private UserVerifyFacade userVerifyFacade;
+
+    @Resource
+    private UserAuthenticationServer userAuthenticationServer;
+
+    private UserSessionDTO getUser() {
+        return userAuthenticationServer.getCurrentUser();
+    }
 
     /**
      * 查询车辆审核列表
@@ -74,14 +88,49 @@ public class UserVerifyController {
     /**
      * 新增车辆审核
      */
+    @UserAuthentication
     @ApiOperation(value = "新增车辆审核", notes = "移动端个人中心模块点击车辆录入")
     @PostMapping("/add")
-    public Result add(@RequestBody UserVerifyOptReq param)
+    public Result add(UserVerifyOptReq param)
     {
-        UserVerifyOptDTO dto = new UserVerifyOptDTO();
-        BeanUtils.copyProperties(param,dto);
+        //1.参数校验
+        paramVerify(param);
+
+        UserVerifyOptDTO dto;
+        try {
+            //2.参数生成
+            dto = optReq2OptDto(param);
+        } catch (IOException e) {
+            log.error("用户{}上传车辆信息审核时图片转换异常:{}",getUser().getServerName(),e);
+            return Result.buildErrorResult("图片上传异常，请重试！");
+        }
         Integer result = userVerifyFacade.add(dto);
         return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult("提交审核失败，请重试！");
+    }
+
+    private UserVerifyOptDTO optReq2OptDto(UserVerifyOptReq param) throws IOException {
+        UserVerifyOptDTO dto = new UserVerifyOptDTO();
+        dto.setUserId(1668502647096690L);
+//        dto.setUserId(getUser().getUserId());
+//        dto.setUserName(getUser().getServerName());
+        dto.setPlateNo(param.getPlateNo());
+        //2.1.三张图片转base64
+        dto.setVehicleImg(getBase64ImgStr(param.getVehicleImg().getInputStream()));
+        dto.setDrivingLicenseImg(getBase64ImgStr(param.getDrivingLicenseImg().getInputStream()));
+        dto.setDrivingPermitImg(getBase64ImgStr(param.getDrivingPermitImg().getInputStream()));
+        return dto;
+    }
+
+    //TODO：转换后的字符串无法贴到地址栏内查看
+    private String getBase64ImgStr(InputStream inputStream) throws IOException {
+        return Base64.getEncoder().encodeToString(IOUtils.toByteArray(inputStream));
+    }
+
+    private void paramVerify(UserVerifyOptReq param) {
+        AssertUtil.checkNull(param.getPlateNo(),"请输入车牌号！");
+        AssertUtil.checkNull(param.getVehicleImg(),"请上传车辆照片！");
+        AssertUtil.checkNull(param.getDrivingLicenseImg(),"请上传驾驶证照片！");
+        AssertUtil.checkNull(param.getDrivingPermitImg(),"请上传行驶证照片！");
     }
 
     /**
@@ -112,5 +161,19 @@ public class UserVerifyController {
 
         userVerifyFacade.batchAudit(dto);
         return Result.buildSuccessResult() ;
+    }
+
+    //生成的base64
+    public static void main(String[] args) throws IOException {
+        File file = new File("C:\\Users\\17235\\Pictures\\Saved Pictures\\a.png");
+        FileInputStream imageInFile = new FileInputStream(file);
+        byte[] imageData = new byte[(int)file.length()];
+        imageInFile.read(imageData);
+        imageInFile.close();
+
+        String base64Image = Base64.getEncoder()
+                .encodeToString(imageData);
+        //查看前需要拼接data:image/png;base64,
+        System.out.println(base64Image);
     }
 }

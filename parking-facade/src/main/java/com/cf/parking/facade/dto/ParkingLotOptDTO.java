@@ -1,5 +1,6 @@
 package com.cf.parking.facade.dto;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -16,6 +17,9 @@ public class ParkingLotOptDTO {
     /** id */
     private Long id;
 
+    /** parentId */
+    private Long parentId;
+
     /** 区域 */
     private String region;
 
@@ -25,7 +29,7 @@ public class ParkingLotOptDTO {
     /** 车位数量 */
     private Long amount;
 
-    /** 类型(0：不可摇号，1：可摇号) */
+    /** 类型(0：可摇号，1：不可摇号) */
     private String type;
 
     /** 创建时间 */
