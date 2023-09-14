@@ -120,6 +120,7 @@ public class LotteryDealService {
 	 * @param inJobNum 受让人工号
 	 */
 	public void transfer(List<UserSpacePO> outSpaceList, List<UserVerifyPO> verifyList, String inJobNum) {
+		log.info("转让人车位：{},受让人车位：{},受让人工号：{}",JSON.toJSONString(outSpaceList),JSON.toJSONString(verifyList),inJobNum);
 		List<UserSpacePO> addList = new ArrayList<>();
 		List<UserSpacePO> updateList = new ArrayList<>();
 		
@@ -129,6 +130,7 @@ public class LotteryDealService {
 		String userName = verifyList.get(0).getUserName();
 		//用户已有车库、有效期
 		List<UserSpacePO> spaceList = userSpaceService.querySpaceGroupByExpireDate(inJobNum);
+		log.info("受让人持有的车位：{}",spaceList);
 		//受让人拥有的车库
 		List<String> parkLotList = spaceList.stream().map(item -> item.getParkingLot()).collect(Collectors.toList());
 		
@@ -182,17 +184,19 @@ public class LotteryDealService {
 				});
 			});
 			
+			//循环体中存车牌的临时变量
 			final List<String> tempList = new ArrayList<>();
 			//受让人车库下的车位信息
 			List<UserSpacePO> parkSpaceList = new ArrayList<>();
 			//根据转让的车库和有效期进行初始化车位数据
 			for(UserSpacePO outSpace : outSpaceList) {
-				if (parkLotList.contains(outSpace.getParkingLot())) {//有该车库
+				if (parkLotList.contains(outSpace.getParkingLot())) {//有该车库车位
+					tempList.addAll(plateList);
 					//查出车位信息进行合并
 					parkSpaceList = userSpaceService.querySpaceByJobNumAndParkLot(inJobNum,outSpace.getParkingLot());
 					parkSpaceList.forEach(park -> {
-						tempList.addAll(plateList);
-						if (!plateList.contains(park.getPlateNo())) {//车牌号不在当前受让人车牌号列表中
+						
+						if (!plateList.contains(park.getPlateNo())) {//车牌号不在当前受让人车牌号列表中，忽略
 							return ;
 						}
 						
@@ -224,31 +228,31 @@ public class LotteryDealService {
 							updateList.add(park);
 						}
 						
-						//tempList 不为空则代表尚有车牌未初始化
-						tempList.forEach(plateNo -> {
-							UserSpacePO po = new UserSpacePO()
-									.setCreateTm(new Date())
-									.setUpdateTm(new Date())
-									.setUserSpaceId(idWorker.nextId())
-									.setJobNumber(inJobNum)
-									.setName(userName)
-									.setPlateNo(plateNo)
-									.setParkingLot(outSpace.getParkingLot())
-									//转让人车位起始日期比今天晚的话就取转让人车位起始日期，否则就取当前日期+1的日期
-									.setScheduleDate(outSpace.getStartDate().compareTo(DateUtil.endOfDay(new Date())) > 0 ? DateUtil.format(outSpace.getStartDate(), "yyyy-MM-dd")  :  DateUtil.format(DateUtil.beginOfDay( DateUtil.tomorrow()), "yyyy-MM-dd"))
-									.setStartDate(outSpace.getStartDate())
-									.setEndDate(outSpace.getEndDate())
-									.setState(UserSpaceStateEnum.UNSYNC.getState())
-									.setBatchId(outSpace.getBatchId())
-									.setBatchNum(outSpace.getBatchNum())
-									.setRoundId(outSpace.getRoundId())
-									;
-							addList.add(po);
-						});
-						
-						tempList.clear();
 					});
 					
+					//tempList 不为空则代表尚有车牌未初始化
+					tempList.forEach(plateNo -> {
+						UserSpacePO po = new UserSpacePO()
+								.setCreateTm(new Date())
+								.setUpdateTm(new Date())
+								.setUserSpaceId(idWorker.nextId())
+								.setJobNumber(inJobNum)
+								.setName(userName)
+								.setPlateNo(plateNo)
+								.setParkingLot(outSpace.getParkingLot())
+								//转让人车位起始日期比今天晚的话就取转让人车位起始日期，否则就取当前日期+1的日期
+								.setScheduleDate(outSpace.getStartDate().compareTo(DateUtil.endOfDay(new Date())) > 0 ? DateUtil.format(outSpace.getStartDate(), "yyyy-MM-dd")  :  DateUtil.format(DateUtil.beginOfDay( DateUtil.tomorrow()), "yyyy-MM-dd"))
+								.setStartDate(outSpace.getStartDate())
+								.setEndDate(outSpace.getEndDate())
+								.setState(UserSpaceStateEnum.UNSYNC.getState())
+								.setBatchId(outSpace.getBatchId())
+								.setBatchNum(outSpace.getBatchNum())
+								.setRoundId(outSpace.getRoundId())
+								;
+						addList.add(po);
+					});
+					
+					tempList.clear();
 					
 				} else {//无该车库
 					verifyList.forEach(verify -> {
@@ -272,7 +276,9 @@ public class LotteryDealService {
 						addList.add(po);
 					});
 				}
-			}
+				
+				
+			}//循环转让车库结束
 			
 			if (!CollectionUtils.isEmpty(addList)) {
 				userSpaceService.saveBatch(addList);

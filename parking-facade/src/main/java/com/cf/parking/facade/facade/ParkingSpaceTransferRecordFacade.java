@@ -15,8 +15,8 @@ public interface ParkingSpaceTransferRecordFacade
 
 	/**
 	 * 车位转让
-	 * @param openId 转让人
-	 * @param jobNum 受让人
+	 * @param outJobNum 转让人
+	 * @param inJobNum 受让人
 	 */
 	void transfer(String outJobNum, String inJobNum);
 

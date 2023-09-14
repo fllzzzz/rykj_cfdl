@@ -79,6 +79,7 @@ public class ParkingSpaceTransferRecordFacadeImpl implements ParkingSpaceTransfe
 		
 		UserPO user = userService.selectByOpenId(inJobNum);
 		AssertUtil.checkNull(user, "受让人不存在"); 
+		AssertUtil.checkTrue(user.getState() == 1, "受让人不为有效状态"); 
 		List<UserVerifyPO> verifyList = userVerifyService.queryVerifyListByUserIdList(Arrays.asList(user.getUserId()));
 		AssertUtil.checkTrue(!CollectionUtils.isEmpty(verifyList), "受让人未绑定车辆,无法转赠");
 		

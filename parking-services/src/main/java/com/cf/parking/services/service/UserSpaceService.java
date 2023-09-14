@@ -165,8 +165,6 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
         }
     }
 
-    // 四楼
-    //  四楼，五楼，产品
 
     /**
      * 将车牌号多个车场去重合并  (1:四楼，五楼，产品 2:五楼，产品 3：老院区）
@@ -434,11 +432,22 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 	}
 
 
-	public List<UserSpacePO> querySpaceGroupByExpireDate(String outJobNum) {
-		return userSpaceMapper.querySpaceGroupByExpireDate(outJobNum);
+	/**
+	 * 根据工号查询车位并根据车库和有效期进行分组
+	 * @param jobNum 工号
+	 * @return
+	 */
+	public List<UserSpacePO> querySpaceGroupByExpireDate(String jobNum) {
+		return userSpaceMapper.querySpaceGroupByExpireDate(jobNum);
 	}
 
 
+	/**
+	 * 根据工号和停车库查询车位信息
+	 * @param jobNum 工号
+	 * @param parkingLot 车库编码
+	 * @return
+	 */
 	public List<UserSpacePO> querySpaceByJobNumAndParkLot(String jobNum, String parkingLot) {
 		return userSpaceMapper.selectList(new LambdaQueryWrapper<UserSpacePO>()
 				.eq(UserSpacePO::getJobNumber,jobNum)
