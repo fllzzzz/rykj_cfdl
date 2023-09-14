@@ -25,12 +25,6 @@ public interface LotteryBatchFacade
      */
     PageResponse<LotteryBatchBO> getLotteryBatchList(LotteryBatchDTO dto);
 
-    /**
-     * 获取摇号批次详细信息
-     * @param dto
-     * @return
-     */
-    LotteryBatchBO getInfo(LotteryBatchDTO dto);
 
     /**
      * 新增摇号批次
@@ -60,4 +54,10 @@ public interface LotteryBatchFacade
      */
     PageResponse<LotteryResultDetailBO> viewResult(LotteryBatchDTO dto);
 
+    /**
+     * 根据摇号轮数查询车位数量
+     * @param roundIdArr
+     * @return
+     */
+    Long getParkingAmountByRound(Long[] roundIdArr);
 }

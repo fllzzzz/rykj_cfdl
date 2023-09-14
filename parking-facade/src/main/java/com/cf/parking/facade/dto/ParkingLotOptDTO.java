@@ -1,6 +1,5 @@
 package com.cf.parking.facade.dto;
 
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
 

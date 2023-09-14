@@ -29,6 +29,10 @@ public class LotteryBatchRsp {
     @ApiModelProperty(value = "车位数量")
     private Long parkingAmount;
 
+    /** 摇号轮数数组*/
+    @ApiModelProperty(value = "摇号轮数数组")
+    private Long[] roundIdArr;
+
     /** 摇号规则：根据id查询摇号轮数名称，多个间逗号间隔 */
     @ApiModelProperty(value = "摇号规则")
     private String lotteryRule;

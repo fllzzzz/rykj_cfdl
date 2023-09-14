@@ -4,15 +4,19 @@ import javax.annotation.Resource;
 
 import com.cf.parking.api.request.LotteryRuleAssignOptReq;
 import com.cf.parking.api.request.LotteryRuleAssignReq;
-import com.cf.parking.api.response.LotteryBlackListRsp;
-import com.cf.parking.api.response.LotteryRuleAssignRsp;
+import com.cf.parking.api.response.*;
+import com.cf.parking.dao.po.DepartmentPO;
+import com.cf.parking.dao.po.UserProfilePO;
 import com.cf.parking.facade.bo.LotteryBlackListBO;
 import com.cf.parking.facade.bo.LotteryRuleAssignBO;
+import com.cf.parking.facade.constant.ParkingSysCodeConstant;
 import com.cf.parking.facade.dto.LotteryBlackListDTO;
 import com.cf.parking.facade.dto.LotteryBlackListOptDTO;
 import com.cf.parking.facade.dto.LotteryRuleAssignDTO;
 import com.cf.parking.facade.dto.LotteryRuleAssignOptDTO;
 import com.cf.parking.facade.facade.LotteryRuleAssignFacade;
+import com.cf.parking.services.service.DepartmentService;
+import com.cf.parking.services.service.UserProfileService;
 import com.cf.parking.services.utils.AssertUtil;
 import com.cf.support.result.PageResponse;
 import com.cf.support.result.Result;
@@ -20,13 +24,17 @@ import com.cf.support.utils.BeanConvertorUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 摇号规则-停车场分配Controller
@@ -42,6 +50,48 @@ public class LotteryRuleAssignController
 {
     @Resource
     private LotteryRuleAssignFacade lotteryRuleAssignFacade;
+
+    @Resource
+    private DepartmentService departmentService;
+
+    @Resource
+    private UserProfileService userProfileService;
+
+    /**
+     * 人员列表
+     */
+    @ApiOperation(value = "人员列表", notes = "停车场分配模块中需要使用到人员列表")
+    @PostMapping("/userList")
+    public Result<List<UserProfileBaseRsp>> userList()
+    {
+        List<UserProfilePO> poList = userProfileService.queryBaseList();
+        List<UserProfileBaseRsp> rspList = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(poList)){
+            rspList = poList.stream().map(x -> new UserProfileBaseRsp().setUserId(x.getUserId()).setName(x.getName()).setJobNumber(x.getJobNumber())).collect(Collectors.toList());
+        }
+        return Result.buildSuccessResult(rspList);
+    }
+
+
+    /**
+     * 部门列表
+     */
+    @ApiOperation(value = "部门列表", notes = "停车场分配模块中需要使用到部门列表")
+    @PostMapping("/departmentList")
+    public Result<List<DepartmentBaseRsp>> departmentList()
+    {
+        List<DepartmentPO> poList = departmentService.queryUsingDepartmentList();
+        List<DepartmentBaseRsp> rspList = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(poList)){
+            rspList = poList.stream().map(x -> new DepartmentBaseRsp().setDeptCode(x.getDeptCode()).setDepartmentName(x.getDepartmentName())).collect(Collectors.toList());
+        }
+        return Result.buildSuccessResult(rspList);
+    }
+
+
+
+
+
 
     /**
      * 查询摇号规则-停车场分配列表

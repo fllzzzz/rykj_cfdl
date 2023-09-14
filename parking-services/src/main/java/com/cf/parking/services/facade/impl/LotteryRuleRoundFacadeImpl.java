@@ -44,13 +44,15 @@ public class LotteryRuleRoundFacadeImpl implements LotteryRuleRoundFacade
     @Resource
     private IdWorker idWorker;
 
-    /** 根据摇号轮数id转换成对应的轮数名称并进行拼接*/
+    /** 根据摇号轮数id转换成对应的轮数名称并进行拼接
+     * roundId：[1,2,3]*/
     public String getNameByRoundId(String roundId){
         String name = null;
         if (StringUtils.isBlank(roundId)){
             return name;
         }
 
+        roundId = roundId.replace("[","").replace("]","");
         if (roundId.contains(",")){
             String[] splitIds = roundId.split(",");
             List<String> nameList = new ArrayList<>();
@@ -65,8 +67,23 @@ public class LotteryRuleRoundFacadeImpl implements LotteryRuleRoundFacade
             LotteryRuleRoundPO roundPO = mapper.selectById(Long.parseLong(roundId));
             name = StringUtils.isNotBlank(roundPO.getName()) ?  roundPO.getName() :  null;
         }
-
         return name;
+    }
+
+    /** 根据摇号轮数id转换成对应的数组
+     * roundId：[1,2,3]*/
+    public Long[] getRoundIdArrByRoundIdStr(String roundId) {
+        if (StringUtils.isBlank(roundId)){
+            return null;
+        }
+        roundId = roundId.replace("[","").replace("]","");
+        String[] split = roundId.split(",");
+        Long[] roundIdArr = new Long[split.length];
+        for (int i = 0; i < split.length; i++) {
+            roundIdArr[i] = Long.parseLong(split[i]);
+        }
+        return roundIdArr;
+
     }
 
     /**
@@ -158,4 +175,12 @@ public class LotteryRuleRoundFacadeImpl implements LotteryRuleRoundFacade
     }
 
 
+    /**
+     * 根据id查询轮数
+     * @param roundId
+     * @return
+     */
+    public LotteryRuleRoundPO getLotteryRuleRoundByRoundId(Long roundId) {
+        return mapper.selectById(roundId);
+    }
 }

@@ -4,10 +4,8 @@ import javax.annotation.Resource;
 
 import com.cf.parking.api.request.LotteryRuleRoundOptReq;
 import com.cf.parking.api.request.LotteryRuleRoundReq;
-import com.cf.parking.api.response.LotteryBlackListRsp;
-import com.cf.parking.api.response.LotteryRuleAssignRsp;
-import com.cf.parking.api.response.LotteryRuleRoundBaseRsp;
-import com.cf.parking.api.response.LotteryRuleRoundRsp;
+import com.cf.parking.api.response.*;
+import com.cf.parking.dao.po.UserProfilePO;
 import com.cf.parking.facade.bo.LotteryBlackListBO;
 import com.cf.parking.facade.bo.LotteryRuleAssignBO;
 import com.cf.parking.facade.bo.LotteryRuleRoundBO;
@@ -24,13 +22,16 @@ import com.cf.support.utils.BeanConvertorUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 摇号规则-轮数Controller
@@ -55,8 +56,8 @@ public class LotteryRuleRoundController
     public Result<List<LotteryRuleRoundBaseRsp>> baseList()
     {
         List<LotteryRuleRoundBaseBO> baseBOList = lotteryRuleRoundFacade.selectBaseList();
-        List<LotteryRuleRoundBaseRsp> lotteryRuleRoundBaseRsps = BeanConvertorUtils.copyList(baseBOList, LotteryRuleRoundBaseRsp.class);
-        return Result.buildSuccessResult(lotteryRuleRoundBaseRsps);
+        List<LotteryRuleRoundBaseRsp> baseRsps = new ArrayList<>();
+        return CollectionUtils.isEmpty(baseBOList) ? Result.buildSuccessResult(baseRsps) : Result.buildSuccessResult(BeanConvertorUtils.copyList(baseBOList, LotteryRuleRoundBaseRsp.class));
     }
 
     /**

@@ -33,10 +33,16 @@ public class DepartmentService extends ServiceImpl<DepartmentPOMapper, Departmen
 					.eq(DepartmentPO::getState, 0)
 				).stream().map(item -> item.getDeptCode()).collect(Collectors.toList());
 	}
-	
-	
 
 
-	
+	/**
+	 * 查询状态为正常的部门列表
+	 * @return
+	 */
+	public List<DepartmentPO> queryUsingDepartmentList() {
+		List<DepartmentPO> poList = departmentPOMapper.selectList(new LambdaQueryWrapper<DepartmentPO>()
+				.eq(DepartmentPO::getState, 0));
+		return poList;
+	}
 }
 
