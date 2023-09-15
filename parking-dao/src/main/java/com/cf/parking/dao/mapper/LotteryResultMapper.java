@@ -16,8 +16,8 @@ public interface LotteryResultMapper extends BaseMapper<LotteryResultPO>
 
 	/**带状态更新
 	 * @param id
-	 * @param state
-	 * @param state2
+	 * @param oldState 原状态
+	 * @param newState 新状态
 	 * @return
 	 */
 	int updateByState(@Param("id") Long id, @Param("oldState") String oldState, @Param("newState") String newState);

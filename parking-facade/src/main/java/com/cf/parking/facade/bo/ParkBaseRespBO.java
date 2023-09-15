@@ -23,4 +23,9 @@ public class ParkBaseRespBO<T> {
 	private String resMsg;
 	
 	private T result;
+	
+	
+	public static ParkBaseRespBO fail() {
+		return new ParkBaseRespBO().setResCode("500").setResMsg("调用异常");
+	}
 }

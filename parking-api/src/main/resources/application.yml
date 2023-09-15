@@ -25,6 +25,7 @@ logging:
   level:
     org.redisson.connection.DNSMonitor: error
     org.apache.http.wire: error
+    com.cf.parking: debug
 
 
 knife4j:

@@ -162,3 +162,11 @@ alter table user_space add column batch_num date comment '期号',add column rou
 alter table user_space  add column batch_id BIGINT comment '批次ID';
 
 alter table user_profile  add column parking_lot_region varchar(64) default '' comment '停车场区域';
+alter table lottery_result add index batch_id_idx(batch_id);
+alter table lottery_result_detail add index result_id_idx(result_id);
+alter table lottery_result add index state_idx(state);
+alter table user_space add index job_number_idx(job_number,parking_lot);
+alter table user_space add index batch_id_idx(batch_id,round_id);
+alter table user_space add index schedule_date_idx(schedule_date);
+
+alter table user_space add column  fail_reason varchar(256) default '' comment '失败原因';

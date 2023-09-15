@@ -2,6 +2,9 @@ package com.cf.parking.services.service;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+
+import com.cf.parking.facade.bo.ParkBaseDetailRespBO;
+import com.cf.parking.facade.bo.ParkBaseRespBO;
 import com.cf.parking.facade.bo.UserSpaceBO;
 import com.cf.parking.services.utils.PageUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +26,7 @@ import com.cf.parking.facade.dto.UserSpaceDTO;
 import com.cf.parking.facade.dto.UserSpaceFuncTimeDTO;
 import com.cf.parking.facade.dto.UserSpacePageDTO;
 import com.cf.parking.facade.dto.UserSpaceValidityDTO;
+import com.cf.parking.services.enums.ParkingRemoteCodeEnum;
 import com.cf.parking.services.enums.UserSpaceStateEnum;
 import com.cf.parking.services.integration.ParkInvokeService;
 import com.cf.support.result.PageResponse;
@@ -215,9 +219,9 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 	 * @return
 	 */
 	public List<UserSpacePO> querySpaceListByJobNum(List<String> jobNumList) {
-		return CollectionUtils.isEmpty(jobNumList) ? null : userSpaceMapper.selectList(new LambdaQueryWrapper<UserSpacePO>()
-					.eq(UserSpacePO::getJobNumber, jobNumList)
-					.ge(UserSpacePO::getEndDate, DateUtil.format(DateUtil.beginOfDay(new Date()), "yyyy-MM-dd HH:mm:ss"))
+		return CollectionUtils.isEmpty(jobNumList) ? Collections.emptyList(): userSpaceMapper.selectList(new LambdaQueryWrapper<UserSpacePO>()
+					.in(UserSpacePO::getJobNumber, jobNumList)
+					.ge(UserSpacePO::getEndDate, DateUtil.format(new Date(), "yyyy-MM-dd"))
 				);
 	}
 
@@ -240,7 +244,7 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 		
 		//车牌信息映射成用户id--车牌集合形式
 		Map<Long,List<String>> verifyMap = verifyList.stream().collect(Collectors.groupingBy(UserVerifyPO::getUserId ,Collectors.mapping(UserVerifyPO::getPlateNo, Collectors.toList())));
-		verifyList.clear();;
+		verifyList.clear();
 		//车位信息映射成Map形式  {jobNum:{plateNo:UserSpacePO}}
 		Map<String/**工号*/, Map<String/**车牌*/, UserSpacePO>> userSpaceMap = (Map<String, Map<String, UserSpacePO>>) spaceList.stream()
 		        .collect(Collectors.toMap(UserSpacePO::getJobNumber, // 工号作为外层Map的键
@@ -291,7 +295,7 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 		}
 		
 		if(!CollectionUtils.isEmpty(existSpaceList)) {
-			userSpaceService.updateBatchById(initSpaceList);
+			userSpaceService.updateBatchById(existSpaceList);
 		}
 		
 	}
@@ -393,11 +397,17 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 		UserSpaceDTO dto = new UserSpaceDTO();
 		spaceList.forEach(space->{
 			try {
-				BeanUtils.copyProperties(space, dto);;
+				BeanUtils.copyProperties(space, dto);
 				dto.setParkingLot(StringUtils.join( parkingLotService.queryParentListViaSelf(dto.getParkingLot()),"," ));
-				boolean flag = parkInvokeService.replaceCarInfo(dto);
-				log.info("定时任务车位同步id={}结果{}",space.getUserSpaceId(),flag);
-				space.setState(flag ? UserSpaceStateEnum.SUCCESS.getState() : UserSpaceStateEnum.FAIL.getState());
+				ParkBaseRespBO<ParkBaseDetailRespBO> resp = parkInvokeService.replaceCarInfo(dto);
+				if(resp != null && ParkingRemoteCodeEnum.RESP_SUCCESS.getState().equals(resp.getResCode()) && resp.getResult() != null && 
+						ParkingRemoteCodeEnum.BUS_CODE.getState().equals(resp.getResult().getCode())) {
+					space.setState(UserSpaceStateEnum.SUCCESS.getState());
+				} else {
+					space.setState(UserSpaceStateEnum.FAIL.getState());
+					space.setFailReason(resp == null ? "系统异常" : (resp.getResult() == null ? resp.getResMsg() : resp.getResult().getMessage()));
+				}
+				log.info("定时任务车位同步id={}结果{}",space.getUserSpaceId(),JSON.toJSONString(resp));
 				userSpaceMapper.updateById(space);
 				Thread.sleep(5000);
 			} catch (Exception e) {
@@ -407,15 +417,15 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 	}
 
 	
+	
 	/**
 	 * 同步车位信息到闸机系统
 	 */
 	public void syncSpace() {
 		UserSpacePO space = userSpaceMapper.selectOne(new LambdaQueryWrapper<UserSpacePO>()
 					.ne(UserSpacePO::getState, UserSpaceStateEnum.SUCCESS.getState())
-					.le(UserSpacePO::getEndDate, DateUtil.format(new Date(), "yyyy-MM-dd"))
-					.isNull(UserSpacePO::getScheduleDate)
-					.last(" limit 1 ")
+					.ge(UserSpacePO::getEndDate, DateUtil.format(new Date(), "yyyy-MM-dd"))
+					.last(" and ifnull(schedule_date,'') = '' limit 1 ")
 				);
 		log.info("获取到待同步车位信息：{}",JSON.toJSONString(space));
 		if (space == null) {
@@ -425,9 +435,15 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 		UserSpaceDTO dto = new UserSpaceDTO();
 		BeanUtils.copyProperties(space, dto);
 		dto.setParkingLot(StringUtils.join( parkingLotService.queryParentListViaSelf(dto.getParkingLot()),"," ));
-		boolean flag = parkInvokeService.replaceCarInfo(dto);
-		log.info("车位同步id={}结果{}",space.getUserSpaceId(),flag);;
-		space.setState(flag ? UserSpaceStateEnum.SUCCESS.getState() : UserSpaceStateEnum.FAIL.getState());
+		ParkBaseRespBO<ParkBaseDetailRespBO> resp = parkInvokeService.replaceCarInfo(dto);
+		if(resp != null && ParkingRemoteCodeEnum.RESP_SUCCESS.getState().equals(resp.getResCode()) && resp.getResult() != null && 
+				ParkingRemoteCodeEnum.BUS_CODE.getState().equals(resp.getResult().getCode())) {
+			space.setState(UserSpaceStateEnum.SUCCESS.getState());
+		} else {
+			space.setState(UserSpaceStateEnum.FAIL.getState());
+			space.setFailReason(resp == null ? "系统异常" : (resp.getResult() == null ? resp.getResMsg() : resp.getResult().getMessage()));
+		}
+		log.info("车位同步id={}结果{}",space.getUserSpaceId(),JSON.toJSONString(resp));
 		userSpaceMapper.updateById(space);
 	}
 
@@ -482,6 +498,22 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 					.eq(UserSpacePO::getBatchId, batchId))
 				.stream().map(space -> space.getJobNumber())
 				.collect(Collectors.toList());
+	}
+
+
+	/**
+	 * 根据批次号和轮次号查询未同步成功的数据量
+	 * @param batchId
+	 * @param roundId
+	 * @return
+	 */
+	public long queryUnSyncListByBatch(Long batchId, Long roundId) {
+		return userSpaceMapper.selectCount(new LambdaQueryWrapper<UserSpacePO>()
+				.eq(UserSpacePO::getRoundId, roundId)
+				.eq(UserSpacePO::getBatchId, batchId)
+				.ne(UserSpacePO::getState, UserSpaceStateEnum.SUCCESS.getState())
+				
+			);
 	}
 }
 

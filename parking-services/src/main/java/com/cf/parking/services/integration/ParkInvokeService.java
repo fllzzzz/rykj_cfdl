@@ -34,7 +34,7 @@ public class ParkInvokeService {
 	 * @param info
 	 * @return
 	 */
-	public boolean replaceCarInfo(UserSpaceDTO space) {
+	public ParkBaseRespBO<ParkBaseDetailRespBO> replaceCarInfo(UserSpaceDTO space) {
 		Carmanagement info = new Carmanagement();
 		info.setLicensePlate(space.getPlateNo())
 			.setJobNo(space.getJobNumber())
@@ -54,14 +54,10 @@ public class ParkInvokeService {
 			String reponseContent = EntityUtils.toString(entity,"UTF-8");
 			log.info("调用添加车辆接口入参：{},出参:{}",JSON.toJSONString(info),JSON.toJSONString(reponseContent));
 			ParkBaseRespBO<ParkBaseDetailRespBO> resp = JSON.parseObject(reponseContent, new TypeReference<ParkBaseRespBO<ParkBaseDetailRespBO>>() {} );
-			if(ParkingRemoteCodeEnum.RESP_SUCCESS.getState().equals(resp.getResCode()) && resp.getResult() != null && 
-					ParkingRemoteCodeEnum.BUS_CODE.getState().equals(resp.getResult().getCode())) {
-				return true;
-			}
-			return false;
+			return resp;
 		} catch (Exception e) {
 			log.info("调用添加车辆接口入参：{},e={}",JSON.toJSONString(info),e);
-			return false;
+			return ParkBaseRespBO.fail();
 		}
 	}
 	

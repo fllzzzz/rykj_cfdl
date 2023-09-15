@@ -18,6 +18,7 @@
         <result column="batch_num" property="batchNum"/>
         <result column="round_id" property="roundId"/>
         <result column="batch_id" property="batchId"/>
+        <result column="fail_reason" property="failReason"/>
     </resultMap>
 
     <delete id="deleteAll">

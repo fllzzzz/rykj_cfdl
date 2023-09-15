@@ -8,6 +8,7 @@ import com.cf.parking.facade.facade.CrossRecordsFacade;
 import com.cf.parking.facade.facade.DingNoticeRecordFacade;
 import com.cf.parking.facade.facade.ScheduleDataFacade;
 import com.cf.parking.services.integration.GatewayHikvisionFeign;
+import com.cf.parking.services.integration.ParkInvokeService;
 import com.cf.parking.services.job.parking.ParkingSpaceTask;
 import com.cf.support.result.PageResponse;
 import com.cf.support.result.Result;
@@ -46,6 +47,9 @@ public class TestController {
 	private ScheduleDataFacade scheduleDataFacade;
 	@Resource
 	private CrossRecordsFacade crossRecordsFacade;
+	
+	@Resource
+	private ParkInvokeService parkInvokeService ;
 
 	/**
 	 * 执行获取车位信息
@@ -185,4 +189,14 @@ public class TestController {
 		log.info("remainSpaceNum={}", hikvisionResult);
 		return Result.buildSuccessResult(hikvisionResult.getData());
 	}
+	
+	
+	@PostMapping("/carAdd")
+	@ApiOperation(value = "添加车位", notes = "添加车位")
+	public Result addCar() {
+		HikvisionResult<List<SpaceNumDTO>> hikvisionResult = gatewayHikvisionFeign.remainSpaceNum(FeignUrlConstant.SPACE_NUM_URL, new ParkSyscodeDTO());
+		log.info("remainSpaceNum={}", hikvisionResult);
+		return Result.buildSuccessResult(hikvisionResult.getData());
+	}
+	
 }
