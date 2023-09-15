@@ -190,4 +190,16 @@ public class UserProfileService extends ServiceImpl<UserProfilePOMapper, UserPro
     public List<UserProfilePO> queryBaseList() {
         return userProfilePOMapper.selectList(new LambdaQueryWrapper<>());
     }
+
+    /**
+     * 根据名称和工号查询userprofile
+     * @param name
+     * @param jobNumber
+     * @return
+     */
+    public UserProfilePO selectUserProfileByNameAndJobNumber(String name, String jobNumber) {
+        return userProfilePOMapper.selectOne(new LambdaQueryWrapper<UserProfilePO>()
+                .eq(UserProfilePO::getName,name)
+                .eq(UserProfilePO::getJobNumber,jobNumber));
+    }
 }

@@ -16,9 +16,9 @@ public class DepartmentBaseRsp {
 
     //部门编码
     @ApiModelProperty(value = "部门编码")
-    private String deptCode;
+    private String code;
 
     //部门名称
     @ApiModelProperty(value = "部门名称")
-    private String departmentName;
+    private String name;
 }

@@ -1,5 +1,6 @@
 package com.cf.parking.api.request;
 
+import cn.hutool.core.date.DateTime;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -35,12 +36,12 @@ public class LotteryBatchOptReq {
     /** 报名开始时间 */
     @ApiModelProperty(value = "报名开始时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date applyStartTime;
+    private DateTime applyStartTime;
 
     /** 报名结束时间 */
     @ApiModelProperty(value = "报名结束时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date applyEndTime;
+    private DateTime applyEndTime;
 
     /** 车位有效开始日期 */
     @ApiModelProperty(value = "车位有效开始日期")
@@ -67,7 +68,9 @@ public class LotteryBatchOptReq {
     private Date updateTm;
 
     //前端传入的时间数组
-    private Date[] dialogApplyTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private DateTime[] dialogApplyTime;
 
-    private Date[] validityDate;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private DateTime[] validityDate;
 }

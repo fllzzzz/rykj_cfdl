@@ -67,7 +67,7 @@ public class LotteryRuleAssignController
         List<UserProfilePO> poList = userProfileService.queryBaseList();
         List<UserProfileBaseRsp> rspList = new ArrayList<>();
         if (!CollectionUtils.isEmpty(poList)){
-            rspList = poList.stream().map(x -> new UserProfileBaseRsp().setUserId(x.getUserId()).setName(x.getName()).setJobNumber(x.getJobNumber())).collect(Collectors.toList());
+            rspList = poList.stream().map(x -> new UserProfileBaseRsp().setName(x.getName()).setCode(x.getJobNumber())).collect(Collectors.toList());
         }
         return Result.buildSuccessResult(rspList);
     }
@@ -83,7 +83,7 @@ public class LotteryRuleAssignController
         List<DepartmentPO> poList = departmentService.queryUsingDepartmentList();
         List<DepartmentBaseRsp> rspList = new ArrayList<>();
         if (!CollectionUtils.isEmpty(poList)){
-            rspList = poList.stream().map(x -> new DepartmentBaseRsp().setDeptCode(x.getDeptCode()).setDepartmentName(x.getDepartmentName())).collect(Collectors.toList());
+            rspList = poList.stream().map(x -> new DepartmentBaseRsp().setCode(x.getDeptCode()).setName(x.getDepartmentName())).collect(Collectors.toList());
         }
         return Result.buildSuccessResult(rspList);
     }

@@ -24,6 +24,7 @@ import org.springframework.util.ObjectUtils;
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 车辆审核 Service业务层处理
@@ -68,11 +69,11 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
      */
     @Override
     public UserVerifyBO getUserVerify(UserVerifyDTO dto) {
-        UserVerifyPO userVerifyPO = mapper.selectById(dto.getId());
+        UserVerifyPO userVerifyPO = mapper.selectOne(new LambdaQueryWrapper<UserVerifyPO>()
+                                                        .eq(UserVerifyPO::getUserId,dto.getUserId())
+                                                        .eq(UserVerifyPO::getPlateNo,dto.getPlatNo()));
 
-        UserVerifyBO bo = new UserVerifyBO();
-        BeanUtils.copyProperties(userVerifyPO,bo);
-        return bo;
+        return BeanConvertorUtils.map(userVerifyPO, UserVerifyBO.class);
     }
 
     /**
@@ -128,6 +129,27 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
     @Override
     public void batchAudit(UserVerifyOptDTO dto) {
         mapper.batchAudit(dto.getIds(),dto.getState(),dto.getReason());
+    }
+
+    /**
+     * 根据userId获取个人车牌号列表
+     * @param userId
+     * @return
+     */
+    @Override
+    public List<String> getPlatNoListByUserId(Long userId) {
+        return mapper.selectList(new LambdaQueryWrapper<UserVerifyPO>().eq(UserVerifyPO::getUserId, userId)).stream().map(UserVerifyPO::getPlateNo).collect(Collectors.toList());
+    }
+
+    /**
+     * 修改审核车辆
+     * @param dto
+     * @return
+     */
+    @Override
+    public Integer update(UserVerifyOptDTO dto) {
+        //TODO
+        return 0;
     }
 
 }

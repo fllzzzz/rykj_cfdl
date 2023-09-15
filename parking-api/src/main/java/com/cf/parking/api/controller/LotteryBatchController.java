@@ -67,7 +67,8 @@ public class LotteryBatchController
 
         PageResponse<LotteryBatchBO> result = lotteryBatchFacade.getLotteryBatchList(dto);
         List<LotteryBatchRsp> lotteryBatchRsps = BeanConvertorUtils.copyList(result.getList(), LotteryBatchRsp.class);
-        return Result.buildSuccessResult(new PageResponse(lotteryBatchRsps,result.getPageNo(),result.getTotal(),result.getPageSize()));
+        Result<PageResponse<LotteryBatchRsp>> resultRsp = Result.buildSuccessResult(new PageResponse(lotteryBatchRsps,result.getPageNo(),result.getTotal(),result.getPageSize()));
+        return resultRsp;
     }
 
     /**

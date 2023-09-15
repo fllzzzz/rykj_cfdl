@@ -17,11 +17,8 @@ public class LotteryBlackListOptDTO  {
     /** id */
     private Long id;
 
-    /** userId */
-    private Long userId;
-
     /** 工号 */
-    private String jobNumber;
+    private String code;
 
     /** 姓名 */
     private String name;
@@ -29,9 +26,4 @@ public class LotteryBlackListOptDTO  {
     /** 原因 */
     private String reason;
 
-    /** 创建时间 */
-    private Date createTm;
-
-    /** 更新时间 */
-    private Date updateTm;
 }

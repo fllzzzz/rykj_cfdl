@@ -23,7 +23,10 @@ public class LotteryRuleAssignBO {
     /** 名称（部门或者人员名称） */
     private String name;
 
-    /** 停车场，多个间逗号间隔 */
+    /** 停车场编号 */
+    private String parkingLotCode;
+
+    /** 停车场 */
     private String parkingLotName;
 
     /** 状态(0：停用，1：启用) */

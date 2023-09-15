@@ -7,13 +7,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cf.parking.dao.mapper.ParkingLotMapper;
 import com.cf.parking.dao.po.ParkingLotPO;
 import com.cf.parking.facade.bo.ParkingLotAreaBO;
 import com.cf.parking.facade.bo.ParkingLotAreaEntranceBO;
 import com.cf.parking.facade.bo.ParkingLotBO;
+import com.cf.parking.facade.bo.ParkingLotTreeBO;
 import com.cf.parking.facade.dto.ParkingLotAreaEntranceOptDTO;
 import com.cf.parking.facade.dto.ParkingLotAreaOptDTO;
 import com.cf.parking.facade.dto.ParkingLotDTO;
@@ -21,6 +21,7 @@ import com.cf.parking.facade.dto.ParkingLotOptDTO;
 import com.cf.parking.facade.facade.ParkingLotFacade;
 import com.cf.parking.services.utils.PageUtils;
 import com.cf.support.bean.IdWorker;
+import com.cf.support.exception.BusinessException;
 import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
 import com.google.gson.Gson;
@@ -30,6 +31,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -70,6 +72,7 @@ public class ParkingLotFacadeImpl implements ParkingLotFacade
                     .orderByAsc(ParkingLotPO::getCreateTm));
 
             List<ParkingLotBO> boList = getParkingLotBOList(poPage.getRecords());
+            setParentNameByBolist(boList);
             return PageUtils.toResponseList(page,boList);
         }else {
             //2.如果parentId为空，先查询所有第一级（园区）的子记录，然后查询子记录
@@ -84,25 +87,39 @@ public class ParkingLotFacadeImpl implements ParkingLotFacade
                         .orderByAsc(ParkingLotPO::getCreateTm));
 
                 List<ParkingLotBO> boList = getParkingLotBOList(poPage.getRecords());
+                setParentNameByBolist(boList);
                 return PageUtils.toResponseList(page,boList);
             }
         }
         return PageUtils.toResponseList(page,new ArrayList<>());
     }
 
+    private void setParentNameByBolist(List<ParkingLotBO> boList) {
+        for (ParkingLotBO parkingLotBO : boList) {
+            setParentNameByBo(parkingLotBO);
+        }
+    }
+
+    private void setParentNameByBo(ParkingLotBO parkingLotBO) {
+        parkingLotBO.setParentName(mapper.selectById(parkingLotBO.getParentId()).getRegion());
+    }
+
+
     private List<ParkingLotBO> getParkingLotBOList(List<ParkingLotPO> list) {
         List<ParkingLotBO> boList = BeanConvertorUtils.copyList(list, ParkingLotBO.class);
         for (ParkingLotBO parkingLotBO : boList) {
-            parkingLotBO.setChildren(getChildren(parkingLotBO));
+            parkingLotBO.setChildren(getParkingLotChildren(parkingLotBO));
+            setParentNameByBo(parkingLotBO);
         }
         return boList;
     }
 
-    private List<ParkingLotBO> getChildren(ParkingLotBO parkingLotBO) {
+    private List<ParkingLotBO> getParkingLotChildren(ParkingLotBO parkingLotBO) {
         List<ParkingLotPO> childPOList = mapper.selectList(new LambdaQueryWrapper<ParkingLotPO>().eq(ParkingLotPO::getParentId, parkingLotBO.getId()));
         List<ParkingLotBO> childBoList = BeanConvertorUtils.copyList(childPOList, ParkingLotBO.class);
         List<ParkingLotBO> result = childBoList.stream().map(bo -> {
-            bo.setChildren(getChildren(bo));
+            bo.setChildren(getParkingLotChildren(bo));
+            setParentNameByBo(bo);
             return bo;
         }).collect(Collectors.toList());
         return result;
@@ -153,13 +170,34 @@ public class ParkingLotFacadeImpl implements ParkingLotFacade
 
     /**
      * 删除停车场
+     * 注：删除时需要删除子停车场
      * @param id
      * @return
      */
     @Override
     public Integer deleteById(Long id) {
         try{
-            int result = mapper.deleteById(id);
+            //1.根据id查询
+            List<Long> ids = new ArrayList<>();
+            ids.add(id);
+            List<Long> poList = mapper.selectList(new LambdaQueryWrapper<ParkingLotPO>().eq(ParkingLotPO::getParentId, id)).stream().map(ParkingLotPO::getId).collect(Collectors.toList());
+            if (CollectionUtils.isNotEmpty(poList)){
+                ids.addAll(poList);
+                while (CollectionUtils.isNotEmpty(poList)){
+                    List<Long> innerIds = new ArrayList<>();
+                    for (Long childId : poList) {
+                        List<Long> childList = mapper.selectList(new LambdaQueryWrapper<ParkingLotPO>().eq(ParkingLotPO::getParentId, childId)).stream().map(ParkingLotPO::getId).collect(Collectors.toList());
+                        innerIds.addAll(childList);
+                    }
+                    if (CollectionUtils.isNotEmpty(innerIds)){
+                        ids.addAll(innerIds);
+                        poList = innerIds;
+                    }else {
+                        break;
+                    }
+                }
+            }
+            int result = mapper.deleteBatchIds(ids);
             log.info("停车场删除成功，id：{}",id);
             return result;
         }catch (Exception e){
@@ -188,7 +226,10 @@ public class ParkingLotFacadeImpl implements ParkingLotFacade
             int result = mapper.insert(po);
             log.info("新增停车场园区成功  ——  {}",po);
             return result;
-        }catch (Exception e){
+        } catch (DataIntegrityViolationException e){
+            log.error("新增停车场园区入口重复：{}，失败原因：{}",po,e);
+            throw new BusinessException("入口重复，请修改后重试！");
+        } catch (Exception e){
             log.error("新增停车场园区失败：{}，失败原因：{}",po,e);
             return 0;
         }
@@ -213,10 +254,37 @@ public class ParkingLotFacadeImpl implements ParkingLotFacade
             int result = mapper.updateById(po);
             log.info("修改停车场园区成功  ——  {}",po);
             return result;
-        }catch (Exception e){
+        }catch (DataIntegrityViolationException e){
+            log.error("修改停车场园区入口重复：{}，失败原因：{}",po,e);
+            throw new BusinessException("入口重复，请修改后重试！");
+        } catch (Exception e){
             log.error("修改停车场园区失败：{}，失败原因：{}",po,e);
             return 0;
         }
+    }
+
+    /**
+     * 查询停车场树形列表
+     * @return
+     */
+    @Override
+    public List<ParkingLotTreeBO> getParkingLotTreeList() {
+        List<ParkingLotPO> poList = mapper.selectList(new LambdaQueryWrapper<ParkingLotPO>().eq(ParkingLotPO::getParentId, 0));
+        List<ParkingLotTreeBO> boList = BeanConvertorUtils.copyList(poList, ParkingLotTreeBO.class);
+        for (ParkingLotTreeBO treeBO : boList) {
+            treeBO.setChildren(getParkingLotTreeChildren(treeBO));
+        }
+        return boList;
+    }
+
+    private List<ParkingLotTreeBO> getParkingLotTreeChildren(ParkingLotTreeBO treeBO) {
+        List<ParkingLotPO> childPOList = mapper.selectList(new LambdaQueryWrapper<ParkingLotPO>().eq(ParkingLotPO::getParentId, treeBO.getId()));
+        List<ParkingLotTreeBO> childBoList = BeanConvertorUtils.copyList(childPOList, ParkingLotTreeBO.class);
+        List<ParkingLotTreeBO> result = childBoList.stream().map(bo -> {
+            bo.setChildren(getParkingLotTreeChildren(bo));
+            return bo;
+        }).collect(Collectors.toList());
+        return result;
     }
 
     /**
@@ -224,9 +292,10 @@ public class ParkingLotFacadeImpl implements ParkingLotFacade
      * @return
      */
     @Override
-    public List<ParkingLotAreaBO> getAreaList() {
+    public List<ParkingLotAreaBO> getAreaList(String region) {
         List<ParkingLotPO> poList = mapper.selectList(new LambdaQueryWrapper<ParkingLotPO>()
-                .eq(ParkingLotPO::getParentId, 0));
+                .eq(ParkingLotPO::getParentId, 0)
+                .like(StringUtils.isNotBlank(region),ParkingLotPO::getRegion,region));
         List<ParkingLotAreaBO> boList = poList.stream().map(po -> {
             ParkingLotAreaBO bo = new ParkingLotAreaBO().setId(po.getId()).setName(po.getRegion());
             if (StringUtils.isNotBlank(po.getRegionCode())) {

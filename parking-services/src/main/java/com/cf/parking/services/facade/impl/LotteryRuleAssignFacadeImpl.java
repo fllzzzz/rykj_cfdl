@@ -12,6 +12,7 @@ import com.cf.parking.facade.bo.LotteryRuleAssignBO;
 import com.cf.parking.facade.dto.LotteryRuleAssignDTO;
 import com.cf.parking.facade.dto.LotteryRuleAssignOptDTO;
 import com.cf.parking.facade.facade.LotteryRuleAssignFacade;
+import com.cf.parking.services.service.ParkingLotService;
 import com.cf.parking.services.utils.PageUtils;
 import com.cf.support.bean.IdWorker;
 import com.cf.support.result.PageResponse;
@@ -34,11 +35,14 @@ import javax.annotation.Resource;
 @Service
 public class LotteryRuleAssignFacadeImpl implements LotteryRuleAssignFacade
 {
-    @Autowired
+    @Resource
     private LotteryRuleAssignMapper mapper;
 
     @Resource
     private IdWorker idWorker;
+
+    @Resource
+    private ParkingLotService parkingLotService;
 
     /**
      * 查询摇号规则-停车场分配列表
@@ -51,15 +55,21 @@ public class LotteryRuleAssignFacadeImpl implements LotteryRuleAssignFacade
 
         Page<LotteryRuleAssignPO> poPage = mapper.selectPage(page, new LambdaQueryWrapper<LotteryRuleAssignPO>()
                 .eq(StringUtils.isNotBlank(dto.getType()), LotteryRuleAssignPO::getType, dto.getType())
-                .eq(StringUtils.isNotBlank(dto.getName()), LotteryRuleAssignPO::getName, dto.getName())
+                .like(StringUtils.isNotBlank(dto.getName()), LotteryRuleAssignPO::getName, dto.getName())
                 .eq(StringUtils.isNotBlank(dto.getParkingLotCode()), LotteryRuleAssignPO::getParkingLotCode, dto.getParkingLotCode())
                 .eq(StringUtils.isNotBlank(dto.getState()), LotteryRuleAssignPO::getState, dto.getState())
                 .orderByAsc(LotteryRuleAssignPO::getCreateTm));
 
         List<LotteryRuleAssignBO> boList = BeanConvertorUtils.copyList(poPage.getRecords(), LotteryRuleAssignBO.class);
 
-        //TODO:根据停车场code查询停车场名称返回前端
+        //根据停车场code查询停车场名称返回前端
+        boList.stream().forEach(this::setParkingLotName);
         return PageUtils.toResponseList(page,boList);
+    }
+
+    private void setParkingLotName(LotteryRuleAssignBO lotteryRuleAssignBO) {
+        String parkingLotName = parkingLotService.selectParkingLotByCode(lotteryRuleAssignBO.getParkingLotCode()).getRegion();
+        lotteryRuleAssignBO.setParkingLotName(parkingLotName);
     }
 
     /**

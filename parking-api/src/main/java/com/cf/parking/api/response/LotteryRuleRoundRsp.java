@@ -23,9 +23,17 @@ public class LotteryRuleRoundRsp {
     @ApiModelProperty(value = "轮数名称")
     private String name;
 
-    /** 停车场(编号)，多个间逗号间隔 */
-    @ApiModelProperty(value = "停车场")
+    /** 停车场编号 */
+    @ApiModelProperty(value = "停车场编号")
+    private String parkingLotCode;
+
+    /** 停车场名称 */
+    @ApiModelProperty(value = "停车场名称")
     private String parkingLotName;
+
+    /** 停车场数量 */
+    @ApiModelProperty(value = "停车场数量")
+    private Long parkingLotAmount;
 
     /** 状态(0：停用，1：启用) */
     @ApiModelProperty(value = "状态")

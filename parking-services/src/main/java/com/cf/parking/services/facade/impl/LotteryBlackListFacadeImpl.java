@@ -8,10 +8,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cf.parking.dao.mapper.LotteryBlackListMapper;
 import com.cf.parking.dao.po.LotteryBatchPO;
 import com.cf.parking.dao.po.LotteryBlackListPO;
+import com.cf.parking.dao.po.UserProfilePO;
 import com.cf.parking.facade.bo.LotteryBlackListBO;
 import com.cf.parking.facade.dto.LotteryBlackListDTO;
 import com.cf.parking.facade.dto.LotteryBlackListOptDTO;
 import com.cf.parking.facade.facade.LotteryBlackListFacade;
+import com.cf.parking.services.service.UserProfileService;
 import com.cf.parking.services.utils.PageUtils;
 import com.cf.support.bean.IdWorker;
 import com.cf.support.result.PageResponse;
@@ -35,8 +37,11 @@ import javax.annotation.Resource;
 @Service
 public class LotteryBlackListFacadeImpl implements LotteryBlackListFacade
 {
-    @Autowired
+    @Resource
     private LotteryBlackListMapper mapper;
+
+    @Resource
+    private UserProfileService userProfileService;
 
     @Resource
     private IdWorker idWorker;
@@ -66,9 +71,15 @@ public class LotteryBlackListFacadeImpl implements LotteryBlackListFacade
      */
     @Override
     public Integer add(LotteryBlackListOptDTO dto) {
+        //1.查询userId
+        UserProfilePO userProfilePO = userProfileService.selectUserProfileByNameAndJobNumber(dto.getName(),dto.getCode());
+
+        //2.设置对象
         LotteryBlackListPO po = new LotteryBlackListPO();
         BeanUtils.copyProperties(dto,po);
         po.setId(idWorker.nextId());
+        po.setJobNumber(dto.getCode());
+        po.setUserId(userProfilePO.getUserId());
         po.setCreateTm(new Date());
         po.setUpdateTm(new Date());
         try{
@@ -88,6 +99,7 @@ public class LotteryBlackListFacadeImpl implements LotteryBlackListFacade
      */
     @Override
     public Integer update(LotteryBlackListOptDTO dto) {
+        //2.设置对象
         LotteryBlackListPO po = new LotteryBlackListPO();
         BeanUtils.copyProperties(dto,po);
         po.setUpdateTm(new Date());
