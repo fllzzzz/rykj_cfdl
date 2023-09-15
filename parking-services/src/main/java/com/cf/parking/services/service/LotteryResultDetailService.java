@@ -11,8 +11,13 @@ import com.cf.parking.services.utils.PageUtils;
 import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
 import javax.annotation.Resource;
+
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author
@@ -23,6 +28,9 @@ public class LotteryResultDetailService extends ServiceImpl<LotteryResultDetailM
 
     @Resource
     private LotteryResultDetailMapper mapper;
+    
+    @Resource
+    private LotteryResultService lotteryResultService;
 
     /**
      * 根据结果id查询对应的结果详情
@@ -49,5 +57,18 @@ public class LotteryResultDetailService extends ServiceImpl<LotteryResultDetailM
 		return mapper.selectList(new LambdaQueryWrapper<LotteryResultDetailPO>()
 					.eq(LotteryResultDetailPO::getResultId, resultId)
 				);
+	}
+
+	/**
+	 * 查询该批次下已中奖的人员工号
+	 * @param batchId
+	 * @return
+	 */
+	public List<String> querySpaceListByBatchId(Long batchId) {
+		List<Long> resultIdList = lotteryResultService.queryResultListByBatchId(batchId);
+		
+		return CollectionUtils.isEmpty(resultIdList) ? Collections.emptyList() : mapper.selectList(new LambdaQueryWrapper<LotteryResultDetailPO>()
+					.in(LotteryResultDetailPO::getResultId, resultIdList)
+				).stream().map(item -> item.getUserJobNumber()).collect(Collectors.toList());
 	}
 }

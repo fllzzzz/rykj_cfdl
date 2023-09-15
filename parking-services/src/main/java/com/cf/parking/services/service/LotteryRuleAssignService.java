@@ -1,6 +1,7 @@
 package com.cf.parking.services.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -43,7 +44,7 @@ public class LotteryRuleAssignService extends ServiceImpl<LotteryRuleAssignMappe
 	 */
 	public List<LotteryRuleAssignPO> queryRuleAssignListByJobNumber(List<String> codeList, String type) {
 		
-		return ruleAssignMapper.selectList(new LambdaQueryWrapper<LotteryRuleAssignPO>()
+		return CollectionUtils.isEmpty(codeList) ? Collections.emptyList() : ruleAssignMapper.selectList(new LambdaQueryWrapper<LotteryRuleAssignPO>()
 					.eq(LotteryRuleAssignPO::getType, type)
 					.in(LotteryRuleAssignPO::getCode, codeList)
 				);
@@ -69,10 +70,8 @@ public class LotteryRuleAssignService extends ServiceImpl<LotteryRuleAssignMappe
 		 * 5.留下的最终结果即为摇号人员
 		 */
 		
-		//获取该车库的报名人员信息
-		List<LotteryApplyRecordPO> parkApplyList = applyList.stream().filter(item-> item.getParkingLotCode().equals(parkLot.getRegionCode())).collect(Collectors.toList());
 		//获取该车库报名人员的工号
-		List<String> jobNumberList = parkApplyList.stream().filter(item-> item.getParkingLotCode().equals(parkLot.getRegionCode())).map(item -> item.getJobNumber()).collect(Collectors.toList());
+		List<String> jobNumberList = applyList.stream().filter(item-> item.getParkingLotCode().equals(parkLot.getRegionCode())).map(item -> item.getJobNumber()).collect(Collectors.toList());
 		log.info("获取到报名停车场：{}的人员工号{}",parkLot.getRegionCode(),JSON.toJSONString(jobNumberList));
 		
 		//获取配置人员数据
@@ -88,7 +87,7 @@ public class LotteryRuleAssignService extends ServiceImpl<LotteryRuleAssignMappe
 			//获取到待剔除人员工号
 			List<String> deleteJobNumList = userParking.entrySet().stream().filter(item -> !item.getValue().contains(parkLot.getRegionCode())).map(Map.Entry::getKey).collect(Collectors.toList());
 			log.info("获取到因未设置车库={}而需要剔除的人员工号={}",parkLot.getRegionCode(),deleteJobNumList);
-			parkApplyList = parkApplyList.stream().filter(item -> !deleteJobNumList.contains(item.getJobNumber())).collect(Collectors.toList());
+			applyList = applyList.stream().filter(item -> !deleteJobNumList.contains(item.getJobNumber())).collect(Collectors.toList());
 			deleteJobNumList.clear();
 			userParking.clear();
 		}
@@ -112,13 +111,12 @@ public class LotteryRuleAssignService extends ServiceImpl<LotteryRuleAssignMappe
 			//deptEmplyeeList是部门设置里未设置当前停车场的部门下属人员，是要从摇号人员中剔除的，但是如果里面有员工在人员配置里设置了该停车场，那还是可以去摇号的。所以要剔除掉这部分人员
 			deptEmplyeeList.removeAll(userSettingJobList);
 			
-			parkApplyList = parkApplyList.stream().filter(item -> !deptEmplyeeList.contains(item.getJobNumber())).collect(Collectors.toList());
+			applyList = applyList.stream().filter(item -> !deptEmplyeeList.contains(item.getJobNumber())).collect(Collectors.toList());
 			deleteDeptList.clear();
 			departParking.clear();
 			deptEmplyeeList.clear();
 		}
-		return parkApplyList;
+		return applyList;
 	}
 
-	
 }

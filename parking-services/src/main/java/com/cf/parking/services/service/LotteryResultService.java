@@ -7,13 +7,12 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cf.parking.dao.mapper.LotteryResultMapper;
 import com.cf.parking.dao.po.LotteryResultDetailPO;
 import com.cf.parking.dao.po.LotteryResultPO;
-import com.cf.parking.facade.bo.LotteryResultBO;
 import com.cf.parking.facade.bo.LotteryResultDetailBO;
 import com.cf.support.result.PageResponse;
 import org.springframework.stereotype.Service;
-
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author
@@ -50,4 +49,16 @@ public class LotteryResultService extends ServiceImpl<LotteryResultMapper, Lotte
         PageResponse<LotteryResultDetailBO> result =  lotteryResultDetailService.selectDetailListByResultId(page,po.getId());
         return result;
     }
+
+
+	/**
+	 * 根据批次查询结果id
+	 * @param batchId
+	 * @return
+	 */
+	public List<Long> queryResultListByBatchId(Long batchId) {
+		return mapper.selectList(new LambdaQueryWrapper<LotteryResultPO>()
+				.eq(LotteryResultPO::getBatchId, batchId)
+				).stream().map(item -> item.getId()).collect(Collectors.toList());
+	}
 }

@@ -18,6 +18,7 @@ import com.cf.parking.facade.dto.LotteryResultDTO;
 import com.cf.parking.facade.dto.UserSpaceDTO;
 import com.cf.parking.facade.facade.LotteryResultFacade;
 import com.cf.parking.services.enums.EnableStateEnum;
+import com.cf.parking.services.enums.LotteryEnableStateEnum;
 import com.cf.parking.services.enums.LotteryResultStateEnum;
 import com.cf.parking.services.service.DepartmentService;
 import com.cf.parking.services.service.EmployeeService;
@@ -38,7 +39,6 @@ import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
 import lombok.extern.slf4j.Slf4j;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
@@ -117,7 +117,7 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 		ParkingLotPO parkingLot = parkingLotService.selectParkingLotByCode(parklotCode);
 		log.info("初步获取到摇号停车场信息：{}",JSON.toJSONString(parkingLot));
 		AssertUtil.checkNull(parkingLot, "停车场信息不存在，请检查设置");
-		AssertUtil.checkTrue(EnableStateEnum.ENABLE.getState().equals(parkingLot.getType()), "停车场的配置为不可参加摇号，请检查设置");
+		AssertUtil.checkTrue(LotteryEnableStateEnum.ENABLE.getState().equals(parkingLot.getType()), "停车场的配置为不可参加摇号，请检查设置");
 		//获取报名的人员,要符合个人中心的车库在这次摇号的车库中这个条件
 		List<LotteryApplyRecordPO> applyList = lotteryApplyRecordService.queryLotteryApplyList(lottery.getBatchId(),parklotCode);
 		log.info("获取到报名摇号的人员信息：{}",JSON.toJSONString(applyList));
@@ -136,19 +136,18 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 		applyList = applyList.stream().filter(item -> (employeeJobNumList.contains(item.getJobNumber()) && !blackJobNumList.contains(item.getJobNumber()) ) ).collect(Collectors.toList());
 		log.info("过滤掉离职和黑名单后的报名摇号的人员信息：{}",JSON.toJSONString(applyList));
 		//查询当前批次已中签的人员工号
-		List<String> spaceJobNumList = userSpaceService.querySpaceListByBatchId(lottery.getBatchId());
+		List<String> spaceJobNumList = lotteryResultDetailService.querySpaceListByBatchId(lottery.getBatchId());
 		//过滤掉已中奖的
 		applyList = applyList.stream().filter(item -> (!spaceJobNumList.contains(item.getJobNumber())  ) ).collect(Collectors.toList());
-
+		AssertUtil.checkTrue(!CollectionUtils.isEmpty(applyList),"过滤后参与摇号人员为空");;
+		
 		//释放数据
 		jobNumberList.clear();
 		blackJobNumList.clear();
 		employeeJobNumList.clear();
 		
-		List<LotteryApplyRecordPO> parkApplyList = new ArrayList<>();
-		parkApplyList = lotteryRuleAssignService.dealApplyByRule(parkingLot, applyList);
-		lotteryDealService.doLottery(batch,lottery,parkingLot,parkApplyList);
-		parkApplyList.clear();
+		applyList = lotteryRuleAssignService.dealApplyByRule(parkingLot, applyList);
+		lotteryDealService.doLottery(batch,lottery,parkingLot,applyList);
 		
 	}
 

@@ -7,6 +7,7 @@ import com.cf.parking.dao.po.UserVerifyPO;
 import com.cf.parking.services.enums.UserVerifyStateEnum;
 import com.cf.parking.dao.mapper.UserVerifyMapper;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -35,7 +36,7 @@ public class UserVerifyService extends ServiceImpl<UserVerifyMapper, UserVerifyP
 	 * @return
 	 */
 	public List<UserVerifyPO> queryVerifyListByUserIdList(List<Long> userIdList) {
-		return CollectionUtils.isEmpty(userIdList) ? null : userVerifyMapper.selectList(new LambdaQueryWrapper<UserVerifyPO>()
+		return CollectionUtils.isEmpty(userIdList) ? Collections.emptyList() : userVerifyMapper.selectList(new LambdaQueryWrapper<UserVerifyPO>()
 					.in(UserVerifyPO::getUserId, userIdList)
 					.eq(UserVerifyPO::getState, UserVerifyStateEnum.SUCCESS.getState())
 				);

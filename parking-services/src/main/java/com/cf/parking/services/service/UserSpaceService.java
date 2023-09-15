@@ -215,9 +215,9 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 	 * @return
 	 */
 	public List<UserSpacePO> querySpaceListByJobNum(List<String> jobNumList) {
-		return CollectionUtils.isEmpty(jobNumList) ? null : userSpaceMapper.selectList(new LambdaQueryWrapper<UserSpacePO>()
-					.eq(UserSpacePO::getJobNumber, jobNumList)
-					.ge(UserSpacePO::getEndDate, DateUtil.format(DateUtil.beginOfDay(new Date()), "yyyy-MM-dd HH:mm:ss"))
+		return CollectionUtils.isEmpty(jobNumList) ? Collections.emptyList(): userSpaceMapper.selectList(new LambdaQueryWrapper<UserSpacePO>()
+					.in(UserSpacePO::getJobNumber, jobNumList)
+					.ge(UserSpacePO::getEndDate, DateUtil.format(new Date(), "yyyy-MM-dd"))
 				);
 	}
 
@@ -240,7 +240,7 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 		
 		//车牌信息映射成用户id--车牌集合形式
 		Map<Long,List<String>> verifyMap = verifyList.stream().collect(Collectors.groupingBy(UserVerifyPO::getUserId ,Collectors.mapping(UserVerifyPO::getPlateNo, Collectors.toList())));
-		verifyList.clear();;
+		verifyList.clear();
 		//车位信息映射成Map形式  {jobNum:{plateNo:UserSpacePO}}
 		Map<String/**工号*/, Map<String/**车牌*/, UserSpacePO>> userSpaceMap = (Map<String, Map<String, UserSpacePO>>) spaceList.stream()
 		        .collect(Collectors.toMap(UserSpacePO::getJobNumber, // 工号作为外层Map的键
@@ -291,7 +291,7 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 		}
 		
 		if(!CollectionUtils.isEmpty(existSpaceList)) {
-			userSpaceService.updateBatchById(initSpaceList);
+			userSpaceService.updateBatchById(existSpaceList);
 		}
 		
 	}
@@ -413,9 +413,8 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 	public void syncSpace() {
 		UserSpacePO space = userSpaceMapper.selectOne(new LambdaQueryWrapper<UserSpacePO>()
 					.ne(UserSpacePO::getState, UserSpaceStateEnum.SUCCESS.getState())
-					.le(UserSpacePO::getEndDate, DateUtil.format(new Date(), "yyyy-MM-dd"))
-					.isNull(UserSpacePO::getScheduleDate)
-					.last(" limit 1 ")
+					.ge(UserSpacePO::getEndDate, DateUtil.format(new Date(), "yyyy-MM-dd"))
+					.last(" and ifnull(schedule_date,'') = '' limit 1 ")
 				);
 		log.info("获取到待同步车位信息：{}",JSON.toJSONString(space));
 		if (space == null) {

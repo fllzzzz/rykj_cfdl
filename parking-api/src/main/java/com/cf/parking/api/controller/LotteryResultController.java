@@ -2,7 +2,6 @@ package com.cf.parking.api.controller;
 
 import javax.annotation.Resource;
 
-import com.cf.parking.api.request.LotteryResultDetailReq;
 import com.cf.parking.api.request.LotteryResultReq;
 import com.cf.parking.api.request.UserSpacePageReq;
 import com.cf.parking.api.response.LotteryResultDetailPageRsp;
@@ -12,7 +11,6 @@ import com.cf.parking.facade.bo.LotteryResultBO;
 import com.cf.parking.facade.bo.LotteryResultDetailBO;
 import com.cf.parking.facade.bo.UserSpaceBO;
 import com.cf.parking.facade.dto.LotteryResultDTO;
-import com.cf.parking.facade.dto.LotteryResultDetailDTO;
 import com.cf.parking.facade.dto.UserSpaceDTO;
 import com.cf.parking.facade.facade.LotteryResultFacade;
 import com.cf.parking.services.utils.AssertUtil;

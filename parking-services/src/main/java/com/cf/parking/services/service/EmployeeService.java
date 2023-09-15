@@ -34,7 +34,7 @@ public class EmployeeService extends ServiceImpl<EmployeePOMapper, EmployeePO> i
 	 * @return 在职人员工号
 	 */
 	public List<String> queryEmployeeListByJobNum(List<String> jobNumberList) {
-		return CollectionUtils.isEmpty(jobNumberList) ? Collections.EMPTY_LIST : employeePOMapper.selectList(new LambdaQueryWrapper<EmployeePO>()
+		return CollectionUtils.isEmpty(jobNumberList) ? Collections.emptyList() : employeePOMapper.selectList(new LambdaQueryWrapper<EmployeePO>()
 					.in(EmployeePO::getEmplNo, jobNumberList)
 					.eq(EmployeePO::getState, 0)
 				).stream().map(item -> item.getEmplNo()).collect(Collectors.toList());
@@ -48,12 +48,12 @@ public class EmployeeService extends ServiceImpl<EmployeePOMapper, EmployeePO> i
 	 */
 	public List<String> queryDeptListByJobNum(List<String> jobNumberList) {
 		
-		List<String> deptCodeList = CollectionUtils.isEmpty(jobNumberList) ? Collections.EMPTY_LIST :  employeePOMapper.selectList(new LambdaQueryWrapper<EmployeePO>()
+		List<String> deptCodeList = CollectionUtils.isEmpty(jobNumberList) ? Collections.emptyList() :  employeePOMapper.selectList(new LambdaQueryWrapper<EmployeePO>()
 				.in(EmployeePO::getEmplNo, jobNumberList)
 				.eq(EmployeePO::getState, 0)
 			).stream().map(item -> item.getDeptCode()).collect(Collectors.toList());
 		if (CollectionUtils.isEmpty(deptCodeList)) {
-			return Collections.EMPTY_LIST;
+			return Collections.emptyList();
 		}
 		return departmentService.queryDeptCodeInUse(deptCodeList);
 	}
@@ -65,7 +65,7 @@ public class EmployeeService extends ServiceImpl<EmployeePOMapper, EmployeePO> i
 	 * @return
 	 */
 	public List<String> queryEmployeeListByDept(List<String> deptList) {
-		return CollectionUtils.isEmpty(deptList) ? Collections.EMPTY_LIST :  employeePOMapper.selectList(new LambdaQueryWrapper<EmployeePO>()
+		return CollectionUtils.isEmpty(deptList) ? Collections.emptyList() :  employeePOMapper.selectList(new LambdaQueryWrapper<EmployeePO>()
 				.in(EmployeePO::getDeptCode, deptList)
 				.eq(EmployeePO::getState, 0)
 			).stream().map(item -> item.getEmplNo()).collect(Collectors.toList());
