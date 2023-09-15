@@ -482,5 +482,21 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 				.stream().map(space -> space.getJobNumber())
 				.collect(Collectors.toList());
 	}
+
+
+	/**
+	 * 根据批次号和轮次号查询未同步成功的数据量
+	 * @param batchId
+	 * @param roundId
+	 * @return
+	 */
+	public long queryUnSyncListByBatch(Long batchId, Long roundId) {
+		return userSpaceMapper.selectCount(new LambdaQueryWrapper<UserSpacePO>()
+				.eq(UserSpacePO::getRoundId, roundId)
+				.eq(UserSpacePO::getBatchId, batchId)
+				.ne(UserSpacePO::getState, UserSpaceStateEnum.SUCCESS.getState())
+				
+			);
+	}
 }
 

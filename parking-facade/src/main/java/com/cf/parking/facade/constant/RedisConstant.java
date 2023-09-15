@@ -53,7 +53,16 @@ public interface RedisConstant {
     String PARKING_DOWN_LOCK_KEY = "parking:down:lock";
     
     
+    /**
+     * 把车位信息写到闸机
+     */
     String PARKING_SYNC_LOCK_KEY = "parking:sync:lock";
+    
+    
+    /**
+     * 结果下发到闸机完成时更新结果表状态
+     */
+    String PARKING_RESULT_LOCK_KEY = "parking:result:lock";
     
     
 }

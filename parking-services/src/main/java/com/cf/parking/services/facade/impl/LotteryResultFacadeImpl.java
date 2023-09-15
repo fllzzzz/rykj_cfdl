@@ -38,7 +38,6 @@ import com.cf.parking.services.utils.PageUtils;
 import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
 import lombok.extern.slf4j.Slf4j;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
@@ -107,11 +106,17 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 		log.info("开始摇号：{}",id);
 		LotteryResultPO lottery = lotteryResultMapper.selectById(id);
 		AssertUtil.checkNull(lottery, "数据不存在");
+		AssertUtil.checkTrue(LotteryResultStateEnum.UNLOTTERY.getState().equals(lottery.getState()),"状态不为待摇号状态，不能摇号");
 		LotteryRuleRoundPO round = lotteryRuleRoundService.getById(lottery.getRoundId());
 		AssertUtil.checkNull(round, "轮次数据不存在");
 		AssertUtil.checkTrue(EnableStateEnum.ENABLE.getState().equals(round.getState()),"摇号轮次未启用");
 		LotteryBatchPO batch = lotteryBatchService.getById(lottery.getBatchId());
 		AssertUtil.checkNull(batch, "批次数据不存在");
+		
+		//防并发
+		int num = lotteryResultMapper.updateByState(id,LotteryResultStateEnum.UNLOTTERY.getState(),LotteryResultStateEnum.UNCONFIRM.getState());
+		AssertUtil.checkTrue(num == 1, "状态已变更，请刷新重试");
+		
 		//获取停车场信息
 		String parklotCode = round.getParkingLotCode();
 		ParkingLotPO parkingLot = parkingLotService.selectParkingLotByCode(parklotCode);

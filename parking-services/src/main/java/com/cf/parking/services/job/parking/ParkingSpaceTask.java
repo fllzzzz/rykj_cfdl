@@ -50,7 +50,7 @@ public class ParkingSpaceTask {
      */
     @Async
 //    @Scheduled(cron = "0 10 0 * * ? ") //零点十分
-    @Scheduled(cron = "0 10 0,3 * * ?") //零点十分 + 3点十分
+ //   @Scheduled(cron = "0 10 0,3 * * ?") //零点十分 + 3点十分  zhj注释
 //    @Scheduled(cron = "0/5 * * * * ?")
     public void getUserSpace() {
         //防止两台机器同时跑任务

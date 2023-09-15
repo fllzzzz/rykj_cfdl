@@ -61,4 +61,15 @@ public class LotteryResultService extends ServiceImpl<LotteryResultMapper, Lotte
 				.eq(LotteryResultPO::getBatchId, batchId)
 				).stream().map(item -> item.getId()).collect(Collectors.toList());
 	}
+
+
+	/**
+	 * 根据状态查询列表
+	 * @param state 状态
+	 */
+	public List<LotteryResultPO> selectResultListByState(String state) {
+		return mapper.selectList(new LambdaQueryWrapper<LotteryResultPO>()
+				.eq(LotteryResultPO::getState, state)
+				);
+	}
 }

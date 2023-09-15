@@ -18,11 +18,9 @@ import com.cf.parking.dao.po.LotteryResultPO;
 import com.cf.parking.dao.po.ParkingLotPO;
 import com.cf.parking.dao.po.UserSpacePO;
 import com.cf.parking.dao.po.UserVerifyPO;
-import com.cf.parking.services.enums.LotteryResultStateEnum;
 import com.cf.parking.services.enums.UserSpaceStateEnum;
 import com.cf.support.bean.IdWorker;
 import com.cf.support.exception.BusinessException;
-
 import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -79,8 +77,6 @@ public class LotteryDealService {
 		}
 		log.info("摇号结果入库：{}",JSON.toJSONString(result));
 		lotteryResultDetailService.saveBatch(result);
-		lottery.setUpdateTm(new Date()).setState(LotteryResultStateEnum.UNCONFIRM.getState());
-		lotteryResultService.updateById(lottery);
 	}
 
 	/**
