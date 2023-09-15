@@ -144,7 +144,7 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 		List<String> spaceJobNumList = lotteryResultDetailService.querySpaceListByBatchId(lottery.getBatchId());
 		//过滤掉已中奖的
 		applyList = applyList.stream().filter(item -> (!spaceJobNumList.contains(item.getJobNumber())  ) ).collect(Collectors.toList());
-		AssertUtil.checkTrue(!CollectionUtils.isEmpty(applyList),"过滤后参与摇号人员为空");;
+		AssertUtil.checkTrue(!CollectionUtils.isEmpty(applyList),"过滤后参与摇号人员为空");
 		
 		//释放数据
 		jobNumberList.clear();

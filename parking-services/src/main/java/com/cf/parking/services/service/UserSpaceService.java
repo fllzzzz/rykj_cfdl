@@ -2,6 +2,9 @@ package com.cf.parking.services.service;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+
+import com.cf.parking.facade.bo.ParkBaseDetailRespBO;
+import com.cf.parking.facade.bo.ParkBaseRespBO;
 import com.cf.parking.facade.bo.UserSpaceBO;
 import com.cf.parking.services.utils.PageUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +26,7 @@ import com.cf.parking.facade.dto.UserSpaceDTO;
 import com.cf.parking.facade.dto.UserSpaceFuncTimeDTO;
 import com.cf.parking.facade.dto.UserSpacePageDTO;
 import com.cf.parking.facade.dto.UserSpaceValidityDTO;
+import com.cf.parking.services.enums.ParkingRemoteCodeEnum;
 import com.cf.parking.services.enums.UserSpaceStateEnum;
 import com.cf.parking.services.integration.ParkInvokeService;
 import com.cf.support.result.PageResponse;
@@ -393,11 +397,17 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 		UserSpaceDTO dto = new UserSpaceDTO();
 		spaceList.forEach(space->{
 			try {
-				BeanUtils.copyProperties(space, dto);;
+				BeanUtils.copyProperties(space, dto);
 				dto.setParkingLot(StringUtils.join( parkingLotService.queryParentListViaSelf(dto.getParkingLot()),"," ));
-				boolean flag = parkInvokeService.replaceCarInfo(dto);
-				log.info("定时任务车位同步id={}结果{}",space.getUserSpaceId(),flag);
-				space.setState(flag ? UserSpaceStateEnum.SUCCESS.getState() : UserSpaceStateEnum.FAIL.getState());
+				ParkBaseRespBO<ParkBaseDetailRespBO> resp = parkInvokeService.replaceCarInfo(dto);
+				if(resp != null && ParkingRemoteCodeEnum.RESP_SUCCESS.getState().equals(resp.getResCode()) && resp.getResult() != null && 
+						ParkingRemoteCodeEnum.BUS_CODE.getState().equals(resp.getResult().getCode())) {
+					space.setState(UserSpaceStateEnum.SUCCESS.getState());
+				} else {
+					space.setState(UserSpaceStateEnum.FAIL.getState());
+					space.setFailReason(resp == null ? "系统异常" : (resp.getResult() == null ? resp.getResMsg() : resp.getResult().getMessage()));
+				}
+				log.info("定时任务车位同步id={}结果{}",space.getUserSpaceId(),JSON.toJSONString(resp));
 				userSpaceMapper.updateById(space);
 				Thread.sleep(5000);
 			} catch (Exception e) {
@@ -406,6 +416,7 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 		});
 	}
 
+	
 	
 	/**
 	 * 同步车位信息到闸机系统
@@ -424,9 +435,15 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 		UserSpaceDTO dto = new UserSpaceDTO();
 		BeanUtils.copyProperties(space, dto);
 		dto.setParkingLot(StringUtils.join( parkingLotService.queryParentListViaSelf(dto.getParkingLot()),"," ));
-		boolean flag = parkInvokeService.replaceCarInfo(dto);
-		log.info("车位同步id={}结果{}",space.getUserSpaceId(),flag);;
-		space.setState(flag ? UserSpaceStateEnum.SUCCESS.getState() : UserSpaceStateEnum.FAIL.getState());
+		ParkBaseRespBO<ParkBaseDetailRespBO> resp = parkInvokeService.replaceCarInfo(dto);
+		if(resp != null && ParkingRemoteCodeEnum.RESP_SUCCESS.getState().equals(resp.getResCode()) && resp.getResult() != null && 
+				ParkingRemoteCodeEnum.BUS_CODE.getState().equals(resp.getResult().getCode())) {
+			space.setState(UserSpaceStateEnum.SUCCESS.getState());
+		} else {
+			space.setState(UserSpaceStateEnum.FAIL.getState());
+			space.setFailReason(resp == null ? "系统异常" : (resp.getResult() == null ? resp.getResMsg() : resp.getResult().getMessage()));
+		}
+		log.info("车位同步id={}结果{}",space.getUserSpaceId(),JSON.toJSONString(resp));
 		userSpaceMapper.updateById(space);
 	}
 

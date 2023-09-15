@@ -94,4 +94,10 @@ public class UserSpaceDTO extends PageRequest implements Serializable {
      * 批次ID
      */
     private Long batchId;
+    
+    
+    /**
+     * 同步失败原因
+     */
+    private String failReason;
 }
