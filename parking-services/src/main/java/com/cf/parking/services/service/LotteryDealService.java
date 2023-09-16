@@ -276,14 +276,14 @@ public class LotteryDealService {
 				
 			}//循环转让车库结束
 			
-			if (!CollectionUtils.isEmpty(addList)) {
-				userSpaceService.saveBatch(addList);
-			}
-			
-			if (!CollectionUtils.isEmpty(updateList)) {
-				userSpaceService.updateBatchById(updateList);
-			}
-			
+		}
+		
+		if (!CollectionUtils.isEmpty(addList)) {
+			userSpaceService.saveBatch(addList);
+		}
+		
+		if (!CollectionUtils.isEmpty(updateList)) {
+			userSpaceService.updateBatchById(updateList);
 		}
 	}
 			
