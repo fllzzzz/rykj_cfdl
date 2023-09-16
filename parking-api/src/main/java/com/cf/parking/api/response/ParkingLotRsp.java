@@ -26,6 +26,10 @@ public class ParkingLotRsp {
     @ApiModelProperty(value = "parentId")
     private Long parentId;
 
+    /** parentName */
+    @ApiModelProperty(value = "parentName")
+    private String parentName;
+
     /** 区域 */
     @ApiModelProperty(value = "区域")
     private String region;

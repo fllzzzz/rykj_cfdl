@@ -19,6 +19,9 @@ public class ParkingLotBO {
     /** parentId */
     private Long parentId;
 
+    /** parentName */
+    private String parentName;
+
     /** 区域 */
     private String region;
 

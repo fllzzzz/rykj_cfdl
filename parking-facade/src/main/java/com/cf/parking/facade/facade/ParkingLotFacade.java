@@ -2,6 +2,7 @@ package com.cf.parking.facade.facade;
 
 import com.cf.parking.facade.bo.ParkingLotAreaBO;
 import com.cf.parking.facade.bo.ParkingLotBO;
+import com.cf.parking.facade.bo.ParkingLotTreeBO;
 import com.cf.parking.facade.dto.ParkingLotAreaOptDTO;
 import com.cf.parking.facade.dto.ParkingLotDTO;
 import com.cf.parking.facade.dto.ParkingLotOptDTO;
@@ -51,7 +52,7 @@ public interface ParkingLotFacade
      * 查询园区列表
      * @return
      */
-    List<ParkingLotAreaBO> getAreaList();
+    List<ParkingLotAreaBO> getAreaList(String region);
 
     /**
      * 新增园区
@@ -66,4 +67,11 @@ public interface ParkingLotFacade
      * @return
      */
     Integer updateArea(ParkingLotAreaOptDTO dto);
+
+    /**
+     * 查询停车场树形列表
+     * @return
+     */
+    List<ParkingLotTreeBO> getParkingLotTreeList();
+
 }

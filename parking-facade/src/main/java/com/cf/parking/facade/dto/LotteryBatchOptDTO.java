@@ -1,5 +1,6 @@
 package com.cf.parking.facade.dto;
 
+import cn.hutool.core.date.DateTime;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -30,11 +31,11 @@ public class LotteryBatchOptDTO {
 
     /** 报名开始时间 */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date applyStartTime;
+    private DateTime applyStartTime;
 
     /** 报名结束时间 */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date applyEndTime;
+    private DateTime applyEndTime;
 
     /** 车位有效开始日期 */
     @JsonFormat(pattern = "yyyy-MM-dd")

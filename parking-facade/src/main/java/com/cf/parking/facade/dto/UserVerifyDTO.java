@@ -24,6 +24,12 @@ public class UserVerifyDTO extends PageRequest {
     /** id */
     private Long id;
 
+    /** 车牌号 */
+    private String platNo;
+
+    /** userId */
+    private Long userId;
+
     /** 申请人 */
     private String userName;
 

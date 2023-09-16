@@ -8,8 +8,10 @@ import com.cf.parking.api.request.ParkingLotReq;
 import com.cf.parking.api.response.ParkingLotAreaRsp;
 import com.cf.parking.api.response.ParkingLotBaseRsp;
 import com.cf.parking.api.response.ParkingLotRsp;
+import com.cf.parking.api.response.ParkingLotTreeRsp;
 import com.cf.parking.facade.bo.ParkingLotAreaBO;
 import com.cf.parking.facade.bo.ParkingLotBO;
+import com.cf.parking.facade.bo.ParkingLotTreeBO;
 import com.cf.parking.facade.constant.ParkingSysCodeConstant;
 import com.cf.parking.facade.dto.ParkingLotAreaOptDTO;
 import com.cf.parking.facade.dto.ParkingLotDTO;
@@ -64,13 +66,26 @@ public class ParkingLotController
     }
 
     /**
+     * 查询停车场树形列表
+     */
+    @ApiOperation(value = "查询停车场树形列表", notes = "查询停车场树形列表")
+    @PostMapping("/treeList")
+    public Result<List<ParkingLotTreeRsp>> treeList()
+    {
+
+        List<ParkingLotTreeBO> result = parkingLotFacade.getParkingLotTreeList();
+        List<ParkingLotTreeRsp> treeRsps = BeanConvertorUtils.copyList(result, ParkingLotTreeRsp.class);
+        return Result.buildSuccessResult(treeRsps);
+    }
+
+    /**
      * 园区列表
      */
     @ApiOperation(value = "园区列表", notes = "页面左侧园区列表")
     @PostMapping("/areaList")
-    public Result<List<ParkingLotAreaRsp>> areaList()
+    public Result<List<ParkingLotAreaRsp>> areaList(@RequestBody ParkingLotReq req)
     {
-        List<ParkingLotAreaBO> boList = parkingLotFacade.getAreaList();
+        List<ParkingLotAreaBO> boList = parkingLotFacade.getAreaList(req.getRegion());
         List<ParkingLotAreaRsp> areaRsps = BeanConvertorUtils.copyList(boList, ParkingLotAreaRsp.class);
         return Result.buildSuccessResult(areaRsps);
     }

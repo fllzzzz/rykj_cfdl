@@ -69,6 +69,8 @@ public class LotteryBlackListController
     @PostMapping("/add")
     public Result add(@RequestBody LotteryBlackListOptReq param)
     {
+        AssertUtil.checkNull(param.getName(),"请选择员工！");
+
         LotteryBlackListOptDTO dto = new LotteryBlackListOptDTO();
         BeanUtils.copyProperties(param,dto);
 

@@ -10,11 +10,13 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cf.parking.dao.mapper.LotteryRuleRoundMapper;
 import com.cf.parking.dao.po.LotteryBlackListPO;
 import com.cf.parking.dao.po.LotteryRuleRoundPO;
+import com.cf.parking.dao.po.ParkingLotPO;
 import com.cf.parking.facade.bo.LotteryRuleRoundBO;
 import com.cf.parking.facade.bo.LotteryRuleRoundBaseBO;
 import com.cf.parking.facade.dto.LotteryRuleRoundDTO;
 import com.cf.parking.facade.dto.LotteryRuleRoundOptDTO;
 import com.cf.parking.facade.facade.LotteryRuleRoundFacade;
+import com.cf.parking.services.service.ParkingLotService;
 import com.cf.parking.services.utils.PageUtils;
 import com.cf.support.bean.IdWorker;
 import com.cf.support.result.PageResponse;
@@ -40,6 +42,9 @@ public class LotteryRuleRoundFacadeImpl implements LotteryRuleRoundFacade
 {
     @Autowired
     private LotteryRuleRoundMapper mapper;
+
+    @Resource
+    private ParkingLotService parkingLotService;
 
     @Resource
     private IdWorker idWorker;
@@ -112,7 +117,17 @@ public class LotteryRuleRoundFacadeImpl implements LotteryRuleRoundFacade
                 .eq(StringUtils.isNotBlank(dto.getState()), LotteryRuleRoundPO::getState, dto.getState()));
 
         List<LotteryRuleRoundBO> boList = BeanConvertorUtils.copyList(poPage.getRecords(), LotteryRuleRoundBO.class);
+        //设置停车场名称和车位数量
+        boList.stream().forEach(this::setParkingLotNameAndAmount);
+
         return PageUtils.toResponseList(page,boList);
+    }
+
+    private void setParkingLotNameAndAmount(LotteryRuleRoundBO bo) {
+        String parkingLotCode = bo.getParkingLotCode();
+        ParkingLotPO parkingLotPO = parkingLotService.selectParkingLotByCode(parkingLotCode);
+        bo.setParkingLotName(parkingLotPO.getRegion());
+        bo.setParkingLotAmount(parkingLotPO.getAmount());
     }
 
     /**

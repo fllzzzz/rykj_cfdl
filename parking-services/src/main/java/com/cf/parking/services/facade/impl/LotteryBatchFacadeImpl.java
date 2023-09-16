@@ -68,7 +68,7 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
 
         LambdaQueryWrapper<LotteryBatchPO> queryWrapper = new LambdaQueryWrapper<LotteryBatchPO>()
                 .le(!ObjectUtils.isEmpty(dto.getEndDate()), LotteryBatchPO::getBatchNum, DateUtil.format(dto.getEndDate(), "yyyy-MM-dd 23:59:59"))
-                .ge(!ObjectUtils.isEmpty(dto.getStartDate()) , LotteryBatchPO::getBatchNum, dto.getStartDate())
+                .ge(!ObjectUtils.isEmpty(dto.getStartDate()) , LotteryBatchPO::getBatchNum, DateUtil.format(dto.getEndDate(), "yyyy-MM-dd 00:00:00"))
                 .like(!ObjectUtils.isEmpty(dto.getRoundId()) , LotteryBatchPO::getRoundId, dto.getRoundId())
                 .eq(StringUtils.isNotEmpty(dto.getState()), LotteryBatchPO::getState, dto.getState())
                 .orderByDesc(LotteryBatchPO::getUpdateTm);
@@ -99,6 +99,8 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
 
         //2.参数设置
         po.setId(idWorker.nextId());
+        //TODO:枚举
+        po.setState("0");
         po.setCreateTm(new Date());
         po.setUpdateTm(new Date());
         //2.1轮数设置（将数组转为字符串）

@@ -15,9 +15,6 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class UserProfileBaseRsp {
 
-    //userId
-    @ApiModelProperty(value = "userId")
-    private Long userId;
 
     //部门编码
     @ApiModelProperty(value = "姓名")
@@ -25,5 +22,5 @@ public class UserProfileBaseRsp {
 
     //工号
     @ApiModelProperty(value = "工号")
-    private String jobNumber;
+    private String code;
 }

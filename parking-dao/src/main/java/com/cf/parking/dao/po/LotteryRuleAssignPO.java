@@ -32,7 +32,7 @@ public class LotteryRuleAssignPO
     /** 名称（部门或者人员名称） */
     private String name;
 
-    /** 停车场(编号)，多个间逗号间隔 */
+    /** 停车场编号 */
     private String parkingLotCode;
 
     /** 状态(0：停用，1：启用) */

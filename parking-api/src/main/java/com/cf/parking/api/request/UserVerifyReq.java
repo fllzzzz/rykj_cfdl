@@ -22,6 +22,10 @@ public class UserVerifyReq {
     @ApiModelProperty(value = "id，单个查询时使用此字段")
     private Long id;
 
+    /** 车牌号 */
+    @ApiModelProperty(value = "车牌号，小程序端使用")
+    private String platNo;
+
     /** 申请人 */
     @ApiModelProperty(value = "申请人")
     private String userName;

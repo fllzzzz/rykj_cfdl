@@ -6,6 +6,8 @@ import com.cf.parking.facade.dto.UserVerifyOptDTO;
 import com.cf.support.result.PageResponse;
 import com.cf.support.result.Result;
 
+import java.util.List;
+
 /**
  * 车辆审核 Service接口
  * @author
@@ -47,4 +49,18 @@ public interface UserVerifyFacade {
      * @return
      */
     void batchAudit(UserVerifyOptDTO dto);
+
+    /**
+     * 根据userId获取个人车牌号列表
+     * @param userId
+     * @return
+     */
+    List<String> getPlatNoListByUserId(Long userId);
+
+    /**
+     * 修改审核车辆
+     * @param dto
+     * @return
+     */
+    Integer update(UserVerifyOptDTO dto);
 }

@@ -71,7 +71,7 @@ create table lottery_batch(
   id           bigint(0)            not null           comment 'id',
   batch_num      date                      comment '期号',
   parking_amount int(0)             default 0          comment '车位数量',
-  round_id       varchar(32)        default ''         comment '摇号轮数，多个间逗号间隔',
+  round_id       varchar(512)        default ''         comment '摇号轮数，多个间逗号间隔',
   apply_start_time     datetime                        comment '报名开始时间',
   apply_end_time       datetime                        comment '报名结束时间',
   valid_start_date     date                            comment '车位有效开始日期',
