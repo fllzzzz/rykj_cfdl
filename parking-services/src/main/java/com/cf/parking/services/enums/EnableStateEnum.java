@@ -10,7 +10,7 @@ package com.cf.parking.services.enums;
 public enum EnableStateEnum {
 
 	ENABLE("1","启用"),
-	DISABLE("0","启用");
+	DISABLE("0","停用");
 	
 	private String state;
 	

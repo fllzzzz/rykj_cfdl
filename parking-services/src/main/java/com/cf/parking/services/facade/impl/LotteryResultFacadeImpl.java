@@ -14,6 +14,7 @@ import com.cf.parking.dao.po.UserVerifyPO;
 import com.cf.parking.facade.bo.LotteryResultBO;
 import com.cf.parking.facade.bo.LotteryResultDetailBO;
 import com.cf.parking.facade.dto.LotteryResultDTO;
+import com.cf.parking.facade.dto.TextMessageDTO;
 import com.cf.parking.facade.dto.UserSpaceDTO;
 import com.cf.parking.facade.facade.LotteryResultFacade;
 import com.cf.parking.services.enums.EnableStateEnum;
@@ -34,17 +35,21 @@ import com.cf.parking.services.service.ParkingLotService;
 import com.cf.parking.services.service.UserSpaceService;
 import com.cf.parking.services.service.UserVerifyService;
 import com.cf.parking.services.utils.AssertUtil;
+import com.cf.support.bean.DingTalkBean;
 import com.cf.support.exception.BusinessException;
 import com.cf.parking.services.utils.PageUtils;
 import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
+
+import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
-import org.springframework.scheduling.TaskScheduler;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -107,6 +112,14 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
     
     @Resource
     private ParkInvokeService parkInvokeService;
+    
+    @Autowired
+    private DingTalkBean dingTalkBean;
+    
+    private final String  message = "恭喜您抽中车库%s车位,有效期为%s~%s";
+    
+    
+    
     
     
     @Transactional(rollbackFor = Exception.class)
@@ -294,6 +307,51 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 				});
 			}
 		});		
+	}
+
+
+	@Override
+	public void notify(Long id) {
+		LotteryResultPO lottery = lotteryResultMapper.selectById(id);
+		AssertUtil.checkNull(lottery, "数据不存在");
+		AssertUtil.checkTrue(LotteryResultStateEnum.UNPUBLIC.getState().equals(lottery.getState()),"数据不为待发布状态，不能发布");
+		int num = lotteryResultMapper.updateByState(id,LotteryResultStateEnum.UNPUBLIC.getState(),LotteryResultStateEnum.UNARCHIVED.getState());
+		if (num < 1) {
+			throw new BusinessException("状态已变更，请刷新重试");
+		}
+		LotteryBatchPO batch = lotteryBatchService.getById(lottery.getBatchId());
+		AssertUtil.checkNull(batch, "批次数据不存在");
+		
+		LotteryRuleRoundPO round = lotteryRuleRoundService.getById(lottery.getRoundId());
+		AssertUtil.checkNull(round, "轮次数据不存在");
+		ParkingLotPO parking = parkingLotService.selectParkingLotByCode(round.getParkingLotCode());
+		
+		long unfinshNum = lotteryResultMapper.selectCount(new LambdaQueryWrapper<LotteryResultPO>()
+					.eq(LotteryResultPO::getBatchId, lottery.getBatchId())
+					.in(LotteryResultPO::getState, Arrays.asList( 
+							LotteryResultStateEnum.UNPUBLIC.getState(),
+							LotteryResultStateEnum.CONFIRM_IN_PROCESS.getState(),
+							LotteryResultStateEnum.UNCONFIRM.getState(),
+							LotteryResultStateEnum.UNLOTTERY.getState()))
+				);
+		List<LotteryResultDetailPO> detailList = lotteryResultDetailService.queryDetailListByResultId(id);
+		if (!CollectionUtils.isEmpty(detailList)) {
+			List<String> openIdList = detailList.stream().map(item -> item.getUserJobNumber()).collect(Collectors.toList());
+			dingTalkBean.sendTextMessage(String.format(message, parking.getRegion(),DateUtil.format(batch.getValidStartDate(),"yyyy-MM-dd"),
+					DateUtil.format(batch.getValidEndDate(),"yyyy-MM-dd")) ,openIdList);
+		}
+		
+		
+		
+		if (unfinshNum == 0) {
+			//申请列表
+			List<LotteryApplyRecordPO> applyList = lotteryApplyRecordService.queryLotteryApplyList(lottery.getBatchId(), null);
+			List<String> spaceList = userSpaceService.querySpaceListByBatchId(lottery.getBatchId());
+			List<String> applyIdList = applyList.stream().map(item -> item.getJobNumber()).collect(Collectors.toList());
+			applyIdList.removeAll(spaceList);
+			dingTalkBean.sendTextMessage("很遗憾，您本次摇号未中奖",applyIdList);
+		}
+		
 	}
 
 

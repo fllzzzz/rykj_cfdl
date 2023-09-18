@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
+import javax.validation.constraints.AssertTrue;
 
 /**
  * 摇号批次Service业务层处理
@@ -190,5 +191,6 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
         }
         return parkingAmount;
     }
+
 
 }

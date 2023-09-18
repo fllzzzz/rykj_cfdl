@@ -60,4 +60,6 @@ public interface LotteryBatchFacade
      * @return
      */
     Long getParkingAmountByRound(Long[] roundIdArr);
+
+
 }

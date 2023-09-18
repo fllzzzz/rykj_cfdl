@@ -63,4 +63,10 @@ public interface LotteryResultFacade
 	 * @param roundId 轮次id
 	 */
 	void syncRetry(Long batchId, Long roundId);
+
+	/**
+	 * 下发钉钉通知
+	 * @param id 结果id
+	 */
+	void notify(Long id);
 }

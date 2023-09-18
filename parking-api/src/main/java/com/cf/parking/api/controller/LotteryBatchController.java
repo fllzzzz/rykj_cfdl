@@ -12,13 +12,11 @@ import com.cf.parking.facade.dto.LotteryBatchDTO;
 import com.cf.parking.facade.dto.LotteryBatchOptDTO;
 import com.cf.parking.facade.facade.LotteryBatchFacade;
 import com.cf.parking.services.utils.AssertUtil;
-import com.cf.parking.services.utils.PageUtils;
 import com.cf.support.result.PageResponse;
 import com.cf.support.result.Result;
 import com.cf.support.utils.BeanConvertorUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -121,7 +119,7 @@ public class LotteryBatchController
     @PostMapping("/notify")
     public Result notify(@RequestBody LotteryBatchReq param)
     {
-        return Result.buildSuccessResult("接口暂未开发");
+        return Result.buildSuccessResult("未实现");
     }
 
 

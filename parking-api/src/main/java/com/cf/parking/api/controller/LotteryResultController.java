@@ -90,6 +90,9 @@ public class LotteryResultController
 	@PostMapping("/publish")
     public Result publish(@RequestBody LotteryResultReq param)
     {
+    	AssertUtil.checkNull(param, "参数不能为空");
+    	AssertUtil.checkNull(param.getId() ,"id不能为空");
+    	lotteryResultFacade.notify(param.getId());
         return Result.buildSuccessResult();
     }
 
