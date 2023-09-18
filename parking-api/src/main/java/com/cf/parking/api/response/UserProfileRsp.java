@@ -95,4 +95,11 @@ public class UserProfileRsp {
 
 	@ApiModelProperty(value = "开车总公里数")
 	private BigDecimal driveTotalKilometers;
+
+	/**
+	 * 停车场区域
+	 * 2023/09/18
+	 */
+	@ApiModelProperty(value = "停车场名称")
+	private String parkingLotRegion;
 }

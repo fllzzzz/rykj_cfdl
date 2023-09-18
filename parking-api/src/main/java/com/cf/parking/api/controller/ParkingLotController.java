@@ -5,20 +5,22 @@ import javax.annotation.Resource;
 import com.cf.parking.api.request.ParkingLotAreaOptReq;
 import com.cf.parking.api.request.ParkingLotOptReq;
 import com.cf.parking.api.request.ParkingLotReq;
-import com.cf.parking.api.response.ParkingLotAreaRsp;
-import com.cf.parking.api.response.ParkingLotBaseRsp;
-import com.cf.parking.api.response.ParkingLotRsp;
-import com.cf.parking.api.response.ParkingLotTreeRsp;
+import com.cf.parking.api.response.*;
+import com.cf.parking.dao.po.UserProfilePO;
 import com.cf.parking.facade.bo.ParkingLotAreaBO;
 import com.cf.parking.facade.bo.ParkingLotBO;
 import com.cf.parking.facade.bo.ParkingLotTreeBO;
+import com.cf.parking.facade.constant.FeignUrlConstant;
 import com.cf.parking.facade.constant.ParkingSysCodeConstant;
-import com.cf.parking.facade.dto.ParkingLotAreaOptDTO;
-import com.cf.parking.facade.dto.ParkingLotDTO;
-import com.cf.parking.facade.dto.ParkingLotOptDTO;
+import com.cf.parking.facade.dto.*;
 import com.cf.parking.facade.facade.ParkingLotFacade;
+import com.cf.parking.services.integration.GatewayHikvisionFeign;
+import com.cf.parking.services.service.UserProfileService;
 import com.cf.parking.services.utils.AssertUtil;
 import com.cf.parking.services.utils.PageUtils;
+import com.cf.support.authertication.UserAuthenticationServer;
+import com.cf.support.authertication.token.dto.UserSessionDTO;
+import com.cf.support.exception.BusinessException;
 import com.cf.support.result.PageResponse;
 import com.cf.support.result.Result;
 import com.cf.support.utils.BeanConvertorUtils;
@@ -28,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,6 +54,21 @@ public class ParkingLotController
 {
     @Resource
     private ParkingLotFacade parkingLotFacade;
+
+    @Resource
+    private UserProfileService userProfileService;
+
+    @Resource
+    private GatewayHikvisionFeign gatewayHikvisionFeign;
+
+    @Resource
+    private UserAuthenticationServer userAuthenticationServer;
+
+    private UserSessionDTO getUser() {
+        return userAuthenticationServer.getCurrentUser();
+    }
+
+    //————————————————PC端————————————————————
 
     /**
      * 停车场基础信息列表
@@ -212,4 +230,40 @@ public class ParkingLotController
         Integer result = parkingLotFacade.deleteById(param.getId());
         return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult("删除失败，请重试！");
     }
+
+
+    //————————————————小程序端————————————————————
+
+    /**
+     * 查询个人停车场
+     */
+    @ApiOperation(value = "查询个人停车场——小程序端", notes = "查询个人停车场——小程序端")
+    @PostMapping("/parkingLot/name")
+    public Result<String> getParkingLotInfo()
+    {
+        //1.获取当前登录用户的信息
+        Long userId = getUser().getUserId();
+        if (ObjectUtils.isEmpty(userId)){
+            throw new BusinessException("请先登录！");
+        }
+
+        //2.查询
+        UserProfilePO userProfile = userProfileService.getUserProfileByUserId(userId);
+        return Result.buildSuccessResult(userProfile.getParkingLotRegion());
+    }
+
+
+    /**
+     * 查询停车场列表
+     */
+    @ApiOperation(value = "查询停车场列表——小程序端", notes = "查询停车场列表——小程序端")
+    @PostMapping("/parkingLot/pieChart")
+    public Result getParkingLotPieChart()
+    {
+        HikvisionResult<List<SpaceNumDTO>> hikvisionResult = gatewayHikvisionFeign.remainSpaceNum(FeignUrlConstant.SPACE_NUM_URL, new ParkSyscodeDTO());
+        log.info("停车场列表:{}", hikvisionResult);
+        return Result.buildSuccessResult(hikvisionResult.getData());
+    }
+
+
 }

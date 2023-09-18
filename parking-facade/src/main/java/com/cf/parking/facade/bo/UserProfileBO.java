@@ -87,4 +87,10 @@ public class UserProfileBO {
 	 * 开车总公里数
 	 */
 	private BigDecimal driveTotalKilometers;
+
+	/**
+	 * 停车场区域
+	 * 2023/09/18
+	 */
+	private String parkingLotRegion;
 }

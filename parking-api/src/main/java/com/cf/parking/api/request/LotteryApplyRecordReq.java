@@ -23,6 +23,10 @@ public class LotteryApplyRecordReq extends PageRequest {
     @ApiModelProperty(value = "id，删除时使用")
     private Long id;
 
+    /** 批次id */
+    @ApiModelProperty(value = "批次id")
+    private Long batchId;
+
     /** 摇号结果(-1：未开号；0：未中；xx：对应停车场的区域编号) */
     @ApiModelProperty(value = "摇号结果")
     private String result;
