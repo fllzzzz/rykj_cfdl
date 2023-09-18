@@ -41,7 +41,7 @@ public class UserProfileService extends ServiceImpl<UserProfilePOMapper, UserPro
     @Resource
     private UserService userService;
 
-    private static final String default_parkingLot = "装配楼2期5F停车场";
+    private static final String DEFAULT_PARKINGLOT = "装配楼2期5F停车场";
 
     /**
      * 用户详情信息保存
@@ -211,8 +211,9 @@ public class UserProfileService extends ServiceImpl<UserProfilePOMapper, UserPro
      * @param userId
      */
     public Integer setDefaultParkingLotByUserId(Long userId) {
-        LambdaUpdateWrapper<UserProfilePO> updateWrapper = new LambdaUpdateWrapper<UserProfilePO>().eq(UserProfilePO::getUserId, userId).set(UserProfilePO::getParkingLotRegion, default_parkingLot);
-        return userProfilePOMapper.update(null, updateWrapper);
+        UserProfilePO userProfilePO = userProfilePOMapper.selectById(userId);
+        userProfilePO.setParkingLotRegion(DEFAULT_PARKINGLOT);
+        return userProfilePOMapper.updateById(userProfilePO);
     }
 
     /**
@@ -221,6 +222,6 @@ public class UserProfileService extends ServiceImpl<UserProfilePOMapper, UserPro
      * @return
      */
     public Integer batchSetDefaultParkingLotByUserIds(List<Long> userIds) {
-        return userProfilePOMapper.batchSetDefaultParkingLotByUserIds(userIds,default_parkingLot);
+        return userProfilePOMapper.batchSetDefaultParkingLotByUserIds(userIds,DEFAULT_PARKINGLOT);
     }
 }

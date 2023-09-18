@@ -123,7 +123,7 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
             int result = mapper.update(userVerifyPO,updateWrapper);
             log.info("车辆审核成功，审核结果：{}，审核意见：{}，审核对象：{}", dto.getState(),dto.getReason(),userVerifyPO);
             //2.修改用户默认停车场为"装配楼2期5F停车场"
-            userProfileService.setDefaultParkingLotByUserId(dto.getUserId());
+            userProfileService.setDefaultParkingLotByUserId(userVerifyPO.getUserId());
 
             return result;
         }catch (Exception e){
@@ -145,7 +145,7 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
         //2.如果是审核通过，修改用户默认停车场
         //2.1查询用户ids
         List<UserVerifyPO> poList = mapper.selectBatchIds(dto.getIds());
-        List<Long> userIds = poList.stream().filter(po->ObjectUtils.isEmpty(po.getUserId())).map(UserVerifyPO::getUserId).collect(Collectors.toList());
+        List<Long> userIds = poList.stream().filter(po->!ObjectUtils.isEmpty(po.getUserId())).map(UserVerifyPO::getUserId).collect(Collectors.toList());
         //2.2批量更新
         if (UserVerifyStateEnum.SUCCESS.getState().equals(dto.getState().toString())){
             userProfileService.batchSetDefaultParkingLotByUserIds(userIds);

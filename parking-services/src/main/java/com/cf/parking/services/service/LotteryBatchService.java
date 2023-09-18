@@ -1,5 +1,6 @@
 package com.cf.parking.services.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.cf.parking.services.enums.LotteryBatchStateEnum;
 import com.cf.parking.services.utils.AssertUtil;
 import cn.hutool.core.date.DateTime;
@@ -11,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSON;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cf.parking.dao.mapper.LotteryBatchMapper;
@@ -88,4 +88,26 @@ public class LotteryBatchService extends ServiceImpl<LotteryBatchMapper, Lottery
 		log.info("自动创建批次任务参数：{}",JSON.toJSONString(dto));
 		lotteryBatchFacade.add(dto);
 	}
+
+	/**
+     * 查询最新一期摇号批次信息（期号最大的、状态为已通知或已结束的）
+     * @return
+     */
+    public LotteryBatchPO getNotifiedLatestBatchInfo() {
+        return lotteryBatchMapper.selectOne(new LambdaQueryWrapper<LotteryBatchPO>()
+                .ne(LotteryBatchPO::getState, LotteryBatchStateEnum.NEED_NOTIFY.getState())
+                .orderByDesc(LotteryBatchPO::getBatchNum));
+    }
+
+
+    /**
+     * 判断当前时间是否处于报名时间内
+     * @param applyStartTime
+     * @param applyEndTime
+     * @return
+     */
+    public boolean judgeWhetherInApplyTime(Date applyStartTime, Date applyEndTime) {
+        Date now = new Date();
+        return now.before(applyEndTime) && now.after(applyStartTime);
+    }
 }

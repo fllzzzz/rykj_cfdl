@@ -71,4 +71,16 @@ public class LotteryResultDetailService extends ServiceImpl<LotteryResultDetailM
 					.in(LotteryResultDetailPO::getResultId, resultIdList)
 				).stream().map(item -> item.getUserJobNumber()).collect(Collectors.toList());
 	}
+
+	/**
+	 * 在结果列表中查询某个用户的结果记录
+	 * @param userId
+	 * @param resultIds
+	 * @return
+	 */
+	public LotteryResultDetailPO selectUserDetailByResultIds(Long userId, List<Long> resultIds) {
+		return mapper.selectOne(new LambdaQueryWrapper<LotteryResultDetailPO>()
+				.in(LotteryResultDetailPO::getResultId,resultIds)
+				.eq(LotteryResultDetailPO::getUserId,userId));
+	}
 }

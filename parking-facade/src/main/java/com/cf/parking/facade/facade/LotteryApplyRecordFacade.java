@@ -1,10 +1,10 @@
 package com.cf.parking.facade.facade;
 
+import com.cf.parking.facade.bo.LotteryApplyBO;
 import com.cf.parking.facade.bo.LotteryApplyRecordBO;
 import com.cf.parking.facade.dto.LotteryApplyRecordDTO;
 import com.cf.support.result.PageResponse;
 
-import java.util.List;
 
 /**
  * 摇号申请记录Service接口
@@ -22,4 +22,26 @@ public interface LotteryApplyRecordFacade
      */
     PageResponse<LotteryApplyRecordBO> getApplyRecordList(LotteryApplyRecordDTO dto);
 
+    /**
+     * 个人申请摇号页面信息查询
+     * @param userId
+     * @return
+     */
+    LotteryApplyBO info(Long userId);
+
+    /**
+     * 申请摇号
+     * @param userId
+     * @param batchId
+     * @return
+     */
+    Integer apply(Long userId, Long batchId);
+
+    /**
+     * 取消摇号
+     * @param userId
+     * @param batchId
+     * @return
+     */
+    Integer cancel(Long userId, Long batchId);
 }

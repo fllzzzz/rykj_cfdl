@@ -8,6 +8,7 @@ import com.cf.parking.facade.bo.UserVerifyBO;
 import com.cf.parking.facade.dto.UserVerifyDTO;
 import com.cf.parking.facade.dto.UserVerifyOptDTO;
 import com.cf.parking.facade.facade.UserVerifyFacade;
+import com.cf.parking.services.enums.PictureInfoEnum;
 import com.cf.parking.services.service.LotteryBlackListService;
 import com.cf.parking.services.utils.AssertUtil;
 import com.cf.support.authertication.AdminUserAuthentication;
@@ -215,7 +216,6 @@ public class UserVerifyController {
         return dto;
     }
 
-    //TODO：转换后的字符串无法贴到地址栏内查看
     private String getBase64ImgStr(InputStream inputStream) throws IOException {
         return Base64.getEncoder().encodeToString(IOUtils.toByteArray(inputStream));
     }
@@ -223,8 +223,18 @@ public class UserVerifyController {
     private void paramVerify(UserVerifyOptReq param) {
         AssertUtil.checkNull(param.getPlateNo(),"请输入车牌号！");
         AssertUtil.checkNull(param.getVehicleImg(),"请上传车辆照片！");
+        picContentTypeVerify(param.getVehicleImg().getContentType());
         AssertUtil.checkNull(param.getDrivingLicenseImg(),"请上传驾驶证照片！");
+        picContentTypeVerify(param.getDrivingLicenseImg().getContentType());
         AssertUtil.checkNull(param.getDrivingPermitImg(),"请上传行驶证照片！");
+        picContentTypeVerify(param.getDrivingPermitImg().getContentType());
+    }
+
+    private void picContentTypeVerify(String contentType) {
+        if (!PictureInfoEnum.CONTENT_TYPE_JPG.getInfo().equals(contentType) &&
+                !PictureInfoEnum.CONTENT_TYPE_PNG.getInfo().equals(contentType)){
+            throw new BusinessException("请上传JPG或PNG类型的图片");
+        }
     }
 
     /**
@@ -272,7 +282,7 @@ public class UserVerifyController {
 
     //生成的base64
     public static void main(String[] args) throws IOException {
-        File file = new File("C:\\Users\\17235\\Pictures\\Saved Pictures\\a.png");
+        File file = new File("D:\\d.png");
         FileInputStream imageInFile = new FileInputStream(file);
         byte[] imageData = new byte[(int)file.length()];
         imageInFile.read(imageData);
@@ -281,6 +291,6 @@ public class UserVerifyController {
         String base64Image = Base64.getEncoder()
                 .encodeToString(imageData);
         //查看前需要拼接data:image/png;base64,
-        System.out.println(base64Image);
+        System.out.println("data:image/png;base64," + base64Image);
     }
 }

@@ -78,4 +78,9 @@ public class LotteryResultService extends ServiceImpl<LotteryResultMapper, Lotte
 				.eq(LotteryResultPO::getState, state)
 				);
 	}
+
+	public List<LotteryResultPO> selectResultListByBatchId(Long batchId) {
+		return mapper.selectList(new LambdaQueryWrapper<LotteryResultPO>()
+				.eq(LotteryResultPO::getBatchId,batchId));
+	}
 }

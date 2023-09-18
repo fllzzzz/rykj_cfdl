@@ -69,8 +69,8 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
         Page<LotteryBatchPO> page = PageUtils.toPage(dto);
 
         LambdaQueryWrapper<LotteryBatchPO> queryWrapper = new LambdaQueryWrapper<LotteryBatchPO>()
-                .le(!ObjectUtils.isEmpty(dto.getEndDate()), LotteryBatchPO::getBatchNum, DateUtil.format(dto.getEndDate(), "yyyy-MM-dd 23:59:59"))
-                .ge(!ObjectUtils.isEmpty(dto.getStartDate()) , LotteryBatchPO::getBatchNum, DateUtil.format(dto.getEndDate(), "yyyy-MM-dd 00:00:00"))
+                .le(!ObjectUtils.isEmpty(dto.getEndDate()), LotteryBatchPO::getBatchNum, dto.getEndDate())
+                .ge(!ObjectUtils.isEmpty(dto.getStartDate()) , LotteryBatchPO::getBatchNum,dto.getStartDate())
                 .like(!ObjectUtils.isEmpty(dto.getRoundId()) , LotteryBatchPO::getRoundId, dto.getRoundId())
                 .eq(StringUtils.isNotEmpty(dto.getState()), LotteryBatchPO::getState, dto.getState())
                 .orderByDesc(LotteryBatchPO::getUpdateTm);

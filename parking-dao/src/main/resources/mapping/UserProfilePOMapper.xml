@@ -171,5 +171,10 @@
 	</update>
 
 	<update id="batchSetDefaultParkingLotByUserIds">
+		update user_profile set parking_lot_region = #{defaultParkingLot}
+		where user_id in
+		<foreach collection="userIds" item="userId" separator="," open="(" close=")">
+			#{userId}
+		</foreach>
     </update>
 </mapper>
