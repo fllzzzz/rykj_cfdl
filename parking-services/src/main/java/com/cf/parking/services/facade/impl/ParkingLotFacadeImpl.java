@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cf.parking.dao.mapper.ParkingLotMapper;
@@ -24,8 +25,6 @@ import com.cf.support.bean.IdWorker;
 import com.cf.support.exception.BusinessException;
 import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -215,8 +214,7 @@ public class ParkingLotFacadeImpl implements ParkingLotFacade
     public Integer addArea(ParkingLotAreaOptDTO dto) {
         //1.根据传入的入口信息转成区域编号
         List<ParkingLotAreaEntranceOptDTO> entranceList = dto.getEntranceList();
-        Gson gson = new Gson();
-        String regionCode = gson.toJson(entranceList);
+        String regionCode = JSON.toJSONString(entranceList);
 
         //2.生成对象
         ParkingLotPO po = new ParkingLotPO();
@@ -244,8 +242,7 @@ public class ParkingLotFacadeImpl implements ParkingLotFacade
     public Integer updateArea(ParkingLotAreaOptDTO dto) {
         //1.根据传入的入口信息转成区域编号
         List<ParkingLotAreaEntranceOptDTO> entranceList = dto.getEntranceList();
-        Gson gson = new Gson();
-        String regionCode = gson.toJson(entranceList);
+        String regionCode = JSON.toJSONString(entranceList);
 
         //2.生成对象
         ParkingLotPO po = new ParkingLotPO().setId(dto.getId()).setRegion(dto.getName()).setRegionCode(regionCode).setUpdateTm(new Date());
@@ -299,10 +296,7 @@ public class ParkingLotFacadeImpl implements ParkingLotFacade
         List<ParkingLotAreaBO> boList = poList.stream().map(po -> {
             ParkingLotAreaBO bo = new ParkingLotAreaBO().setId(po.getId()).setName(po.getRegion());
             if (StringUtils.isNotBlank(po.getRegionCode())) {
-                Gson gson = new Gson();
-                Type type = new TypeToken<List<ParkingLotAreaEntranceBO>>() {
-                }.getType();
-                List<ParkingLotAreaEntranceBO> entranceBOList = gson.fromJson(po.getRegionCode(), type);
+                List<ParkingLotAreaEntranceBO> entranceBOList = JSON.parseArray(po.getRegionCode(),ParkingLotAreaEntranceBO.class );
                 bo.setEntranceList(entranceBOList);
             }
             return bo;

@@ -27,6 +27,9 @@ public class LotteryResultService extends ServiceImpl<LotteryResultMapper, Lotte
     @Resource
     private LotteryResultDetailService lotteryResultDetailService;
 
+	@Resource
+	private ParkingLotService parkingLotService;
+
 
     /**
      * 已结束的摇号批次进行结果查看
@@ -47,7 +50,10 @@ public class LotteryResultService extends ServiceImpl<LotteryResultMapper, Lotte
 
         //2.根据结果id查询对应的结果详情
         PageResponse<LotteryResultDetailBO> result =  lotteryResultDetailService.selectDetailListByResultId(page,po.getId());
-        return result;
+		result.getList().forEach(bo -> {
+			bo.setParkingLotName(parkingLotService.selectParkingLotByCode(bo.getParkingLotCode()).getRegion());
+		});
+		return result;
     }
 
 

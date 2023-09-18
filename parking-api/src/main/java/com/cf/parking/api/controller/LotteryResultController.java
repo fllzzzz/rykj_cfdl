@@ -130,15 +130,15 @@ public class LotteryResultController
      */
     @ApiOperation(value = "确认结果查询", notes = "确认结果查询")
     @PostMapping("/confirmResult")
-    public Result<List<UserSpaceRsp>> confirmResult(@RequestBody UserSpacePageReq param)
+    public Result<List<LotteryResultDetailPageRsp>> confirmResult(@RequestBody UserSpacePageReq param)
     {
         AssertUtil.checkNull(param.getBatchNum(),"确认结果的期号不能为空！");
-        AssertUtil.checkNull(param.getBatchNum(),"确认结果的轮数不能为空！");
+        AssertUtil.checkNull(param.getRoundId(),"确认结果的轮数不能为空！");
         UserSpaceDTO dto = new UserSpaceDTO();
         BeanUtils.copyProperties(param,dto);
 
-        PageResponse<UserSpaceBO> result = lotteryResultFacade.confirmResult(dto);
-        List<UserSpaceRsp> userSpaceRsps = BeanConvertorUtils.copyList(result.getList(), UserSpaceRsp.class);
-        return PageUtils.pageResult(result,userSpaceRsps);
+        PageResponse<LotteryResultDetailBO> result = lotteryResultFacade.confirmResult(dto);
+        List<LotteryResultDetailPageRsp> detailPageRsps = BeanConvertorUtils.copyList(result.getList(), LotteryResultDetailPageRsp.class);
+        return PageUtils.pageResult(result,detailPageRsps);
     }
 }

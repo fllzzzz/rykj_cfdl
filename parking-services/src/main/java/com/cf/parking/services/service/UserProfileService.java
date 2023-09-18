@@ -15,6 +15,7 @@ import com.cf.support.exception.BusinessException;
 import com.cf.support.utils.BeanConvertorUtils;
 import com.cf.parking.facade.bo.AdminScoreRecordBO;
 import com.cf.parking.facade.dto.AdminScoresPageDTO;
+import io.swagger.models.auth.In;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +40,8 @@ public class UserProfileService extends ServiceImpl<UserProfilePOMapper, UserPro
     private UserProfilePOMapper userProfilePOMapper;
     @Resource
     private UserService userService;
+
+    private static final String default_parkingLot = "装配楼2期5F停车场";
 
     /**
      * 用户详情信息保存
@@ -201,5 +204,23 @@ public class UserProfileService extends ServiceImpl<UserProfilePOMapper, UserPro
         return userProfilePOMapper.selectOne(new LambdaQueryWrapper<UserProfilePO>()
                 .eq(UserProfilePO::getName,name)
                 .eq(UserProfilePO::getJobNumber,jobNumber));
+    }
+
+    /**
+     * 修改用户默认停车场为"装配楼2期5F停车场"
+     * @param userId
+     */
+    public Integer setDefaultParkingLotByUserId(Long userId) {
+        LambdaUpdateWrapper<UserProfilePO> updateWrapper = new LambdaUpdateWrapper<UserProfilePO>().eq(UserProfilePO::getUserId, userId).set(UserProfilePO::getParkingLotRegion, default_parkingLot);
+        return userProfilePOMapper.update(null, updateWrapper);
+    }
+
+    /**
+     * 批量修改用户默认停车场为"装配楼2期5F停车场"
+     * @param userIds
+     * @return
+     */
+    public Integer batchSetDefaultParkingLotByUserIds(List<Long> userIds) {
+        return userProfilePOMapper.batchSetDefaultParkingLotByUserIds(userIds,default_parkingLot);
     }
 }

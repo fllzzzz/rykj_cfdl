@@ -12,6 +12,7 @@ import com.cf.parking.facade.dto.LotteryBatchDTO;
 import com.cf.parking.facade.dto.LotteryBatchOptDTO;
 import com.cf.parking.facade.facade.LotteryBatchFacade;
 import com.cf.parking.services.utils.AssertUtil;
+import com.cf.parking.services.utils.PageUtils;
 import com.cf.support.result.PageResponse;
 import com.cf.support.result.Result;
 import com.cf.support.utils.BeanConvertorUtils;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -136,6 +138,9 @@ public class LotteryBatchController
         BeanUtils.copyProperties(param,dto);
 
         PageResponse<LotteryResultDetailBO> result = lotteryBatchFacade.viewResult(dto);
+        if (null == result){
+            return Result.buildSuccessResult(new PageResponse(new ArrayList(), param.getPageNo(), 0L, param.getPageSize()));
+        }
         List<LotteryResultDetailPageRsp> lotteryBatchRsps = BeanConvertorUtils.copyList(result.getList(), LotteryResultDetailPageRsp.class);
         return Result.buildSuccessResult(new PageResponse(lotteryBatchRsps,result.getPageNo(),result.getTotal(),result.getPageSize()));
     }

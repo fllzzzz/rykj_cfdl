@@ -41,7 +41,7 @@ public class ParkInvokeService {
 	
 	@Resource
 	private RedisUtil redisUtil;
-	
+
 	/**
 	 * 新增或修改车辆信息
 	 * @param info
@@ -63,7 +63,7 @@ public class ParkInvokeService {
 			AssertUtil.checkNull(info.getJobNo(), "工号不能为空");
 			AssertUtil.checkNull(info.getPermissStart(), "权限期限开始时间不能为空");
 			AssertUtil.checkNull(info.getLicensePlate(), "权限期限结束时间不能为空");
-			
+
 			Map<String,String> header = getHeaderToken();
 			String reponseContent = HttpClientUtil.post(parkingProperties.getHost() + parkingProperties.getAddCarmanagementUrl(), JSON.toJSONString(info),header);
 			log.info("调用添加车辆接口入参：{},出参:{}",JSON.toJSONString(info),JSON.toJSONString(reponseContent));
@@ -82,7 +82,6 @@ public class ParkInvokeService {
 		}
 	}
 	
-	
 	/**
 	 * @param dto
 	 * @return
@@ -92,7 +91,7 @@ public class ParkInvokeService {
 		try {
 			AssertUtil.checkNull(dto, "参数不能为空");
 			Map<String,String> header = getHeaderToken();
-			
+
 			String reponseContent = HttpClientUtil.post(parkingProperties.getHost() + parkingProperties.getQueryyardUrl(), JSON.toJSONString(dto),header);
 			log.info("调用查询车库接口入参：{},出参:{}",JSON.toJSONString(dto),JSON.toJSONString(reponseContent));
 			ParkBaseRespBO<YardPageBO> resp = JSON.parseObject(reponseContent, new TypeReference<ParkBaseRespBO<YardPageBO>>() {} );
@@ -115,8 +114,8 @@ public class ParkInvokeService {
 			return null;
 		}
 	}
-	
-	
+
+
 	/**
 	 * 查询车辆信息
 	 * @param dto
@@ -129,7 +128,7 @@ public class ParkInvokeService {
 			String reponseContent = HttpClientUtil.post(parkingProperties.getHost() + parkingProperties.getQueryCarUrl(), JSON.toJSONString(dto),header);
 			log.info("查询车辆信息口入参：{},出参:{}",JSON.toJSONString(dto),JSON.toJSONString(reponseContent));
 			ParkBaseRespBO<ParkingCarQueryRespBO<ParkingCarInfoBO<ParkingYardBO>>> resp = JSON.parseObject(reponseContent, new TypeReference<ParkBaseRespBO<ParkingCarQueryRespBO<ParkingCarInfoBO<ParkingYardBO>>>>() {} );
-			if(ParkingRemoteCodeEnum.RESP_SUCCESS.getState().equals(resp.getResCode()) && resp.getResult() != null && 
+			if(ParkingRemoteCodeEnum.RESP_SUCCESS.getState().equals(resp.getResCode()) && resp.getResult() != null &&
 					ParkingRemoteCodeEnum.BUS_CODE.getState().equals(resp.getResult().getCode())) {
 				return resp.getResult();
 			}
@@ -144,19 +143,19 @@ public class ParkInvokeService {
 		} catch (Exception e) {
 			log.error("查询车辆信息出错：{}",e);
 			return null;
-			
+
 		}
-	
-		
+
+
 	}
-	
+
 	private Map<String,String> getHeaderToken() throws Exception{
 		Map<String,String> header = new HashMap<>();
 		String token = getToken();
 		header.put("access-token", token);
 		return header;
 	}
-	
+
 	/**
 	 * 获取token
 	 * @return
@@ -182,5 +181,5 @@ public class ParkInvokeService {
 			}
 			throw new BusinessException("获取token失败");
 	}
-	
+
 }

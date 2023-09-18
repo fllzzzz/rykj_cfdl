@@ -56,5 +56,5 @@ public interface LotteryResultFacade
 	 * @param dto
 	 * @return
 	 */
-    PageResponse<UserSpaceBO> confirmResult(UserSpaceDTO dto);
+    PageResponse<LotteryResultDetailBO> confirmResult(UserSpaceDTO dto);
 }
