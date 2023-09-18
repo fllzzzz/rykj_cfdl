@@ -1,6 +1,9 @@
 package com.cf.parking.api.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.cf.parking.api.request.BlackListBatchAddReq;
+import com.cf.parking.facade.bo.ParkingCarQueryRespBO;
+import com.cf.parking.facade.bo.YardPageBO;
 import com.cf.parking.facade.constant.FeignUrlConstant;
 import com.cf.parking.facade.dto.*;
 import com.cf.parking.facade.facade.BlackListFacade;
@@ -191,12 +194,23 @@ public class TestController {
 	}
 	
 	
-	@PostMapping("/carAdd")
-	@ApiOperation(value = "添加车位", notes = "添加车位")
-	public Result addCar() {
-		HikvisionResult<List<SpaceNumDTO>> hikvisionResult = gatewayHikvisionFeign.remainSpaceNum(FeignUrlConstant.SPACE_NUM_URL, new ParkSyscodeDTO());
-		log.info("remainSpaceNum={}", hikvisionResult);
-		return Result.buildSuccessResult(hikvisionResult.getData());
+	@PostMapping("/queryCarList")
+	@ApiOperation(value = "查询车位", notes = "查询车位")
+	public Result queryCar() {
+		ParkingCarQueryDTO dto = new ParkingCarQueryDTO();
+		ParkingCarQueryRespBO result = parkInvokeService.queryCarInfo(dto);
+		System.out.println(JSON.toJSONString(result));
+		return Result.buildSuccessResult(result);
+	}
+	
+	
+	@PostMapping("/queryYardList")
+	@ApiOperation(value = "查询车库", notes = "查询车库")
+	public Result queryYard() {
+		QueryYardDTO dto = new QueryYardDTO();
+		YardPageBO result = parkInvokeService.queryYard(dto);
+		System.out.println(JSON.toJSONString(result));
+		return Result.buildSuccessResult(result);
 	}
 	
 }

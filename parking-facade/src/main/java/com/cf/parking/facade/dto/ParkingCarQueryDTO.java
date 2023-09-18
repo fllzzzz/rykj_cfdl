@@ -28,11 +28,11 @@ public class ParkingCarQueryDTO {
 	 */
 	private String carOwnerClassification = "摇号";
 	/**
-	 * 页数
+	 * 页数 必填
 	 */
 	private Long pageNum = 1l;
 	/**
-	 * 条数
+	 * 条数 必填
 	 */
 	private Long pageSize = 20l;
 }
