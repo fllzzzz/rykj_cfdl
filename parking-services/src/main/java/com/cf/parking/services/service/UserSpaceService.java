@@ -3,6 +3,7 @@ package com.cf.parking.services.service;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 
+import com.cf.parking.facade.bo.LotteryResultDetailBO;
 import com.cf.parking.facade.bo.ParkBaseDetailRespBO;
 import com.cf.parking.facade.bo.ParkBaseRespBO;
 import com.cf.parking.facade.bo.UserSpaceBO;
@@ -476,15 +477,25 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 	 * @param dto
 	 * @return
 	 */
-	public PageResponse<UserSpaceBO> pageSelectListByBatchAndRound(UserSpaceDTO dto) {
+	public PageResponse<LotteryResultDetailBO> pageSelectListByBatchAndRound(UserSpaceDTO dto) {
 		Page<UserSpacePO> page = PageUtils.toPage(dto);
 		Page<UserSpacePO> poPage = userSpaceMapper.selectPage(page, new LambdaQueryWrapper<UserSpacePO>()
 				.eq(UserSpacePO::getBatchNum, dto.getBatchNum())
 				.eq(UserSpacePO::getRoundId, dto.getRoundId())
 				.eq(StringUtils.isNotBlank(dto.getState()), UserSpacePO::getState, dto.getState()));
 
-		List<UserSpaceBO> userSpaceBOS = BeanConvertorUtils.copyList(poPage.getRecords(), UserSpaceBO.class);
-		return PageUtils.toResponseList(page,userSpaceBOS);
+		List<LotteryResultDetailBO> detailBOS = poPage.getRecords().stream().map(this::getLotteryResultDetailBOByUserSpacePO).collect(Collectors.toList());
+		return PageUtils.toResponseList(page,detailBOS);
+	}
+
+	private LotteryResultDetailBO getLotteryResultDetailBOByUserSpacePO(UserSpacePO po) {
+		LotteryResultDetailBO detailBO = new LotteryResultDetailBO();
+		detailBO.setId(po.getUserSpaceId());
+		detailBO.setParkingLotName(parkingLotService.selectParkingLotByCode(po.getParkingLot()).getRegion());
+		detailBO.setUserName(po.getName());
+		detailBO.setUserJobNumber(po.getJobNumber());
+		detailBO.setState(po.getState());
+		return detailBO;
 	}
 
 

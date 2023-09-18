@@ -1,6 +1,7 @@
 package com.cf.parking.facade.bo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.util.Date;
@@ -19,8 +20,11 @@ public class LotteryResultBO {
     private Long batchId;
 
     /** 期号 */
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
     private Date batchNum;
+
+    /** 轮号id */
+    private Long RoundId;
 
     /** 轮号 */
     private String RoundName;

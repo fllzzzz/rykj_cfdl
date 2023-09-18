@@ -1,6 +1,7 @@
 package com.cf.parking.api.request;
 
 import com.cf.support.result.PageRequest;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -38,6 +39,7 @@ public class UserSpacePageReq extends PageRequest {
 
     /** 期号 */
     @ApiModelProperty(value = "期号")
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
     private Date batchNum;
 
     /** 摇号轮数id */

@@ -193,6 +193,8 @@ public class UserVerifyController {
         try {
             //4.参数生成（图片转换）
             dto = optReq2OptDto(param);
+            dto.setUserId(userId);
+            dto.setUserName(getUser().getServerName());
         } catch (IOException e) {
             log.error("用户{}上传车辆信息审核时图片转换异常:{}",getUser().getServerName(),e);
             return Result.buildErrorResult("图片上传异常，请重试！");
@@ -245,6 +247,7 @@ public class UserVerifyController {
         }
 
         //3.参数校验
+        AssertUtil.checkNull(param.getId(),"请选择要修改的车辆信息！");
         paramVerify(param);
 
         //4.参数转换
@@ -252,6 +255,9 @@ public class UserVerifyController {
         try {
             //4.参数生成（图片转换）
             dto = optReq2OptDto(param);
+            dto.setId(param.getId());
+            dto.setUserId(userId);
+            dto.setUserName(getUser().getServerName());
         } catch (IOException e) {
             log.error("用户{}上传车辆信息审核时图片转换异常:{}",getUser().getServerName(),e);
             return Result.buildErrorResult("图片上传异常，请重试！");

@@ -15,6 +15,7 @@ import com.cf.parking.facade.bo.LotteryResultDetailBO;
 import com.cf.parking.facade.dto.LotteryBatchDTO;
 import com.cf.parking.facade.dto.LotteryBatchOptDTO;
 import com.cf.parking.facade.facade.LotteryBatchFacade;
+import com.cf.parking.services.enums.LotteryBatchStateEnum;
 import com.cf.parking.services.service.LotteryResultService;
 import com.cf.parking.services.service.ParkingLotService;
 import com.cf.parking.services.utils.AssertUtil;
@@ -99,8 +100,7 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
 
         //2.参数设置
         po.setId(idWorker.nextId());
-        //TODO:枚举
-        po.setState("0");
+        po.setState(LotteryBatchStateEnum.NEED_NOTIFY.getState());
         po.setCreateTm(new Date());
         po.setUpdateTm(new Date());
         //2.1轮数设置（将数组转为字符串）

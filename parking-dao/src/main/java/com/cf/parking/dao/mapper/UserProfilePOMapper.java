@@ -16,4 +16,10 @@ public interface UserProfilePOMapper extends BaseMapper<UserProfilePO> {
 
 	int updateSelectionList(@Param("list") List<UserProfilePO> record);
 
+	/**
+	 * 批量修改用户默认停车场
+	 * @param userIds
+	 * @return
+	 */
+    Integer batchSetDefaultParkingLotByUserIds(List<Long> userIds,String defaultParkingLot);
 }

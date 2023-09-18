@@ -52,11 +52,11 @@ public class ParkInvokeService {
 			AssertUtil.checkNull(info.getLicensePlate(), "权限期限结束时间不能为空");
 			HttpEntity entity = HttpClientUtil.doPostStr(parkingProperties.getHost() + parkingProperties.getAddCarmanagementUrl(), JSON.toJSONString(info));
 			String reponseContent = EntityUtils.toString(entity,"UTF-8");
-			log.info("调用添加车辆接口入参：{},出参:{}",JSON.toJSONString(info),JSON.toJSONString(reponseContent));
+//			log.info("调用添加车辆接口入参：{},出参:{}",JSON.toJSONString(info),JSON.toJSONString(reponseContent));
 			ParkBaseRespBO<ParkBaseDetailRespBO> resp = JSON.parseObject(reponseContent, new TypeReference<ParkBaseRespBO<ParkBaseDetailRespBO>>() {} );
 			return resp;
 		} catch (Exception e) {
-			log.info("调用添加车辆接口入参：{},e={}",JSON.toJSONString(info),e);
+//			log.info("调用添加车辆接口入参：{},e={}",JSON.toJSONString(info),e);
 			return ParkBaseRespBO.fail();
 		}
 	}

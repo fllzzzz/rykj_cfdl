@@ -171,11 +171,17 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 				.ge(!ObjectUtils.isEmpty(dto.getStartDate()) , LotteryResultPO::getBatchNum, dto.getStartDate())
 				.eq(!ObjectUtils.isEmpty(dto.getRoundId()) , LotteryResultPO::getRoundId, dto.getRoundId())
 				.eq(StringUtils.isNotEmpty(dto.getState()), LotteryResultPO::getState, dto.getState())
-				.ne(LotteryResultPO::getState,"5")
+				.ne(LotteryResultPO::getState,LotteryResultStateEnum.HAVE_ARCHIVED.getState())
 				.orderByDesc(LotteryResultPO::getBatchNum);
 
 		Page<LotteryResultPO> poPage = lotteryResultMapper.selectPage(page, queryWrapper);
 		List<LotteryResultBO> boList = BeanConvertorUtils.copyList(poPage.getRecords(), LotteryResultBO.class);
+		//roundName设置
+		boList.forEach(lotteryResultBO -> {
+			LotteryRuleRoundPO roundPO = lotteryRuleRoundService.getById(lotteryResultBO.getRoundId());
+			lotteryResultBO.setRoundName(roundPO.getName());
+		});
+
 		return PageUtils.toResponseList(page,boList);
 	}
 
@@ -190,16 +196,16 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 
 		//1.更新状态为已归档
 		LotteryResultPO po = lotteryResultMapper.selectById(id);
-		po.setState("5");
+		po.setState(LotteryResultStateEnum.HAVE_ARCHIVED.getState());
 		lotteryResultMapper.updateById(po);
 
 		//2.查看相同期号下是否还有其他未归档的记录。如果没有，将该期摇号批次表状态变为已结束
 		List<LotteryResultPO> lotteryResultPOList = lotteryResultMapper.selectList(new LambdaQueryWrapper<LotteryResultPO>()
 				.eq(LotteryResultPO::getBatchNum, po.getBatchNum())
-				.ne(LotteryResultPO::getState, "5"));
+				.ne(LotteryResultPO::getState, LotteryResultStateEnum.HAVE_ARCHIVED.getState()));
 
 		if (CollectionUtils.isEmpty(lotteryResultPOList)){
-//			lotteryBatchService.archive(po.getBatchId());
+			lotteryBatchService.endByBatchId(po.getBatchId());
 		}
 		return null;
 	}
@@ -237,7 +243,13 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 	@Override
 	public PageResponse<LotteryResultDetailBO> lotteryResult(LotteryResultDTO dto) {
         Page<LotteryResultDetailPO> page = PageUtils.toPage(dto);
-        return lotteryResultDetailService.selectDetailListByResultId(page, dto.getId());
+		PageResponse<LotteryResultDetailBO> boPageResponse = lotteryResultDetailService.selectDetailListByResultId(page, dto.getId());
+		//设置停车场名称
+		boPageResponse.getList().forEach(x->{
+			ParkingLotPO parkingLotPO = parkingLotService.selectParkingLotByCode(x.getParkingLotCode());
+			x.setParkingLotName(parkingLotPO.getRegion());
+		});
+		return boPageResponse;
 	}
 
 
@@ -248,7 +260,7 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 	 * @return
 	 */
 	@Override
-	public PageResponse<UserSpaceBO> confirmResult(UserSpaceDTO dto) {
+	public PageResponse<LotteryResultDetailBO> confirmResult(UserSpaceDTO dto) {
 		return userSpaceService.pageSelectListByBatchAndRound(dto);
 	}
 

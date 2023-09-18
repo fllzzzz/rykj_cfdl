@@ -169,4 +169,7 @@
 			where user_id = #{record.userId,jdbcType=BIGINT}
 		</foreach>
 	</update>
+
+	<update id="batchSetDefaultParkingLotByUserIds">
+    </update>
 </mapper>

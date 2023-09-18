@@ -5,12 +5,14 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cf.parking.dao.mapper.UserVerifyMapper;
+import com.cf.parking.dao.po.UserProfilePO;
 import com.cf.parking.dao.po.UserVerifyPO;
 import com.cf.parking.facade.bo.UserVerifyBO;
 import com.cf.parking.facade.dto.UserVerifyDTO;
 import com.cf.parking.facade.dto.UserVerifyOptDTO;
 import com.cf.parking.facade.facade.UserVerifyFacade;
 import com.cf.parking.services.enums.UserVerifyStateEnum;
+import com.cf.parking.services.service.UserProfileService;
 import com.cf.parking.services.utils.PageUtils;
 import com.cf.support.bean.IdWorker;
 import com.cf.support.result.PageResponse;
@@ -19,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
@@ -40,6 +43,9 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
 
     @Resource
     private IdWorker idWorker;
+
+    @Resource
+    private UserProfileService userProfileService;
 
     /**
      * 查询车辆审核列表
@@ -104,16 +110,21 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
      * @param dto
      * @return
      */
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Integer audit(UserVerifyOptDTO dto) {
         UserVerifyPO userVerifyPO = mapper.selectById(dto.getId());
         try{
+            //1.审核
             LambdaUpdateWrapper<UserVerifyPO> updateWrapper = new LambdaUpdateWrapper<UserVerifyPO>()
                     .eq(UserVerifyPO::getId, dto.getId())
                     .set(UserVerifyPO::getState, dto.getState())
                     .set(UserVerifyPO::getReason, dto.getReason());
             int result = mapper.update(userVerifyPO,updateWrapper);
             log.info("车辆审核成功，审核结果：{}，审核意见：{}，审核对象：{}", dto.getState(),dto.getReason(),userVerifyPO);
+            //2.修改用户默认停车场为"装配楼2期5F停车场"
+            userProfileService.setDefaultParkingLotByUserId(dto.getUserId());
+
             return result;
         }catch (Exception e){
             log.error("车辆审核失败：审核对象：{}，报错原因{}",userVerifyPO,e);
@@ -126,9 +137,19 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
      * @param dto
      * @return
      */
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void batchAudit(UserVerifyOptDTO dto) {
-        mapper.batchAudit(dto.getIds(),dto.getState(),dto.getReason());
+        //1.批量审核
+        Integer result = mapper.batchAudit(dto.getIds(), dto.getState(), dto.getReason());
+        //2.如果是审核通过，修改用户默认停车场
+        //2.1查询用户ids
+        List<UserVerifyPO> poList = mapper.selectBatchIds(dto.getIds());
+        List<Long> userIds = poList.stream().filter(po->ObjectUtils.isEmpty(po.getUserId())).map(UserVerifyPO::getUserId).collect(Collectors.toList());
+        //2.2批量更新
+        if (UserVerifyStateEnum.SUCCESS.getState().equals(dto.getState().toString())){
+            userProfileService.batchSetDefaultParkingLotByUserIds(userIds);
+        }
     }
 
     /**
@@ -148,8 +169,20 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
      */
     @Override
     public Integer update(UserVerifyOptDTO dto) {
-        //TODO
-        return 0;
+
+        UserVerifyPO userVerifyPO = mapper.selectById(dto.getId());
+        BeanUtils.copyProperties(dto,userVerifyPO);
+        userVerifyPO.setState(Integer.parseInt(UserVerifyStateEnum.UNAUDIT.getState()));
+        userVerifyPO.setReason("");
+        userVerifyPO.setUpdateTm(new Date());
+        try{
+            int result = mapper.updateById(userVerifyPO);
+            log.info("修改个人车辆审核信息成功  ——  {}",userVerifyPO);
+            return result;
+        }catch (Exception e){
+            log.error("修改个人车辆审核信息失败：{}  ——  {}",e,userVerifyPO);
+            return 0;
+        }
     }
 
 }

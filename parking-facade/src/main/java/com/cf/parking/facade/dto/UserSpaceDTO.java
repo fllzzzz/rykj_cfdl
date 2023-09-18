@@ -1,6 +1,7 @@
 package com.cf.parking.facade.dto;
 
 import com.cf.support.result.PageRequest;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import java.io.Serializable;
@@ -38,6 +39,7 @@ public class UserSpaceDTO extends PageRequest implements Serializable {
     private String state;
 
     /** 期号 */
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
     private Date batchNum;
 
     /** 摇号轮数id */

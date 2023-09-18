@@ -14,8 +14,7 @@ public enum LotteryResultStateEnum {
 	CONFIRM_IN_PROCESS("2","确认中"),
 	UNPUBLIC("3","待发布"),
 	UNARCHIVED("4","待归档"),
-	
-	;
+	HAVE_ARCHIVED("5","已归档");
 	
 	
 	private String state;

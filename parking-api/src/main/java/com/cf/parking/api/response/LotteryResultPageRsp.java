@@ -26,8 +26,12 @@ public class LotteryResultPageRsp {
 
     /** 期号 */
     @ApiModelProperty(value = "期号")
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
     private Date batchNum;
+
+    /** 轮号id */
+    @ApiModelProperty(value = "轮号id")
+    private Long RoundId;
 
     /** 轮号 */
     @ApiModelProperty(value = "轮号")
