@@ -46,11 +46,11 @@ public class Carmanagement {
 	/**
 	 * 权限期限开始时间  yyyy-MM-dd HH:mm:ss  必填
 	 */
-	private Date permissStart;
+	private String permissStart;
 	/**
 	 * 权限期限结束时间  yyyy-MM-dd HH:mm:ss  必填
 	 */
-	private Date permissEnd;
+	private String permissEnd;
 	
 	
 	

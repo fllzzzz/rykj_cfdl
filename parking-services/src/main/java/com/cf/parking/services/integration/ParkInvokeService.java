@@ -1,5 +1,6 @@
 package com.cf.parking.services.integration;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,8 +52,8 @@ public class ParkInvokeService {
 			.setJobNo(space.getJobNumber())
 			.setParkIndexCode(space.getParkingLot().split(","))
 			.setCarOwner(space.getName())
-			.setPermissStart(DateUtil.beginOfDay(space.getStartDate()))
-			.setPermissEnd(DateUtil.endOfDay(space.getEndDate()));
+			.setPermissStart(DateUtil.format(DateUtil.beginOfDay(space.getStartDate()), "yyyy-MM-dd HH:mm:ss") )
+			.setPermissEnd(DateUtil.format(DateUtil.endOfDay(space.getEndDate()), "yyyy-MM-dd HH:mm:ss"));
 		try {
 			AssertUtil.checkNull(info, "参数不能为空");
 			AssertUtil.checkNull(info.getLicensePlate(), "车牌号不能为空");
@@ -73,6 +74,10 @@ public class ParkInvokeService {
 		}
 	}
 	
+	public static void main(String[] args) {
+		Date d = DateUtil.endOfDay(new Date());
+		System.out.println(d.toLocaleString());
+	}
 	
 	/**
 	 * @param dto

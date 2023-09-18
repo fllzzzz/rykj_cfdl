@@ -529,7 +529,9 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 	 * @param date
 	 */
 	public void updateEndDate(String jobNumber, Date date) {
-		UserSpacePO space = new UserSpacePO().setEndDate(date);
+		UserSpacePO space = new UserSpacePO().setEndDate(date)
+				.setScheduleDate("")
+				.setState(UserSpaceStateEnum.UNSYNC.getState());
 		userSpaceMapper.update(space, new LambdaUpdateWrapper<UserSpacePO>().eq(UserSpacePO::getJobNumber, jobNumber));
 	}
 }
