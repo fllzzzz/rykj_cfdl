@@ -1,9 +1,9 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://101.34.3.87:3306/cfdl-parking?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&allowMultiQueries=true&serverTimezone=Asia/Shanghai
-    username: rykjdev
-    password: Rykjdev@202302
+    url: jdbc:mysql://192.168.1.194:3306/parking?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&allowMultiQueries=true&serverTimezone=Asia/Shanghai
+    username: root
+    password: Cfmoto@123
     type: com.alibaba.druid.pool.DruidDataSource
     druid:
       stat-view-servlet:
@@ -27,10 +27,10 @@ spring:
 #        use-global-data-source-stat: true
 
   redis:
-    host: 127.0.0.1
+    host: 192.168.1.147
     port: 6379
     database: 0
-    password: 
+    password: Cfmoto@123
     timeout: 3000
     jedis:
       pool:
@@ -47,11 +47,11 @@ jwt:
 
 dingtalk:
   keyWord: parking
-  url: https://oapi.dingtalk.com/robot/send?access_token=7894bdbe2cf01f7d426af4540660d5095d4129e288fec70d92e9eeba54721110
-  agentId: 2720211144
-  appKey: dinggtd3vevd9dez7geo
-  secret: hz7MwBBU9wTdLl3er0RCYLDMMaEyQ-dwADqXcphV2f3OlaJo5fWHti_QZ4KGpIHJ
-  corpId: ding037640a7807d374ba39a90f97fcb1e09
+  url: https://oapi.dingtalk.com/robot/send?access_token=764b2ead9c756ac34bd8e133f4e4344c8b784957aa6ffe6552dd92d676d73b5f
+  agentId: 2034016904
+  appKey: dingyuew3xwaajod2wqp
+  secret: U0w5lHtz58n6UEirdxN9-CYfgjTnBPJNZa_4GkTN9uDHh-A02wMFTlWVVTdHZzEq
+  corpId: dingb32dfe3fb37ee75c35c2f4657eb6378f
   messageActionUrl: http://test-parking.cfmoto.com:8186/#/pages/loading/loading?orderId=
   signUrl: http://test-parking.cfmoto.com:8186/#/
 
@@ -74,7 +74,7 @@ gateway:
 log:
   topic: test-log
   address: 47.98.128.233:9092,47.97.22.216:9092,47.98.158.231:9092
-
+  
 #闸机系统
 parking:
   host: https://studio.e.huawei.com
@@ -85,4 +85,3 @@ parking:
   grantType: client_credentials
   clientId: 7a01285f4b3b49f48061555d29741ebf
   clientSecret: 1158935bf67a854418c3d8c1e8462d46ce7eba3f98ee72a5
-  

@@ -78,7 +78,7 @@
         </root>
     </springProfile>
 
-    <springProfile name="dev,test">
+    <springProfile name="dev,test,custom">
         <root level="INFO">
             <appender-ref ref="CONSOLE-WITH-COLOR"/>
             <appender-ref ref="FILE"/>
