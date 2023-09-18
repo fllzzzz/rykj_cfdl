@@ -12,7 +12,6 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -29,6 +28,7 @@ import com.cf.parking.facade.dto.UserSpaceValidityDTO;
 import com.cf.parking.services.enums.ParkingRemoteCodeEnum;
 import com.cf.parking.services.enums.UserSpaceStateEnum;
 import com.cf.parking.services.integration.ParkInvokeService;
+import com.cf.support.bean.IdWorker;
 import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
 import org.apache.commons.collections4.CollectionUtils;
@@ -51,6 +51,9 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
     // 每次批量保存最大的数量
     private final Integer MAX_BATCH_SAVE_NUM = 500;
     private final String DATE_FORMAT_STR = "yyyy-MM-dd";
+    
+    @Resource
+	private IdWorker idWorker;
 
     @Resource
     private UserSpaceService userSpaceService;
@@ -332,7 +335,7 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 					.setParkingLot(detail.getParkingLotCode())
 					.setState(UserSpaceStateEnum.UNSYNC.getState())
 					.setUpdateTm(new Date())
-					.setUserSpaceId(IdWorker.getId())
+					.setUserSpaceId(idWorker.nextId())
 					.setEndDate(batch.getValidEndDate())
 					.setStartDate(batch.getValidStartDate())
 					.setPlateNo(plateNo)
@@ -368,7 +371,7 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 						.setBatchId(lottery.getBatchId())
 						.setBatchNum(lottery.getBatchNum())
 						.setRoundId(lottery.getRoundId())
-						.setUserSpaceId(IdWorker.getId());
+						.setUserSpaceId(idWorker.nextId());
 		return userSpace;
 	}
 
@@ -436,15 +439,18 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 		BeanUtils.copyProperties(space, dto);
 		dto.setParkingLot(StringUtils.join( parkingLotService.queryParentListViaSelf(dto.getParkingLot()),"," ));
 		ParkBaseRespBO<ParkBaseDetailRespBO> resp = parkInvokeService.replaceCarInfo(dto);
+		
+		UserSpacePO stateSpace = new UserSpacePO();
 		if(resp != null && ParkingRemoteCodeEnum.RESP_SUCCESS.getState().equals(resp.getResCode()) && resp.getResult() != null && 
 				ParkingRemoteCodeEnum.BUS_CODE.getState().equals(resp.getResult().getCode())) {
-			space.setState(UserSpaceStateEnum.SUCCESS.getState());
+			stateSpace.setState(UserSpaceStateEnum.SUCCESS.getState());
 		} else {
-			space.setState(UserSpaceStateEnum.FAIL.getState());
-			space.setFailReason(resp == null ? "系统异常" : (resp.getResult() == null ? resp.getResMsg() : resp.getResult().getMessage()));
+			stateSpace.setState(UserSpaceStateEnum.FAIL.getState());
+			stateSpace.setFailReason(resp == null ? "系统异常" : (resp.getResult() == null ? resp.getResMsg() : resp.getResult().getMessage()));
 		}
-		log.info("车位同步id={}结果{}",space.getUserSpaceId(),JSON.toJSONString(resp));
-		userSpaceMapper.updateById(space);
+		stateSpace.setUserSpaceId(space.getUserSpaceId());	
+		log.info("车位同步id={}结果{}",stateSpace.getUserSpaceId(),JSON.toJSONString(resp));
+		userSpaceMapper.updateById(stateSpace);
 	}
 
 
@@ -514,6 +520,17 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 				.ne(UserSpacePO::getState, UserSpaceStateEnum.SUCCESS.getState())
 				
 			);
+	}
+
+
+	/**
+	 * 更新员工的车位有效期到 指定日期
+	 * @param jobNumber
+	 * @param date
+	 */
+	public void updateEndDate(String jobNumber, Date date) {
+		UserSpacePO space = new UserSpacePO().setEndDate(date);
+		userSpaceMapper.update(space, new LambdaUpdateWrapper<UserSpacePO>().eq(UserSpacePO::getJobNumber, jobNumber));
 	}
 }
 

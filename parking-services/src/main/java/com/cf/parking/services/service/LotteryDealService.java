@@ -285,6 +285,9 @@ public class LotteryDealService {
 		if (!CollectionUtils.isEmpty(updateList)) {
 			userSpaceService.updateBatchById(updateList);
 		}
+		
+		//把转让人的车位有效期更改为今天
+		userSpaceService.updateEndDate(outSpaceList.get(0).getJobNumber(),new Date());
 	}
 			
 	
