@@ -69,6 +69,9 @@ public interface RedisConstant {
 	 */
 	String PARKING_TOKEN = "parking:token";
     
-    
+	/**
+	 * 定时创建批次任务
+	 */
+	String AUTO_CREATE_BATCH = "parking:create:batch";
 }
 

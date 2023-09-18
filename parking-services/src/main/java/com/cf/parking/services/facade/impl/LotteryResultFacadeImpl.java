@@ -13,13 +13,14 @@ import com.cf.parking.dao.po.UserSpacePO;
 import com.cf.parking.dao.po.UserVerifyPO;
 import com.cf.parking.facade.bo.LotteryResultBO;
 import com.cf.parking.facade.bo.LotteryResultDetailBO;
-import com.cf.parking.facade.bo.UserSpaceBO;
 import com.cf.parking.facade.dto.LotteryResultDTO;
 import com.cf.parking.facade.dto.UserSpaceDTO;
 import com.cf.parking.facade.facade.LotteryResultFacade;
 import com.cf.parking.services.enums.EnableStateEnum;
 import com.cf.parking.services.enums.LotteryEnableStateEnum;
 import com.cf.parking.services.enums.LotteryResultStateEnum;
+import com.cf.parking.services.enums.UserSpaceStateEnum;
+import com.cf.parking.services.integration.ParkInvokeService;
 import com.cf.parking.services.service.DepartmentService;
 import com.cf.parking.services.service.EmployeeService;
 import com.cf.parking.services.service.LotteryApplyRecordService;
@@ -42,6 +43,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -97,6 +101,12 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
     
     @Resource
     private UserVerifyService userVerifyService;
+    
+    @Resource
+    private ThreadPoolTaskExecutor asyncExecutor;
+    
+    @Resource
+    private ParkInvokeService parkInvokeService;
     
     
     @Transactional(rollbackFor = Exception.class)
@@ -262,6 +272,28 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 	@Override
 	public PageResponse<LotteryResultDetailBO> confirmResult(UserSpaceDTO dto) {
 		return userSpaceService.pageSelectListByBatchAndRound(dto);
+	}
+
+
+	@Override
+	public void syncRetry(Long batchId, Long roundId) {
+		List<UserSpacePO> failList = userSpaceService.querySpaceListByBatch(batchId, roundId,UserSpaceStateEnum.FAIL.getState());
+		if (CollectionUtils.isEmpty(failList)){
+			return ;
+		}
+		asyncExecutor.execute(new Runnable() {
+			@Override
+			public void run() {
+				failList.forEach(space -> {
+					try {
+						userSpaceService.invokeCarAddService(space);
+						Thread.sleep(5000);
+					} catch (Exception e) {
+						log.error("一键同步过程中车位={}报错={}", JSON.toJSONString(space),e);
+					}
+				});
+			}
+		});		
 	}
 
 

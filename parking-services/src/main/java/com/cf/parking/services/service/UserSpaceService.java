@@ -2,11 +2,9 @@ package com.cf.parking.services.service;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
-
 import com.cf.parking.facade.bo.LotteryResultDetailBO;
 import com.cf.parking.facade.bo.ParkBaseDetailRespBO;
 import com.cf.parking.facade.bo.ParkBaseRespBO;
-import com.cf.parking.facade.bo.UserSpaceBO;
 import com.cf.parking.services.utils.PageUtils;
 import lombok.extern.slf4j.Slf4j;
 import com.alibaba.fastjson.JSON;
@@ -66,6 +64,7 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
     
     @Resource
     private ParkingLotService parkingLotService;
+    
     
     
     /**
@@ -401,18 +400,7 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 		UserSpaceDTO dto = new UserSpaceDTO();
 		spaceList.forEach(space->{
 			try {
-				BeanUtils.copyProperties(space, dto);
-				dto.setParkingLot(StringUtils.join( parkingLotService.queryParentListViaSelf(dto.getParkingLot()),"," ));
-				ParkBaseRespBO<ParkBaseDetailRespBO> resp = parkInvokeService.replaceCarInfo(dto);
-				if(resp != null && ParkingRemoteCodeEnum.RESP_SUCCESS.getState().equals(resp.getResCode()) && resp.getResult() != null && 
-						ParkingRemoteCodeEnum.BUS_CODE.getState().equals(resp.getResult().getCode())) {
-					space.setState(UserSpaceStateEnum.SUCCESS.getState());
-				} else {
-					space.setState(UserSpaceStateEnum.FAIL.getState());
-					space.setFailReason(resp == null ? "系统异常" : (resp.getResult() == null ? resp.getResMsg() : resp.getResult().getMessage()));
-				}
-				log.info("定时任务车位同步id={}结果{}",space.getUserSpaceId(),JSON.toJSONString(resp));
-				userSpaceMapper.updateById(space);
+				invokeCarAddService(space);
 				Thread.sleep(5000);
 			} catch (Exception e) {
 				log.info("定时任务车位同步id={}出错{}",space.getUserSpaceId(),e);
@@ -436,6 +424,16 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 			return ;
 		}
 		
+		invokeCarAddService(space);
+	}
+
+	
+	/**
+	 * 调用闸机系统把车位信息同步过去
+	 * @param space
+	 */
+	public void invokeCarAddService(UserSpacePO space) {
+		log.info("同步车位信息：{}",JSON.toJSONString(space));
 		UserSpaceDTO dto = new UserSpaceDTO();
 		BeanUtils.copyProperties(space, dto);
 		dto.setParkingLot(StringUtils.join( parkingLotService.queryParentListViaSelf(dto.getParkingLot()),"," ));
@@ -453,7 +451,6 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 		log.info("车位同步id={}结果{}",stateSpace.getUserSpaceId(),JSON.toJSONString(resp));
 		userSpaceMapper.updateById(stateSpace);
 	}
-
 
 	/**
 	 * 根据工号查询车位并根据车库和有效期进行分组
@@ -544,6 +541,21 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 				.setScheduleDate("")
 				.setState(UserSpaceStateEnum.UNSYNC.getState());
 		userSpaceMapper.update(space, new LambdaUpdateWrapper<UserSpacePO>().eq(UserSpacePO::getJobNumber, jobNumber));
+	}
+
+
+	/**
+	 * 根据批次、轮次 、状态查询车位信息
+	 * @param batchId 批次
+	 * @param roundId 轮次
+	 * @param state	状态
+	 * @return
+	 */
+	public List<UserSpacePO> querySpaceListByBatch(Long batchId, Long roundId, String state) {
+		return userSpaceMapper.selectList(new LambdaQueryWrapper<UserSpacePO>()
+				.eq(UserSpacePO::getRoundId, roundId)
+				.eq(UserSpacePO::getBatchId, batchId)
+				.eq(UserSpacePO::getState, state));
 	}
 }
 

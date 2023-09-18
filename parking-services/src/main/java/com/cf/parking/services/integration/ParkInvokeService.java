@@ -1,10 +1,11 @@
 package com.cf.parking.services.integration;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.annotation.Resource;
+
+import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpResponseException;
 import org.springframework.stereotype.Service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
@@ -68,17 +69,19 @@ public class ParkInvokeService {
 			log.info("调用添加车辆接口入参：{},出参:{}",JSON.toJSONString(info),JSON.toJSONString(reponseContent));
 			ParkBaseRespBO<ParkBaseDetailRespBO> resp = JSON.parseObject(reponseContent, new TypeReference<ParkBaseRespBO<ParkBaseDetailRespBO>>() {} );
 			return resp;
+		} catch(HttpResponseException e) {
+			log.info("调用添加车辆接口入参：{},调用失败e={}",JSON.toJSONString(info),e);
+			if(e.getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
+				redisUtil.del(RedisConstant.PARKING_TOKEN);
+			}
+			return ParkBaseRespBO.fail();
+			
 		} catch (Exception e) {
 			log.info("调用添加车辆接口入参：{},e={}",JSON.toJSONString(info),e);
 			return ParkBaseRespBO.fail();
 		}
 	}
 	
-	public static void main(String[] args) {
-		Date d = DateUtil.endOfDay(new Date());
-		System.out.println(d.toLocaleString());
-	}
-
 	/**
 	 * @param dto
 	 * @return
@@ -99,6 +102,13 @@ public class ParkInvokeService {
 				return result;
 			}
 			return null;
+		} catch(HttpResponseException e) {
+			log.info("调用查询车库接口入参：{},调用失败e={}",JSON.toJSONString(dto),e);
+			if(e.getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
+				redisUtil.del(RedisConstant.PARKING_TOKEN);
+			}
+			return null;
+			
 		} catch (Exception e) {
 			log.info("调用查询车库接口入参：{},e:{}",JSON.toJSONString(dto),e);
 			return null;
@@ -115,7 +125,7 @@ public class ParkInvokeService {
 		try {
 			log.info("查询车辆信息入参：{}",JSON.toJSONString(dto));
 			Map<String,String> header = getHeaderToken();
-			String reponseContent = HttpClientUtil.post(parkingProperties.getHost() + parkingProperties.getQueryyardUrl(), JSON.toJSONString(dto),header);
+			String reponseContent = HttpClientUtil.post(parkingProperties.getHost() + parkingProperties.getQueryCarUrl(), JSON.toJSONString(dto),header);
 			log.info("查询车辆信息口入参：{},出参:{}",JSON.toJSONString(dto),JSON.toJSONString(reponseContent));
 			ParkBaseRespBO<ParkingCarQueryRespBO<ParkingCarInfoBO<ParkingYardBO>>> resp = JSON.parseObject(reponseContent, new TypeReference<ParkBaseRespBO<ParkingCarQueryRespBO<ParkingCarInfoBO<ParkingYardBO>>>>() {} );
 			if(ParkingRemoteCodeEnum.RESP_SUCCESS.getState().equals(resp.getResCode()) && resp.getResult() != null &&
@@ -123,6 +133,13 @@ public class ParkInvokeService {
 				return resp.getResult();
 			}
 			return null;
+		} catch(HttpResponseException e) {
+			log.info("调用查询车辆接口入参：{},调用失败e={}",JSON.toJSONString(dto),e);
+			if(e.getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
+				redisUtil.del(RedisConstant.PARKING_TOKEN);
+			}
+			return null;
+			
 		} catch (Exception e) {
 			log.error("查询车辆信息出错：{}",e);
 			return null;

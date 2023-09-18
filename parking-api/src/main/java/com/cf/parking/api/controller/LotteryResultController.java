@@ -2,14 +2,14 @@ package com.cf.parking.api.controller;
 
 import javax.annotation.Resource;
 
+import com.alibaba.fastjson.JSON;
 import com.cf.parking.api.request.LotteryResultReq;
+import com.cf.parking.api.request.LotteryResultRetryReq;
 import com.cf.parking.api.request.UserSpacePageReq;
 import com.cf.parking.api.response.LotteryResultDetailPageRsp;
 import com.cf.parking.api.response.LotteryResultPageRsp;
-import com.cf.parking.api.response.UserSpaceRsp;
 import com.cf.parking.facade.bo.LotteryResultBO;
 import com.cf.parking.facade.bo.LotteryResultDetailBO;
-import com.cf.parking.facade.bo.UserSpaceBO;
 import com.cf.parking.facade.dto.LotteryResultDTO;
 import com.cf.parking.facade.dto.UserSpaceDTO;
 import com.cf.parking.facade.facade.LotteryResultFacade;
@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.util.List;
 
 /**
@@ -94,6 +93,18 @@ public class LotteryResultController
         return Result.buildSuccessResult();
     }
 
+    @ApiOperation(value = "一键同步", notes = "点击一键同步按钮")
+	@PostMapping("/syncRetry")
+    public Result syncRetry(@RequestBody LotteryResultRetryReq param)
+    {
+    	log.info("一键同步参数：{}",JSON.toJSONString(param));
+    	AssertUtil.checkNull(param, "参数不能为空");
+    	AssertUtil.checkNull(param.getBatchId(), "批次id不能为空");
+    	AssertUtil.checkNull(param.getRoundId(), "轮次id不能为空");
+    	lotteryResultFacade.syncRetry(param.getBatchId(),param.getRoundId());
+        return Result.buildSuccessResult();
+    }
+    
     /**
      * 结果归档
      *

@@ -22,4 +22,6 @@ public class ParkingCarQueryRespBO<ParkingCarInfoBO> {
 	private String message;
 	
 	private List<ParkingCarInfoBO> data;
+	
+	private Long total;
 }
