@@ -64,6 +64,11 @@ public interface RedisConstant {
      */
     String PARKING_RESULT_LOCK_KEY = "parking:result:lock";
     
+	/**
+	 * 请求闸机的token
+	 */
+	String PARKING_TOKEN = "parking:token";
+    
     
 }
 

@@ -25,4 +25,26 @@ public class ParkingProperties {
      */
     private String queryyardUrl;
     
+    /**
+     * 获取token地址
+     */
+    private String tokenUrl;
+    /**
+     * 车辆信息查询Url
+     */
+    private String queryCarUrl;
+    /**
+     * 授权类型
+     */
+    private String grantType;
+    /**
+     * 客户端id
+     */
+    private String clientId;
+    /**
+     * 秘钥
+     */
+    private String clientSecret;
+    
+    
 }
