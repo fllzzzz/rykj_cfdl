@@ -208,7 +208,9 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 		//roundName设置
 		boList.forEach(lotteryResultBO -> {
 			LotteryRuleRoundPO roundPO = lotteryRuleRoundService.getById(lotteryResultBO.getRoundId());
-			lotteryResultBO.setRoundName(roundPO.getName());
+			if (null != roundPO ){
+				lotteryResultBO.setRoundName(roundPO.getName());
+			}
 		});
 
 		return PageUtils.toResponseList(page,boList);

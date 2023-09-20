@@ -63,14 +63,14 @@ public class LotteryRuleRoundFacadeImpl implements LotteryRuleRoundFacade
             List<String> nameList = new ArrayList<>();
             for (String splitId : splitIds) {
                 LotteryRuleRoundPO roundPO = mapper.selectById(Long.parseLong(splitId));
-                if (StringUtils.isNotBlank(roundPO.getName())){
+                if (null != roundPO  && StringUtils.isNotBlank(roundPO.getName())){
                     nameList.add(roundPO.getName());
                 }
             }
             name = nameList.stream().collect(Collectors.joining(","));
         }else {
             LotteryRuleRoundPO roundPO = mapper.selectById(Long.parseLong(roundId));
-            name = StringUtils.isNotBlank(roundPO.getName()) ?  roundPO.getName() :  null;
+            name = (null != roundPO && StringUtils.isNotBlank(roundPO.getName())) ?  roundPO.getName() :  null;
         }
         return name;
     }
