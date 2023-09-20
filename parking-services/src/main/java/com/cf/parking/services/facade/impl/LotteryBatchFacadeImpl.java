@@ -245,9 +245,14 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
         for (Long roundId : roundIdArr) {
             //1.根据轮数查询停车场编码
             LotteryRuleRoundPO round = lotteryRuleRoundFacade.getLotteryRuleRoundByRoundId(roundId);
+            if (round == null) {
+            	continue;
+            }
             //2.根据停车场编码查询车位数量
             ParkingLotPO parkingLot = parkingLotService.selectParkingLotByCode(round.getParkingLotCode());
-            AssertUtil.checkNull(parkingLot, "轮次对应的停车场不存在");
+            if (parkingLot == null) {
+            	continue;
+            }
             parkingAmount += parkingLot.getAmount();
         }
         return parkingAmount;
