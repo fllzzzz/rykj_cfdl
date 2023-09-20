@@ -31,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -133,9 +134,9 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
             }
 
             return result;
-        }catch (Exception e){
-            log.error("新增摇号批次失败：{}，失败原因：{}",po,e);
-            return 0;
+        } catch (DataIntegrityViolationException e){
+            log.error("新增摇号批次重复失败：{}，失败原因：{}",po,e);
+            throw new BusinessException("该批次已存在");
         }
     }
 
