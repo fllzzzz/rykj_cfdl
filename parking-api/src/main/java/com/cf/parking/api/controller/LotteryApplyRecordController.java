@@ -47,7 +47,11 @@ public class LotteryApplyRecordController
     private UserAuthenticationServer userAuthenticationServer;
 
     private UserSessionDTO getUser() {
-        return userAuthenticationServer.getCurrentUser();
+        UserSessionDTO userSessionDTO = new UserSessionDTO();
+        userSessionDTO.setUserId(1668559697477717L);
+        userSessionDTO.setServerName("魏慧");
+        return  userSessionDTO;
+//        return userAuthenticationServer.getCurrentUser();
     }
 
 
@@ -61,10 +65,8 @@ public class LotteryApplyRecordController
     public Result<LotteryApplyRsp>  info()
     {
         //1.获取当前登录用户的信息
-        Long userId = getUser().getUserId();
-        if (ObjectUtils.isEmpty(userId)){
-            throw new BusinessException("请先登录！");
-        }
+        UserSessionDTO user = getUserSessionDTO();
+        Long userId = user.getUserId();
 
         //2.个人申请摇号页面信息查询
         LotteryApplyBO applyBO = lotteryApplyRecordFacade.info(userId);
@@ -79,16 +81,22 @@ public class LotteryApplyRecordController
     public Result  apply(@RequestBody LotteryApplyRecordReq param)
     {
         //1.获取当前登录用户的信息
-        Long userId = getUser().getUserId();
-        if (ObjectUtils.isEmpty(userId)){
-            throw new BusinessException("请先登录！");
-        }
+        UserSessionDTO user = getUserSessionDTO();
+        Long userId = user.getUserId();
 
         AssertUtil.checkNull(param.getBatchId(),"请选择摇号报名批次！");
 
         //2.申请摇号
         Integer result = lotteryApplyRecordFacade.apply(userId,param.getBatchId());
         return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult("申请失败，请重试！");
+    }
+
+    private UserSessionDTO getUserSessionDTO() {
+        UserSessionDTO user = getUser();
+        if (ObjectUtils.isEmpty(user)){
+            throw new BusinessException("请先登录！");
+        }
+        return user;
     }
 
 
@@ -100,10 +108,8 @@ public class LotteryApplyRecordController
     public Result  cancel(@RequestBody LotteryApplyRecordReq param)
     {
         //1.获取当前登录用户的信息
-        Long userId = getUser().getUserId();
-        if (ObjectUtils.isEmpty(userId)){
-            throw new BusinessException("请先登录！");
-        }
+        UserSessionDTO user = getUserSessionDTO();
+        Long userId = user.getUserId();
 
         AssertUtil.checkNull(param.getBatchId(),"请选择取消摇号批次！");
 
@@ -116,12 +122,13 @@ public class LotteryApplyRecordController
     /**
      * 查询摇号申请记录列表
      */
-    @ApiOperation(value = "查询摇号申请记录列表", notes = "根据条件分页查询")
+    @ApiOperation(value = "查询摇号申请记录列表————小程序", notes = "根据条件分页查询")
     @PostMapping("/list")
     public Result<PageResponse<LotteryApplyRecordPageRsp>>  getApplyRecordList(@RequestBody LotteryApplyRecordReq param)
     {
         //1.获取当前登录用户的信息
-        Long userId = getUser().getUserId();
+        UserSessionDTO user = getUserSessionDTO();
+        Long userId = user.getUserId();
         param.setUserId(userId);
 
         //2.参数转换

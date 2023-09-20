@@ -101,7 +101,7 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
             log.info("新增车辆审核成功  ——  {}",userVerifyPO);
             return result;
         }catch (Exception e){
-            log.error("新增车辆审核失败：{}",e);
+            log.error("新增车辆审核失败——  {}，失败原因：{}",userVerifyPO,e);
             return 0;
         }
     }
@@ -184,6 +184,16 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
             log.error("修改个人车辆审核信息失败：{}  ——  {}",e,userVerifyPO);
             return 0;
         }
+    }
+
+    /**
+     * 删除个人车辆信息
+     * @param id
+     * @return
+     */
+    @Override
+    public Integer deleteById(Long id) {
+        return mapper.deleteById(id);
     }
 
 }

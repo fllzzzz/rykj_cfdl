@@ -42,7 +42,7 @@ public class UserProfileService extends ServiceImpl<UserProfilePOMapper, UserPro
     @Resource
     private UserService userService;
 
-    
+
 
     /**
      * 用户详情信息保存
@@ -208,7 +208,7 @@ public class UserProfileService extends ServiceImpl<UserProfilePOMapper, UserPro
     }
 
     /**
-     * 修改用户默认停车场为"装配楼2期5F停车场"
+     * 如果当前用户的停车场不是默认的，则审核时修改用户默认停车场为"装配楼2期5F停车场"
      * @param userId
      */
     public Integer setDefaultParkingLotByUserId(Long userId) {

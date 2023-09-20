@@ -1,34 +1,24 @@
 package com.cf.parking.services.facade.impl;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import javax.annotation.Resource;
 import com.cf.parking.dao.mapper.ParkingSpaceTransferRecordMapper;
-import com.cf.parking.dao.po.LotteryBlackListPO;
-import com.cf.parking.dao.po.UserPO;
-import com.cf.parking.dao.po.UserSpacePO;
-import com.cf.parking.dao.po.UserVerifyPO;
+import com.cf.parking.dao.po.*;
 import com.cf.parking.facade.facade.ParkingSpaceTransferRecordFacade;
-import com.cf.parking.services.service.LotteryBlackListService;
-import com.cf.parking.services.service.LotteryDealService;
-import com.cf.parking.services.service.UserService;
-import com.cf.parking.services.service.UserSpaceService;
-import com.cf.parking.services.service.UserVerifyService;
+import com.cf.parking.services.service.*;
 import com.cf.parking.services.utils.AssertUtil;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.cf.parking.dao.po.ParkingSpaceTransferRecordPO;
 import com.cf.parking.facade.bo.ParkingSpaceTransferRecordBO;
 import com.cf.parking.facade.dto.ParkingSpaceTransferRecordDTO;
 import com.cf.parking.services.utils.PageUtils;
 import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
 
-import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -60,6 +50,9 @@ public class ParkingSpaceTransferRecordFacadeImpl implements ParkingSpaceTransfe
     
     @Resource
     private LotteryDealService lotteryDealService;
+
+	@Resource
+	private ParkingLotService parkingLotService;
     
 	@Override
 	public void transfer(String outJobNum, String inJobNum) {
@@ -113,12 +106,18 @@ public class ParkingSpaceTransferRecordFacadeImpl implements ParkingSpaceTransfe
 
         Page<ParkingSpaceTransferRecordPO> poPage = parkingSpaceTransferRecordMapper.selectPage(page, new LambdaQueryWrapper<ParkingSpaceTransferRecordPO>()
                 .eq(ObjectUtils.isNotEmpty(dto.getUserId()), ParkingSpaceTransferRecordPO::getUserId, dto.getUserId())
-                .le(ObjectUtils.isNotEmpty(dto.getValidEndDate()), ParkingSpaceTransferRecordPO::getValidEndDate, dto.getValidEndDate())
-                .ge(ObjectUtils.isNotEmpty(dto.getValidStartDate()), ParkingSpaceTransferRecordPO::getValidStartDate, dto.getValidStartDate())
+                .le(ObjectUtils.isNotEmpty(dto.getValidEndDate()), ParkingSpaceTransferRecordPO::getCreateTm, dto.getValidEndDate())
+                .ge(ObjectUtils.isNotEmpty(dto.getValidStartDate()), ParkingSpaceTransferRecordPO::getCreateTm, dto.getValidStartDate())
                 .orderByDesc(ParkingSpaceTransferRecordPO::getCreateTm));
 
         List<ParkingSpaceTransferRecordBO> boList = BeanConvertorUtils.copyList(poPage.getRecords(), ParkingSpaceTransferRecordBO.class);
-        return PageUtils.toResponseList(page,boList);
+		boList.forEach(this::setParkingLotRegionByCode);
+		return PageUtils.toResponseList(page,boList);
     }
+
+	private void setParkingLotRegionByCode(ParkingSpaceTransferRecordBO bo) {
+		ParkingLotPO parkingLotPO = parkingLotService.selectParkingLotByCode(bo.getParkingLotCode());
+		bo.setParkingLotRegion(parkingLotPO.getRegion());
+	}
 
 }

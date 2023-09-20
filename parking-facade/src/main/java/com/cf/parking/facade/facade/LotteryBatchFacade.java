@@ -6,7 +6,6 @@ import com.cf.parking.facade.dto.LotteryBatchDTO;
 import com.cf.parking.facade.dto.LotteryBatchOptDTO;
 import com.cf.support.result.PageResponse;
 
-import java.util.List;
 
 
 /**
@@ -62,4 +61,9 @@ public interface LotteryBatchFacade
     Long getParkingAmountByRound(Long[] roundIdArr);
 
 
+    /**
+     * 钉钉通知所有用户摇号批次信息
+     * @param id
+     */
+    Integer notifyAllUserByBatchId(Long id);
 }

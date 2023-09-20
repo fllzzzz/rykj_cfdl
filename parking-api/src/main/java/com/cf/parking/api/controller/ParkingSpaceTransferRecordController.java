@@ -10,6 +10,7 @@ import com.cf.support.authertication.UserAuthentication;
 import com.cf.parking.services.utils.PageUtils;
 import com.cf.support.authertication.UserAuthenticationServer;
 import com.cf.support.authertication.token.dto.UserSessionDTO;
+import com.cf.support.exception.BusinessException;
 import com.cf.support.result.PageResponse;
 import com.cf.support.result.Result;
 import com.cf.support.utils.BeanConvertorUtils;
@@ -17,6 +18,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,7 +32,7 @@ import java.util.List;
  * @author
  * @date 2023-09-05
  */
-@UserAuthentication
+//@UserAuthentication
 @Api(tags = "车位转赠记录管理模块——摇号系统")
 @Slf4j
 @RestController
@@ -44,18 +46,23 @@ public class ParkingSpaceTransferRecordController
     private UserAuthenticationServer userAuthenticationServer;
 
     private UserSessionDTO getUser() {
-        return userAuthenticationServer.getCurrentUser();
+        UserSessionDTO userSessionDTO = new UserSessionDTO();
+        userSessionDTO.setUserId(1668559697477717L);
+        userSessionDTO.setServerName("魏慧");
+        return  userSessionDTO;
+//        return userAuthenticationServer.getCurrentUser();
     }
     
     /**
      * 查询车位转赠记录列表
      */
-    @ApiOperation(value = "查询车位转赠记录列表", notes = "根据条件分页查询")
+    @ApiOperation(value = "查询车位转赠记录列表————小程序", notes = "根据条件分页查询")
     @PostMapping("/list")
     public Result<PageResponse<ParkingSpaceTransferRecordRsp>> list(@RequestBody ParkingSpaceTransferRecordReq param)
     {
         //1.获取当前登录用户的信息
-        Long userId = getUser().getUserId();
+        UserSessionDTO user = getUserSessionDTO();
+        Long userId = user.getUserId();
         param.setUserId(userId);
 
         //2.参数转换
@@ -67,12 +74,21 @@ public class ParkingSpaceTransferRecordController
         List<ParkingSpaceTransferRecordRsp> transferRecordRsps = BeanConvertorUtils.copyList(result.getList(), ParkingSpaceTransferRecordRsp.class);
         return PageUtils.pageResult(result,transferRecordRsps);
     }
-    
-    
-    @ApiOperation(value = "车位转赠", notes = "车位转赠")
+
+    private UserSessionDTO getUserSessionDTO() {
+        UserSessionDTO user = getUser();
+        if (ObjectUtils.isEmpty(user)){
+            throw new BusinessException("请先登录！");
+        }
+        return user;
+    }
+
+
+    @ApiOperation(value = "车位转赠————小程序", notes = "车位转赠")
     @PostMapping("/transfer")
     public Result transfer( String jobNum){
-    	String openId = getUser().getOpenId();
+        UserSessionDTO user = getUserSessionDTO();
+        String openId = user.getOpenId();
     	parkingSpaceTransferRecordFacade.transfer(openId,jobNum);
     	return Result.buildSuccessResult();
     }

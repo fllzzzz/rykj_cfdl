@@ -18,6 +18,7 @@ import com.cf.support.utils.BeanConvertorUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -73,11 +74,18 @@ public class LotteryBatchController
 
     /**
      * 新增摇号批次
+     * (新增摇号批次时自动生成摇号结果)
      */
     @ApiOperation(value = "新增摇号批次", notes = "点击新增按钮")
     @PostMapping("/add")
     public Result add(@RequestBody LotteryBatchOptReq param)
     {
+        //1.参数校验
+        if (null == param.getRoundIdArr() || param.getRoundIdArr().length == 0){
+            return  Result.buildErrorResult("请选择摇号轮数！");
+        }
+
+        //2.参数转换
         LotteryBatchOptDTO dto = new LotteryBatchOptDTO();
         BeanUtils.copyProperties(param,dto);
 
@@ -87,11 +95,18 @@ public class LotteryBatchController
 
     /**
      * 修改摇号批次
+     * (修改前要判断是否已通知)
      */
     @ApiOperation(value = "修改摇号批次", notes = "点击修改按钮")
     @PostMapping("/update")
     public Result edit(@RequestBody LotteryBatchOptReq param)
     {
+        //1.参数校验
+        if (null == param.getRoundIdArr() || param.getRoundIdArr().length == 0){
+            return  Result.buildErrorResult("请选择摇号轮数！");
+        }
+
+        //2.参数转换
         LotteryBatchOptDTO dto = new LotteryBatchOptDTO();
         BeanUtils.copyProperties(param,dto);
 
@@ -101,6 +116,7 @@ public class LotteryBatchController
 
     /**
      * 删除摇号批次
+     * (修改前要判断是否已通知)
      */
     @ApiOperation(value = "删除摇号批次", notes = "点击删除按钮")
 	@PostMapping("/delete")
@@ -119,7 +135,10 @@ public class LotteryBatchController
     @PostMapping("/notify")
     public Result notify(@RequestBody LotteryBatchReq param)
     {
-        return Result.buildSuccessResult("未实现");
+        AssertUtil.checkNull(param.getId(),"请选择要通知的批次！");
+
+        Integer result = lotteryBatchFacade.notifyAllUserByBatchId(param.getId());
+        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult("通知失败，请重试！");
     }
 
 

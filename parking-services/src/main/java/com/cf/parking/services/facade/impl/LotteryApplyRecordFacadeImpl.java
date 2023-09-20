@@ -1,5 +1,6 @@
 package com.cf.parking.services.facade.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -12,10 +13,8 @@ import com.cf.parking.facade.bo.LotteryApplyBO;
 import com.cf.parking.facade.bo.LotteryApplyRecordBO;
 import com.cf.parking.facade.dto.LotteryApplyRecordDTO;
 import com.cf.parking.facade.facade.LotteryApplyRecordFacade;
-import com.cf.parking.services.service.LotteryBatchService;
-import com.cf.parking.services.service.LotteryResultDetailService;
-import com.cf.parking.services.service.LotteryResultService;
-import com.cf.parking.services.service.ParkingLotService;
+import com.cf.parking.services.enums.LotteryApplyRecordStateEnum;
+import com.cf.parking.services.service.*;
 import com.cf.parking.services.utils.PageUtils;
 import com.cf.support.authertication.UserAuthenticationServer;
 import com.cf.support.authertication.token.dto.UserSessionDTO;
@@ -24,6 +23,7 @@ import com.cf.support.exception.BusinessException;
 import com.cf.support.result.PageResponse;
 import com.cf.support.result.Result;
 import com.cf.support.utils.BeanConvertorUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -40,6 +40,7 @@ import javax.xml.crypto.Data;
  * @author
  * @date 2023-09-05
  */
+@Slf4j
 @Service
 public class LotteryApplyRecordFacadeImpl implements LotteryApplyRecordFacade
 {
@@ -62,10 +63,17 @@ public class LotteryApplyRecordFacadeImpl implements LotteryApplyRecordFacade
     private LotteryResultDetailService lotteryResultDetailService;
 
     @Resource
+    private UserProfileService userProfileService;
+
+    @Resource
     private UserAuthenticationServer userAuthenticationServer;
 
     private UserSessionDTO getUser() {
-        return userAuthenticationServer.getCurrentUser();
+        UserSessionDTO userSessionDTO = new UserSessionDTO();
+        userSessionDTO.setUserId(1668559697477717L);
+        userSessionDTO.setServerName("魏慧");
+        return  userSessionDTO;
+//        return userAuthenticationServer.getCurrentUser();
     }
 
     /**
@@ -77,9 +85,21 @@ public class LotteryApplyRecordFacadeImpl implements LotteryApplyRecordFacade
     public PageResponse<LotteryApplyRecordBO> getApplyRecordList(LotteryApplyRecordDTO dto) {
         Page<LotteryApplyRecordPO> page = PageUtils.toPage(dto);
 
+        List<String> list = new ArrayList<>();
+        list.add(null);
+        list.add("");
+        list.add("0");
+        list.add("-1");
+
+        if (list.contains(dto.getResult())){
+            System.out.println("true");
+        }
+
+
         LambdaQueryWrapper<LotteryApplyRecordPO> queryWrapper = new LambdaQueryWrapper<LotteryApplyRecordPO>()
                 .eq(ObjectUtils.isNotEmpty(dto.getUserId()), LotteryApplyRecordPO::getUserId, dto.getUserId())
-                .eq(StringUtils.isNotBlank(dto.getResult()), LotteryApplyRecordPO::getResult, dto.getResult())
+                .eq("0".equals(dto.getResult()), LotteryApplyRecordPO::getResult, dto.getResult())
+                .notIn("1".equals(dto.getResult()), LotteryApplyRecordPO::getResult,list)
                 .eq(LotteryApplyRecordPO::getUserId, getUser().getUserId())
                 .le(ObjectUtils.isNotEmpty(dto.getEndDate()), LotteryApplyRecordPO::getBatchNum, dto.getEndDate())
                 .ge(ObjectUtils.isNotEmpty(dto.getStartDate()), LotteryApplyRecordPO::getBatchNum, dto.getStartDate())
@@ -106,6 +126,9 @@ public class LotteryApplyRecordFacadeImpl implements LotteryApplyRecordFacade
 
         //1.查询最新一期摇号批次信息（期号最大的、状态为已通知或已结束的）
         LotteryBatchPO lotteryBatchPO = lotteryBatchService.getNotifiedLatestBatchInfo();
+        if (null == lotteryBatchPO){
+            return new LotteryApplyBO();
+        }
         applyBO.setBatchId(lotteryBatchPO.getId());
         applyBO.setApplyStartTime(lotteryBatchPO.getApplyStartTime());
         applyBO.setApplyEndTime(lotteryBatchPO.getApplyEndTime());
@@ -118,20 +141,23 @@ public class LotteryApplyRecordFacadeImpl implements LotteryApplyRecordFacade
             //报名时间内————>查看是否已申请
             LotteryApplyRecordPO recordPO = mapper.selectOne(new LambdaQueryWrapper<LotteryApplyRecordPO>()
                     .eq(LotteryApplyRecordPO::getBatchNum, lotteryBatchPO.getBatchNum())
-                    .eq(LotteryApplyRecordPO::getApplyState, "1"));
+                    .eq(LotteryApplyRecordPO::getApplyState, LotteryApplyRecordStateEnum.HAVE_APPLIED.getState()));
 
             applyBO.setApplyState(null != recordPO);
         }else {
             //报名时间外
             if ((new Date()).before(lotteryBatchPO.getApplyStartTime())){
                 applyBO.setResult("当前未到报名时间！");
+                applyBO.setResultColor(0);
             }else {
                 LotteryApplyRecordPO applyRecordPO = mapper.selectOne(new LambdaQueryWrapper<LotteryApplyRecordPO>()
                         .eq(LotteryApplyRecordPO::getBatchId, lotteryBatchPO.getId())
-                        .eq(LotteryApplyRecordPO::getUserId, userId));
+                        .eq(LotteryApplyRecordPO::getUserId, userId)
+                        .eq(LotteryApplyRecordPO::getApplyState,LotteryApplyRecordStateEnum.HAVE_APPLIED.getState()));
 
                 if (null == applyRecordPO){
                     applyBO.setResult("您本期未参加摇号报名！");
+                    applyBO.setResultColor(1);
                     return applyBO;
                 }
 
@@ -141,19 +167,23 @@ public class LotteryApplyRecordFacadeImpl implements LotteryApplyRecordFacade
                 List<Long> resultIds = resultList.stream().filter(result -> Integer.parseInt(result.getState()) >= 4).map(LotteryResultPO::getId).collect(Collectors.toList());
                 if (CollectionUtils.isEmpty(resultIds)){
                     applyBO.setResult("摇号结果暂未发布，请耐心等待！");
+                    applyBO.setResultColor(2);
                     return applyBO;
                 }
                 LotteryResultDetailPO detailPO = lotteryResultDetailService.selectUserDetailByResultIds(userId,resultIds);
                 if (null != detailPO){
                     ParkingLotPO parkingLotPO = parkingLotService.selectParkingLotByCode(detailPO.getParkingLotCode());
                     applyBO.setResult("恭喜您摇中" + parkingLotPO.getRegion() + "停车场！");
+                    applyBO.setResultColor(4);
                 }else {
                     //如果都已经发布了
                     if (resultList.size() == resultIds.size() ){
                         applyBO.setResult("很遗憾您未摇中停车场！");
+                        applyBO.setResultColor(3);
                     }else {
                         //如果有未发布的
                         applyBO.setResult("摇号结果暂未发布，请耐心等待！");
+                        applyBO.setResultColor(2);
                     }
                 }
             }
@@ -169,8 +199,34 @@ public class LotteryApplyRecordFacadeImpl implements LotteryApplyRecordFacade
      */
     @Override
     public Integer apply(Long userId, Long batchId) {
-        //TODO：先查看有没有状态为0的记录，没有进行新增，有进行修改状态
-        return null;
+        LotteryApplyRecordPO lotteryApplyRecordPO = mapper.selectOne(new LambdaQueryWrapper<LotteryApplyRecordPO>()
+                .eq(LotteryApplyRecordPO::getUserId, userId)
+                .eq(LotteryApplyRecordPO::getBatchId, batchId)
+                .eq(LotteryApplyRecordPO::getApplyState,LotteryApplyRecordStateEnum.CANCEL.getState()));
+
+        //如果之前有，修改状态
+        if (null != lotteryApplyRecordPO){
+            lotteryApplyRecordPO.setApplyState(LotteryApplyRecordStateEnum.HAVE_APPLIED.getState());
+            int result = mapper.updateById(lotteryApplyRecordPO);
+            log.info("用户申请摇号：{}",lotteryApplyRecordPO);
+            return result;
+        }
+        //之前没有的话新增
+        //1.查询对应批次摇号信息
+        LotteryBatchPO batchPO = lotteryBatchService.getById(batchId);
+        UserProfilePO userProfile = userProfileService.getUserProfileByUserId(userId);
+
+        LotteryApplyRecordPO insertApplyRecordPO = new LotteryApplyRecordPO();
+        insertApplyRecordPO.setId(idWorker.nextId()).setBatchId(batchId).setBatchNum(batchPO.getBatchNum())
+                .setParkingLotCode("todo").setValidStartDate(batchPO.getValidStartDate())
+                .setValidEndDate(batchPO.getValidEndDate()).setUserId(userId)
+                .setUserName(userProfile.getName()).setJobNumber(userProfile.getJobNumber())
+                .setApplyState(LotteryApplyRecordStateEnum.HAVE_APPLIED.getState())
+                .setResult("-1").setCreateTm(new Date()).setUpdateTm(new Date());
+
+        int result = mapper.insert(insertApplyRecordPO);
+        log.info("用户申请摇号：{}",insertApplyRecordPO);
+        return result;
     }
 
     /**
@@ -188,21 +244,8 @@ public class LotteryApplyRecordFacadeImpl implements LotteryApplyRecordFacade
         if (null == lotteryApplyRecordPO){
             throw new BusinessException("未找到报名记录！");
         }
-        lotteryApplyRecordPO.setApplyState("0");
+        lotteryApplyRecordPO.setApplyState(LotteryApplyRecordStateEnum.CANCEL.getState()).setUpdateTm(new Date());
         return mapper.updateById(lotteryApplyRecordPO);
-    }
-
-
-    /**
-     * 新增摇号申请记录
-     * 
-     * @param po 摇号申请记录
-     * @return 结果
-     */
-    public int insertLotteryApplyRecord(LotteryApplyRecordPO po)
-    {
-        po.setId(idWorker.nextId());
-        return mapper.insert(po);
     }
 
 

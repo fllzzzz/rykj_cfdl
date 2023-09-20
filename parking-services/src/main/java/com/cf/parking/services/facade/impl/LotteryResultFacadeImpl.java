@@ -114,11 +114,10 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
     
     @Resource
     private ParkInvokeService parkInvokeService;
-    
-    
+
     @Resource
     private UserProfileService userProfileService;
-    
+
     @Autowired
     private DingTalkBean dingTalkBean;
     
@@ -142,7 +141,7 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 		LotteryBatchPO batch = lotteryBatchService.getById(lottery.getBatchId());
 		AssertUtil.checkNull(batch, "批次数据不存在");
 		AssertUtil.checkTrue(batch.getApplyEndTime().compareTo(new Date()) < 0, "当前还处于申请日期内，不能进行摇号操作");
-		
+
 		//防并发
 		int num = lotteryResultMapper.updateByState(id,LotteryResultStateEnum.UNLOTTERY.getState(),LotteryResultStateEnum.UNCONFIRM.getState());
 		AssertUtil.checkTrue(num == 1, "状态已变更，请刷新重试");

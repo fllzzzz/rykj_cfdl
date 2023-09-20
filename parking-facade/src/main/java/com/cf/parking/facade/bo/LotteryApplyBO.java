@@ -38,6 +38,9 @@ public class LotteryApplyBO {
     /** 摇号结果 */
     private String result;
 
+    /** 摇号结果颜色 */
+    private Integer resultColor;
+
     /** 报名时间状态，true：报名时间内；false：报名时间外 */
     private Boolean timeState;
 

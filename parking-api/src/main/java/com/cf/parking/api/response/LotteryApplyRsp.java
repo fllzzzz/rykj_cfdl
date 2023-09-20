@@ -43,12 +43,16 @@ public class LotteryApplyRsp {
     @ApiModelProperty(value = "摇号结果")
     private String result;
 
-    /** 报名时间状态，0：报名时间内；1：报名时间外 */
-    @ApiModelProperty(value = "报名时间状态，0：报名时间内；1：报名时间外")
+    /** 摇号结果颜色 */
+    @ApiModelProperty(value = "摇号结果颜色")
+    private Integer resultColor;
+
+    /** 报名时间状态，true：报名时间内；false：报名时间外 */
+    @ApiModelProperty(value = "报名时间状态，true：报名时间内；false：报名时间外")
     private Boolean timeState;
 
-    /** 是否已申请状态，0：已申请；1：未申请 */
-    @ApiModelProperty(value = "是否已申请状态，0：已申请；1：未申请")
+    /** 是否已申请状态，true：已申请；false：未申请 */
+    @ApiModelProperty(value = "是否已申请状态，true：已申请；false：未申请")
     private Boolean applyState;
 
 

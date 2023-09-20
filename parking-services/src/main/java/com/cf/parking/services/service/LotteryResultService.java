@@ -83,4 +83,17 @@ public class LotteryResultService extends ServiceImpl<LotteryResultMapper, Lotte
 		return mapper.selectList(new LambdaQueryWrapper<LotteryResultPO>()
 				.eq(LotteryResultPO::getBatchId,batchId));
 	}
+
+	public Integer insert(LotteryResultPO lotteryResultPO) {
+		return mapper.insert(lotteryResultPO);
+	}
+
+	/**
+	 * 根据摇号批次的id，批量删除摇号结果记录
+	 * @param batchId
+	 */
+	public Integer batchDeleteByLotteryBatchId(Long batchId) {
+		return mapper.delete(new LambdaQueryWrapper<LotteryResultPO>()
+				.eq(LotteryResultPO::getBatchId, batchId));
+	}
 }

@@ -63,4 +63,11 @@ public interface UserVerifyFacade {
      * @return
      */
     Integer update(UserVerifyOptDTO dto);
+
+    /**
+     * 删除个人车辆信息
+     * @param id
+     * @return
+     */
+    Integer deleteById(Long id);
 }
