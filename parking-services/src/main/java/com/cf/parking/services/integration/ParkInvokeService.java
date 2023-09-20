@@ -22,6 +22,7 @@ import com.cf.parking.facade.dto.Carmanagement;
 import com.cf.parking.facade.dto.ParkingCarQueryDTO;
 import com.cf.parking.facade.dto.QueryYardDTO;
 import com.cf.parking.facade.dto.UserSpaceDTO;
+import com.cf.parking.services.constant.ParkingConstants;
 import com.cf.parking.services.enums.ParkingRemoteCodeEnum;
 import com.cf.parking.services.properties.ParkingProperties;
 import com.cf.parking.services.utils.AssertUtil;
@@ -53,8 +54,8 @@ public class ParkInvokeService {
 			.setJobNo(space.getJobNumber())
 			.setParkIndexCode(space.getParkingLot().split(","))
 			.setCarOwner(space.getName())
-			.setPermissStart(DateUtil.format(DateUtil.beginOfDay(space.getStartDate()), "yyyy-MM-dd HH:mm:ss") )
-			.setPermissEnd(DateUtil.format(DateUtil.endOfDay(space.getEndDate()), "yyyy-MM-dd HH:mm:ss"));
+			.setPermissStart(DateUtil.format(DateUtil.beginOfDay(space.getStartDate()), ParkingConstants.FULL_DATE_FORMAT) )
+			.setPermissEnd(DateUtil.format(DateUtil.endOfDay(space.getEndDate()), ParkingConstants.FULL_DATE_FORMAT));
 		try {
 			AssertUtil.checkNull(info, "参数不能为空");
 			AssertUtil.checkNull(info.getLicensePlate(), "车牌号不能为空");

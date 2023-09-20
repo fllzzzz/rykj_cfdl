@@ -16,6 +16,7 @@ import com.cf.parking.facade.bo.LotteryResultDetailBO;
 import com.cf.parking.facade.dto.LotteryResultDTO;
 import com.cf.parking.facade.dto.UserSpaceDTO;
 import com.cf.parking.facade.facade.LotteryResultFacade;
+import com.cf.parking.services.constant.ParkingConstants;
 import com.cf.parking.services.enums.EnableStateEnum;
 import com.cf.parking.services.enums.LotteryEnableStateEnum;
 import com.cf.parking.services.enums.LotteryResultStateEnum;
@@ -347,8 +348,8 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 			log.info("中奖人员工号：{},摇中停车场：{}",JSON.toJSONString(openIdList),JSON.toJSONString(parking));
 			List<Long> userIdList = detailList.stream().map(item -> item.getUserId()).collect(Collectors.toList());;
 			userProfileService.batchSetDefaultParkingLotByUserIds(userIdList,parking.getRegion());
-			dingTalkBean.sendTextMessage(String.format(message, parking.getRegion(),DateUtil.format(batch.getValidStartDate(),"yyyy-MM-dd"),
-					DateUtil.format(batch.getValidEndDate(),"yyyy-MM-dd")) ,openIdList);
+			dingTalkBean.sendTextMessage(String.format(message, parking.getRegion(),DateUtil.format(batch.getValidStartDate(),ParkingConstants.SHORT_DATE_FORMAT),
+					DateUtil.format(batch.getValidEndDate(),ParkingConstants.SHORT_DATE_FORMAT)) ,openIdList);
 		}
 		
 		
