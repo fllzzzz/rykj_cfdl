@@ -11,6 +11,7 @@ import com.cf.parking.dao.po.UserInfoPO;
 import com.cf.parking.dao.po.UserPO;
 import com.cf.parking.dao.po.UserProfilePO;
 import com.cf.parking.facade.enums.BizResultCodeEnum;
+import com.cf.parking.services.constant.ParkingConstants;
 import com.cf.support.exception.BusinessException;
 import com.cf.support.utils.BeanConvertorUtils;
 import com.cf.parking.facade.bo.AdminScoreRecordBO;
@@ -41,7 +42,7 @@ public class UserProfileService extends ServiceImpl<UserProfilePOMapper, UserPro
     @Resource
     private UserService userService;
 
-    private static final String DEFAULT_PARKINGLOT = "装配楼2期5F停车场";
+
 
     /**
      * 用户详情信息保存
@@ -210,12 +211,10 @@ public class UserProfileService extends ServiceImpl<UserProfilePOMapper, UserPro
      * 如果当前用户的停车场不是默认的，则审核时修改用户默认停车场为"装配楼2期5F停车场"
      * @param userId
      */
-    public void setDefaultParkingLotByUserId(Long userId) {
+    public Integer setDefaultParkingLotByUserId(Long userId) {
         UserProfilePO userProfilePO = userProfilePOMapper.selectById(userId);
-        if (StringUtils.isEmpty(userProfilePO.getParkingLotRegion()) || DEFAULT_PARKINGLOT.equals(userProfilePO.getParkingLotRegion())){
-            userProfilePO.setParkingLotRegion(DEFAULT_PARKINGLOT);
-            userProfilePOMapper.updateById(userProfilePO);
-        }
+        userProfilePO.setParkingLotRegion(ParkingConstants.DEFAULT_PARKINGLOT);
+        return userProfilePOMapper.updateById(userProfilePO);
     }
 
     /**
@@ -223,7 +222,7 @@ public class UserProfileService extends ServiceImpl<UserProfilePOMapper, UserPro
      * @param userIds
      * @return
      */
-    public Integer batchSetDefaultParkingLotByUserIds(List<Long> userIds) {
-        return userProfilePOMapper.batchSetDefaultParkingLotByUserIds(userIds,DEFAULT_PARKINGLOT);
+    public Integer batchSetDefaultParkingLotByUserIds(List<Long> userIds,String parkingLot) {
+        return userProfilePOMapper.batchSetDefaultParkingLotByUserIds(userIds,parkingLot);
     }
 }
