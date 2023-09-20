@@ -6,7 +6,6 @@ import java.util.List;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cf.parking.dao.mapper.LotteryBlackListMapper;
-import com.cf.parking.dao.po.LotteryBatchPO;
 import com.cf.parking.dao.po.LotteryBlackListPO;
 import com.cf.parking.dao.po.UserProfilePO;
 import com.cf.parking.facade.bo.LotteryBlackListBO;
@@ -21,12 +20,9 @@ import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-
 import javax.annotation.Resource;
 
 /**
@@ -88,9 +84,9 @@ public class LotteryBlackListFacadeImpl implements LotteryBlackListFacade
             int result = mapper.insert(po);
             log.info("添加黑名单成功  ——  {}",po);
             return result;
-        }catch (DuplicateKeyException e){
+        } catch (DataIntegrityViolationException e){
             log.error("添加黑名单重复：{}，失败原因：{}",po,e);
-            throw new BusinessException("该用户已在黑名单中，无须重复添加");
+            throw new BusinessException("该用户已在黑名单，无须重复添加");
         } catch (Exception e){
             log.error("添加黑名单失败：{}，失败原因：{}",po,e);
             return 0;

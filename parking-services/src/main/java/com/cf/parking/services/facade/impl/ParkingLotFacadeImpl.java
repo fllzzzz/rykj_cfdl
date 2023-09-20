@@ -1,6 +1,5 @@
 package com.cf.parking.services.facade.impl;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -31,7 +30,6 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -142,7 +140,10 @@ public class ParkingLotFacadeImpl implements ParkingLotFacade
             int result = mapper.insert(po);
             log.info("新增停车场成功  ——  {}",po);
             return result;
-        }catch (Exception e){
+        } catch (DataIntegrityViolationException e){
+            log.error("新增停车场重复：{}，失败原因：{}",po,e);
+            throw new BusinessException("园区编码已存在，请修改后重试！");
+        } catch (Exception e){
             log.error("新增停车场失败：{}，失败原因：{}",po,e);
             return 0;
         }
@@ -162,7 +163,10 @@ public class ParkingLotFacadeImpl implements ParkingLotFacade
             int result = mapper.updateById(po);
             log.info("修改停车场成功  ——  {}",po);
             return result;
-        }catch (Exception e){
+        } catch (DataIntegrityViolationException e){
+            log.error("修改停车场重复：{}，失败原因：{}",po,e);
+            throw new BusinessException("园区编码已存在，请修改后重试！");
+        } catch (Exception e){
             log.error("修改停车场失败：{}，失败原因：{}",po,e);
             return 0;
         }
@@ -225,7 +229,7 @@ public class ParkingLotFacadeImpl implements ParkingLotFacade
             int result = mapper.insert(po);
             log.info("新增停车场园区成功  ——  {}",po);
             return result;
-        } catch (DuplicateKeyException e){
+        } catch (DataIntegrityViolationException e){
             log.error("新增停车场园区入口重复：{}，失败原因：{}",po,e);
             throw new BusinessException("园区编码已存在，请修改后重试！");
         } catch (Exception e){
