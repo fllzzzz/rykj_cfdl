@@ -46,11 +46,7 @@ public class ParkingSpaceTransferRecordController
     private UserAuthenticationServer userAuthenticationServer;
 
     private UserSessionDTO getUser() {
-        UserSessionDTO userSessionDTO = new UserSessionDTO();
-        userSessionDTO.setUserId(1668559697477717L);
-        userSessionDTO.setServerName("魏慧");
-        return  userSessionDTO;
-//        return userAuthenticationServer.getCurrentUser();
+        return userAuthenticationServer.getCurrentUser();
     }
     
     /**
