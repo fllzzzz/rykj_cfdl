@@ -20,6 +20,7 @@ import io.swagger.models.auth.In;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.Collection;
@@ -223,6 +224,21 @@ public class UserProfileService extends ServiceImpl<UserProfilePOMapper, UserPro
      * @return
      */
     public Integer batchSetDefaultParkingLotByUserIds(List<Long> userIds,String parkingLot) {
+    	if(CollectionUtils.isEmpty(userIds)) {
+			return 0;
+		}
         return userProfilePOMapper.batchSetDefaultParkingLotByUserIds(userIds,parkingLot);
     }
+
+	/**
+	 * 根据工号设置停车场
+	 * @param applyIdList
+	 * @param parkingLot
+	 */
+	public void batchSetParkingLotByJobNum(List<String> applyIdList, String parkingLot) {
+		if(CollectionUtils.isEmpty(applyIdList)) {
+			return;
+		}
+		userProfilePOMapper.batchSetParkingLotByJobNum(applyIdList,parkingLot);
+	}
 }

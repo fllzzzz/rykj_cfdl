@@ -345,10 +345,13 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 		if (!CollectionUtils.isEmpty(detailList)) {
 			List<String> openIdList = detailList.stream().map(item -> item.getUserJobNumber()).collect(Collectors.toList());
 			log.info("中奖人员工号：{},摇中停车场：{}",JSON.toJSONString(openIdList),JSON.toJSONString(parking));
-			List<Long> userIdList = detailList.stream().map(item -> item.getUserId()).collect(Collectors.toList());;
-			userProfileService.batchSetDefaultParkingLotByUserIds(userIdList,parking.getRegion());
 			dingTalkBean.sendTextMessage(String.format(message, parking.getRegion(),DateUtil.format(batch.getValidStartDate(),ParkingConstants.SHORT_DATE_FORMAT),
 					DateUtil.format(batch.getValidEndDate(),ParkingConstants.SHORT_DATE_FORMAT)) ,openIdList);
+			List<Long> userIdList = detailList.stream().map(item -> item.getUserId()).collect(Collectors.toList());
+			//更新默认停车场
+			userProfileService.batchSetDefaultParkingLotByUserIds(userIdList,parking.getRegion());
+			//更新申请记录表的摇号结果
+			lotteryApplyRecordService.updateResultByJobNum(openIdList,parking.getRegion());
 		}
 		
 		
@@ -360,6 +363,7 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 			List<String> applyIdList = applyList.stream().map(item -> item.getJobNumber()).collect(Collectors.toList());
 			log.info("未中奖人员工号：{}",JSON.toJSONString(applyIdList));
 			applyIdList.removeAll(spaceList);
+			userProfileService.batchSetParkingLotByJobNum(applyIdList,parking.getRegion());
 			dingTalkBean.sendTextMessage("很遗憾，您本次摇号未中奖",applyIdList);
 		}
 		

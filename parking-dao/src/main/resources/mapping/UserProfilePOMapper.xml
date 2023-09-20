@@ -177,4 +177,12 @@
 			#{userId}
 		</foreach>
     </update>
+    
+    <update id="batchSetParkingLotByJobNum">
+		update user_profile set parking_lot_region = #{parkingLot}
+		where job_number in
+		<foreach collection="jobNumList" item="jobNum" separator="," open="(" close=")">
+			#{"jobNum"}
+		</foreach>
+    </update>
 </mapper>
