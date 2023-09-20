@@ -216,7 +216,7 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
             //1.删除前判断是否已通知
             LotteryBatchPO lotteryBatchPO = mapper.selectById(id);
             AssertUtil.checkNull(lotteryBatchPO, "批次记录不存在");
-            AssertUtil.checkTrue(!LotteryResultStateEnum.UNLOTTERY.getState().equals(lotteryBatchPO.getState()), "已通知，无法删除！");
+            AssertUtil.checkTrue(LotteryResultStateEnum.UNLOTTERY.getState().equals(lotteryBatchPO.getState()), "已通知，无法删除！");
 
             //2.删除摇号批次信息
             int result = mapper.deleteById(id);
