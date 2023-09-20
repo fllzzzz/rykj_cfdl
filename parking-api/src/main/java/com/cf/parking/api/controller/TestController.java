@@ -221,7 +221,12 @@ public class TestController {
 	@PostMapping("/sendDingMessage")
 	@ApiOperation(value = "发送钉钉消息", notes = "发送钉钉消息")
 	public Result sendDingMessage() {
-		dingTalkBean.sendTextMessage("测试消息", Arrays.asList("28492530271177557","013622186224083959","16931906975949266"));
+		try {
+			dingTalkBean.sendTextMessage("测试消息", Arrays.asList("28492530271177557","013622186224083959","16931906975949266"));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return Result.buildSuccessResult();
 	}
 	
