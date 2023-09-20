@@ -168,7 +168,7 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
             //1.修改前判断是否已通知
             LotteryBatchPO lotteryBatchPO = mapper.selectById(dto.getId());
             AssertUtil.checkNull(lotteryBatchPO, "批次记录不存在");
-            AssertUtil.checkTrue(!LotteryResultStateEnum.UNLOTTERY.getState().equals(lotteryBatchPO.getState()), "已通知，无法删除！");
+            AssertUtil.checkTrue(LotteryBatchStateEnum.NEED_NOTIFY.getState().equals(lotteryBatchPO.getState()), "状态不是待通知，不能进行修改");
 
             //1.修改摇号批次
             int result = mapper.updateById(po);
