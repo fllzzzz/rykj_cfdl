@@ -82,7 +82,8 @@ public class ParkingSpaceTransferRecordController
 
     @ApiOperation(value = "车位转赠————小程序", notes = "车位转赠")
     @PostMapping("/transfer")
-    public Result transfer( String jobNum){
+    public Result transfer( @RequestBody String jobNum){
+    	log.info("开始转赠：{}",jobNum);
         UserSessionDTO user = getUserSessionDTO();
         String openId = user.getOpenId();
     	parkingSpaceTransferRecordFacade.transfer(openId,jobNum);

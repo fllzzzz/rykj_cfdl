@@ -82,15 +82,9 @@ public class LotteryApplyRecordFacadeImpl implements LotteryApplyRecordFacade
         Page<LotteryApplyRecordPO> page = PageUtils.toPage(dto);
 
         List<String> list = new ArrayList<>();
-        list.add(null);
         list.add("");
         list.add("0");
         list.add("-1");
-
-        if (list.contains(dto.getResult())){
-            System.out.println("true");
-        }
-
 
         LambdaQueryWrapper<LotteryApplyRecordPO> queryWrapper = new LambdaQueryWrapper<LotteryApplyRecordPO>()
                 .eq(ObjectUtils.isNotEmpty(dto.getUserId()), LotteryApplyRecordPO::getUserId, dto.getUserId())
