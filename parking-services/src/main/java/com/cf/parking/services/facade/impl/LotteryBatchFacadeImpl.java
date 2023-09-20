@@ -155,6 +155,7 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Integer update(LotteryBatchOptDTO dto) {
         LotteryBatchPO po = new LotteryBatchPO();
         BeanUtils.copyProperties(dto,po);
@@ -164,7 +165,6 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
         Long[] roundIdArr = dto.getRoundIdArr();
         String roundId = Arrays.toString(roundIdArr).replaceAll("\\s+","");
         po.setRoundId(roundId);
-        try{
             //1.修改前判断是否已通知
             LotteryBatchPO lotteryBatchPO = mapper.selectById(dto.getId());
             AssertUtil.checkNull(lotteryBatchPO, "批次记录不存在");
@@ -190,10 +190,6 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
                 lotteryResultService.insert(lotteryResultPO);
             }
             return result;
-        }catch (Exception e){
-            log.error("修改摇号批次失败：{}，失败原因：{}",po,e);
-            return 0;
-        }
     }
 
     /**
