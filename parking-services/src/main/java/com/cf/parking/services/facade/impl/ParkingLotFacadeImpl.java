@@ -10,15 +10,11 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cf.parking.dao.mapper.ParkingLotMapper;
 import com.cf.parking.dao.po.ParkingLotPO;
-import com.cf.parking.facade.bo.ParkingLotAreaBO;
-import com.cf.parking.facade.bo.ParkingLotAreaEntranceBO;
-import com.cf.parking.facade.bo.ParkingLotBO;
-import com.cf.parking.facade.bo.ParkingLotTreeBO;
-import com.cf.parking.facade.dto.ParkingLotAreaEntranceOptDTO;
-import com.cf.parking.facade.dto.ParkingLotAreaOptDTO;
-import com.cf.parking.facade.dto.ParkingLotDTO;
-import com.cf.parking.facade.dto.ParkingLotOptDTO;
+import com.cf.parking.facade.bo.*;
+import com.cf.parking.facade.constant.FeignUrlConstant;
+import com.cf.parking.facade.dto.*;
 import com.cf.parking.facade.facade.ParkingLotFacade;
+import com.cf.parking.services.integration.GatewayHikvisionFeign;
 import com.cf.parking.services.utils.PageUtils;
 import com.cf.support.bean.IdWorker;
 import com.cf.support.exception.BusinessException;
@@ -49,6 +45,9 @@ public class ParkingLotFacadeImpl implements ParkingLotFacade
 
     @Resource
     private IdWorker idWorker;
+
+    @Resource
+    private GatewayHikvisionFeign gatewayHikvisionFeign;
 
     /**
      * 查询停车场列表（层级结构）
@@ -277,6 +276,17 @@ public class ParkingLotFacadeImpl implements ParkingLotFacade
             treeBO.setChildren(getParkingLotTreeChildren(treeBO));
         }
         return boList;
+    }
+
+    /**
+     * 查询停车场车位数量饼图
+     * @return
+     */
+    @Override
+    public List<SpaceNumBO> getParkingLotPieChart() {
+        HikvisionResult<List<SpaceNumDTO>> hikvisionResult = gatewayHikvisionFeign.remainSpaceNum(FeignUrlConstant.SPACE_NUM_URL, new ParkSyscodeDTO());
+        log.info("所有停车场列表:{}", hikvisionResult);
+        return BeanConvertorUtils.copyList(hikvisionResult.getData(), SpaceNumBO.class);
     }
 
     private List<ParkingLotTreeBO> getParkingLotTreeChildren(ParkingLotTreeBO treeBO) {
