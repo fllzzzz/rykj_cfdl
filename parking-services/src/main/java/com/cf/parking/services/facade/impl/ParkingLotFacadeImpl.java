@@ -31,6 +31,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -224,9 +225,9 @@ public class ParkingLotFacadeImpl implements ParkingLotFacade
             int result = mapper.insert(po);
             log.info("新增停车场园区成功  ——  {}",po);
             return result;
-        } catch (DataIntegrityViolationException e){
+        } catch (DuplicateKeyException e){
             log.error("新增停车场园区入口重复：{}，失败原因：{}",po,e);
-            throw new BusinessException("入口重复，请修改后重试！");
+            throw new BusinessException("园区编码已存在，请修改后重试！");
         } catch (Exception e){
             log.error("新增停车场园区失败：{}，失败原因：{}",po,e);
             return 0;

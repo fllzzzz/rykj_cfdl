@@ -10,7 +10,6 @@ import com.cf.parking.dao.po.UserProfilePO;
 import com.cf.parking.facade.bo.ParkingLotAreaBO;
 import com.cf.parking.facade.bo.ParkingLotBO;
 import com.cf.parking.facade.bo.ParkingLotTreeBO;
-import com.cf.parking.facade.constant.FeignUrlConstant;
 import com.cf.parking.facade.constant.ParkingSysCodeConstant;
 import com.cf.parking.facade.dto.*;
 import com.cf.parking.facade.facade.ParkingLotFacade;

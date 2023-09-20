@@ -241,6 +241,7 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
             LotteryRuleRoundPO round = lotteryRuleRoundFacade.getLotteryRuleRoundByRoundId(roundId);
             //2.根据停车场编码查询车位数量
             ParkingLotPO parkingLot = parkingLotService.selectParkingLotByCode(round.getParkingLotCode());
+            AssertUtil.checkNull(parkingLot, "轮次对应的停车场不存在");
             parkingAmount += parkingLot.getAmount();
         }
         return parkingAmount;

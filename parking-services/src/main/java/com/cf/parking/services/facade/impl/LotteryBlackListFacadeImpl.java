@@ -16,6 +16,7 @@ import com.cf.parking.facade.facade.LotteryBlackListFacade;
 import com.cf.parking.services.service.UserProfileService;
 import com.cf.parking.services.utils.PageUtils;
 import com.cf.support.bean.IdWorker;
+import com.cf.support.exception.BusinessException;
 import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -86,7 +88,10 @@ public class LotteryBlackListFacadeImpl implements LotteryBlackListFacade
             int result = mapper.insert(po);
             log.info("添加黑名单成功  ——  {}",po);
             return result;
-        }catch (Exception e){
+        }catch (DuplicateKeyException e){
+            log.error("添加黑名单重复：{}，失败原因：{}",po,e);
+            throw new BusinessException("该用户已在黑名单中，无须重复添加");
+        } catch (Exception e){
             log.error("添加黑名单失败：{}，失败原因：{}",po,e);
             return 0;
         }

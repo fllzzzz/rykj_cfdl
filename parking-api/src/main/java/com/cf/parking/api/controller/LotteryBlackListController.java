@@ -4,13 +4,8 @@ import javax.annotation.Resource;
 
 import com.cf.parking.api.request.LotteryBlackListOptReq;
 import com.cf.parking.api.request.LotteryBlackListReq;
-import com.cf.parking.api.response.LotteryBatchRsp;
 import com.cf.parking.api.response.LotteryBlackListRsp;
-import com.cf.parking.dao.po.LotteryBatchPO;
-import com.cf.parking.dao.po.LotteryBlackListPO;
-import com.cf.parking.facade.bo.LotteryBatchBO;
 import com.cf.parking.facade.bo.LotteryBlackListBO;
-import com.cf.parking.facade.dto.LotteryBatchDTO;
 import com.cf.parking.facade.dto.LotteryBlackListDTO;
 import com.cf.parking.facade.dto.LotteryBlackListOptDTO;
 import com.cf.parking.facade.facade.LotteryBlackListFacade;
@@ -26,8 +21,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Date;
 import java.util.List;
 
 /**
