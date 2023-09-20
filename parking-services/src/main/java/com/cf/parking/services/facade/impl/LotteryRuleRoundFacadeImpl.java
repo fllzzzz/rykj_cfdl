@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cf.parking.dao.mapper.LotteryRuleRoundMapper;
-import com.cf.parking.dao.po.LotteryBlackListPO;
 import com.cf.parking.dao.po.LotteryRuleRoundPO;
 import com.cf.parking.dao.po.ParkingLotPO;
 import com.cf.parking.facade.bo.LotteryRuleRoundBO;
@@ -126,8 +125,10 @@ public class LotteryRuleRoundFacadeImpl implements LotteryRuleRoundFacade
     private void setParkingLotNameAndAmount(LotteryRuleRoundBO bo) {
         String parkingLotCode = bo.getParkingLotCode();
         ParkingLotPO parkingLotPO = parkingLotService.selectParkingLotByCode(parkingLotCode);
-        bo.setParkingLotName(parkingLotPO.getRegion());
-        bo.setParkingLotAmount(parkingLotPO.getAmount());
+        if (parkingLotPO != null) {
+        	bo.setParkingLotName(parkingLotPO.getRegion());
+        	bo.setParkingLotAmount(parkingLotPO.getAmount());
+        }
     }
 
     /**

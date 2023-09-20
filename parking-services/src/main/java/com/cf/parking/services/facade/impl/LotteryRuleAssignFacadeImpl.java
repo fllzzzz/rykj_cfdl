@@ -6,8 +6,8 @@ import java.util.List;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cf.parking.dao.mapper.LotteryRuleAssignMapper;
-import com.cf.parking.dao.po.LotteryBlackListPO;
 import com.cf.parking.dao.po.LotteryRuleAssignPO;
+import com.cf.parking.dao.po.ParkingLotPO;
 import com.cf.parking.facade.bo.LotteryRuleAssignBO;
 import com.cf.parking.facade.dto.LotteryRuleAssignDTO;
 import com.cf.parking.facade.dto.LotteryRuleAssignOptDTO;
@@ -20,7 +20,6 @@ import com.cf.support.utils.BeanConvertorUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -68,8 +67,10 @@ public class LotteryRuleAssignFacadeImpl implements LotteryRuleAssignFacade
     }
 
     private void setParkingLotName(LotteryRuleAssignBO lotteryRuleAssignBO) {
-        String parkingLotName = parkingLotService.selectParkingLotByCode(lotteryRuleAssignBO.getParkingLotCode()).getRegion();
-        lotteryRuleAssignBO.setParkingLotName(parkingLotName);
+    	ParkingLotPO parking = parkingLotService.selectParkingLotByCode(lotteryRuleAssignBO.getParkingLotCode());
+        if (parking != null) {
+        	lotteryRuleAssignBO.setParkingLotName(parking.getRegion());
+        }
     }
 
     /**
