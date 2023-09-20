@@ -130,7 +130,15 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
 
             //2.自动生成对应批次的摇号结果记录（选择了几轮就生成几条记录）
             for (Long round : roundIdArr) {
-                insertLotteryResultByBatchAndRound(po, round);
+            	LotteryResultPO lotteryResultPO = new LotteryResultPO()
+                        .setId(idWorker.nextId())
+                        .setBatchId(po.getId())
+                        .setBatchNum(po.getBatchNum())
+                        .setRoundId(round)
+                        .setState(LotteryResultStateEnum.UNLOTTERY.getState())
+                        .setCreateTm(new Date())
+                        .setUpdateTm(new Date());
+                lotteryResultService.insert(lotteryResultPO);
             }
 
             return result;
@@ -140,17 +148,6 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
         }
     }
 
-    private void insertLotteryResultByBatchAndRound(LotteryBatchPO po, Long round) {
-        LotteryResultPO lotteryResultPO = new LotteryResultPO()
-                .setId(idWorker.nextId())
-                .setBatchId(po.getId())
-                .setBatchNum(po.getBatchNum())
-                .setRoundId(round)
-                .setState(LotteryResultStateEnum.UNLOTTERY.getState())
-                .setCreateTm(new Date())
-                .setUpdateTm(new Date());
-        lotteryResultService.insert(lotteryResultPO);
-    }
 
     /**
      * 修改摇号批次
@@ -182,7 +179,15 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
 
             //3.生成新的摇号结果
             for (Long round : roundIdArr) {
-                insertLotteryResultByBatchAndRound(po, round);
+            	LotteryResultPO lotteryResultPO = new LotteryResultPO()
+                        .setId(idWorker.nextId())
+                        .setBatchId(po.getId())
+                        .setBatchNum(po.getBatchNum())
+                        .setRoundId(round)
+                        .setState(LotteryResultStateEnum.UNLOTTERY.getState())
+                        .setCreateTm(new Date())
+                        .setUpdateTm(new Date());
+                lotteryResultService.insert(lotteryResultPO);
             }
             return result;
         }catch (Exception e){
