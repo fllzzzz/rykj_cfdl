@@ -112,7 +112,7 @@ public class LotteryDealService {
 
 	/**
 	 * 执行转让操作
-	 * @param spaceList 转让人车位
+	 * @param outSpaceList 转让人车位
 	 * @param verifyList 受让人车牌
 	 * @param inJobNum 受让人工号
 	 */
@@ -120,6 +120,7 @@ public class LotteryDealService {
 		log.info("转让人车位：{},受让人车位：{},受让人工号：{}",JSON.toJSONString(outSpaceList),JSON.toJSONString(verifyList),inJobNum);
 		List<UserSpacePO> addList = new ArrayList<>();
 		List<UserSpacePO> updateList = new ArrayList<>();
+		
 		
 		//获取车牌集合
 		List<String> plateList = verifyList.stream().map(item -> item.getPlateNo()).collect(Collectors.toList());
@@ -289,6 +290,7 @@ public class LotteryDealService {
 		
 		//把转让人的车位有效期更改为今天
 		userSpaceService.updateEndDate(outSpaceList.get(0).getJobNumber(),new Date());
+		
 	}
 			
 	

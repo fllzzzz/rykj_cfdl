@@ -25,6 +25,7 @@ import com.esotericsoftware.minlog.Log;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 /**
@@ -58,6 +59,10 @@ public class ParkingSpaceTransferRecordFacadeImpl implements ParkingSpaceTransfe
 	@Resource
 	private ParkingLotService parkingLotService;
     
+	
+	
+	
+	@Transactional(rollbackFor = Exception.class)
 	@Override
 	public void transfer(String outJobNum, String inJobNum) {
 		log.info("转让开始，转让人：{},受让人：{}",outJobNum,inJobNum);;

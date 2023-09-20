@@ -2,11 +2,13 @@ package com.cf.parking.api.controller;
 
 import javax.annotation.Resource;
 import com.cf.parking.api.request.ParkingSpaceTransferRecordReq;
+import com.cf.parking.api.request.TransferReq;
 import com.cf.parking.api.response.ParkingSpaceTransferRecordRsp;
 import com.cf.parking.facade.bo.ParkingSpaceTransferRecordBO;
 import com.cf.parking.facade.dto.ParkingSpaceTransferRecordDTO;
 import com.cf.parking.facade.facade.ParkingSpaceTransferRecordFacade;
 import com.cf.support.authertication.UserAuthentication;
+import com.cf.parking.services.utils.AssertUtil;
 import com.cf.parking.services.utils.PageUtils;
 import com.cf.support.authertication.UserAuthenticationServer;
 import com.cf.support.authertication.token.dto.UserSessionDTO;
@@ -82,11 +84,13 @@ public class ParkingSpaceTransferRecordController
 
     @ApiOperation(value = "车位转赠————小程序", notes = "车位转赠")
     @PostMapping("/transfer")
-    public Result transfer( @RequestBody String jobNum){
-    	log.info("开始转赠：{}",jobNum);
+    public Result transfer( @RequestBody TransferReq req){
+    	AssertUtil.checkNull(req, "参数不存在");
+    	AssertUtil.checkNull(req.getJobNum(), "受让人不存在");
+    	log.info("开始转赠：{}",req.getJobNum());
         UserSessionDTO user = getUserSessionDTO();
         String openId = user.getOpenId();
-    	parkingSpaceTransferRecordFacade.transfer(openId,jobNum);
+    	parkingSpaceTransferRecordFacade.transfer(openId,req.getJobNum());
     	return Result.buildSuccessResult();
     }
 
