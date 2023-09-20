@@ -28,7 +28,7 @@ public class LotteryApplyRecordReq extends PageRequest {
     private Long batchId;
 
     /** 摇号结果(-1：未开号；0：未中；xx：对应停车场的区域编号) */
-    @ApiModelProperty(value = "摇号结果")
+    @ApiModelProperty(value = "摇号结果，0：未中，1：摇中")
     private String result;
 
     /** 开始期号 */

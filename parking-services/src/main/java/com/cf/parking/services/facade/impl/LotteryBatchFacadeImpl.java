@@ -16,23 +16,26 @@ import com.cf.parking.facade.dto.LotteryBatchDTO;
 import com.cf.parking.facade.dto.LotteryBatchOptDTO;
 import com.cf.parking.facade.facade.LotteryBatchFacade;
 import com.cf.parking.services.enums.LotteryBatchStateEnum;
+import com.cf.parking.services.enums.LotteryResultStateEnum;
 import com.cf.parking.services.service.LotteryResultService;
 import com.cf.parking.services.service.ParkingLotService;
+import com.cf.parking.services.service.UserProfileService;
 import com.cf.parking.services.utils.AssertUtil;
 import com.cf.parking.services.utils.PageUtils;
+import com.cf.support.bean.DingTalkBean;
 import com.cf.support.bean.IdWorker;
+import com.cf.support.exception.BusinessException;
 import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
-import javax.validation.constraints.AssertTrue;
 
 /**
  * 摇号批次Service业务层处理
@@ -57,7 +60,15 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
     private ParkingLotService parkingLotService;
 
     @Resource
+    private UserProfileService userProfileService;
+
+    @Resource
+    private DingTalkBean dingTalkBean;
+
+    @Resource
     private IdWorker idWorker;
+
+    private final String  message = "%s期摇号报名时间：%s~%s，车位有效期：%s~%s，您可在报名有效期内报名摇号。";
 
     /**
      * 查询摇号批次列表
@@ -93,6 +104,7 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
      * @param dto
      * @return
      */
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Integer add(LotteryBatchOptDTO dto) {
         //1.参数复制
@@ -111,13 +123,32 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
         po.setRoundId(roundId);
 
         try{
+            //1.插入摇号批次记录
             int result = mapper.insert(po);
             log.info("新增摇号批次成功  ——  {}",po);
+
+            //2.自动生成对应批次的摇号结果记录（选择了几轮就生成几条记录）
+            for (Long round : roundIdArr) {
+                insertLotteryResultByBatchAndRound(po, round);
+            }
+
             return result;
         }catch (Exception e){
             log.error("新增摇号批次失败：{}，失败原因：{}",po,e);
             return 0;
         }
+    }
+
+    private void insertLotteryResultByBatchAndRound(LotteryBatchPO po, Long round) {
+        LotteryResultPO lotteryResultPO = new LotteryResultPO()
+                .setId(idWorker.nextId())
+                .setBatchId(po.getId())
+                .setBatchNum(po.getBatchNum())
+                .setRoundId(round)
+                .setState(LotteryResultStateEnum.UNLOTTERY.getState())
+                .setCreateTm(new Date())
+                .setUpdateTm(new Date());
+        lotteryResultService.insert(lotteryResultPO);
     }
 
     /**
@@ -136,8 +167,22 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
         String roundId = Arrays.toString(roundIdArr).replaceAll("\\s+","");
         po.setRoundId(roundId);
         try{
+            //1.修改前判断是否已通知
+            LotteryBatchPO lotteryBatchPO = mapper.selectById(dto.getId());
+            AssertUtil.checkNull(lotteryBatchPO, "批次记录不存在");
+            AssertUtil.checkTrue(!LotteryResultStateEnum.UNLOTTERY.getState().equals(lotteryBatchPO.getState()), "已通知，无法删除！");
+
+            //1.修改摇号批次
             int result = mapper.updateById(po);
             log.info("修改摇号批次成功  ——  {}",po);
+
+            //2.将之前的摇号结果删除
+            lotteryResultService.batchDeleteByLotteryBatchId(po.getId());
+
+            //3.生成新的摇号结果
+            for (Long round : roundIdArr) {
+                insertLotteryResultByBatchAndRound(po, round);
+            }
             return result;
         }catch (Exception e){
             log.error("修改摇号批次失败：{}，失败原因：{}",po,e);
@@ -153,8 +198,17 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
     @Override
     public Integer deleteById(Long id) {
         try{
+            //1.删除前判断是否已通知
+            LotteryBatchPO lotteryBatchPO = mapper.selectById(id);
+            AssertUtil.checkNull(lotteryBatchPO, "批次记录不存在");
+            AssertUtil.checkTrue(!LotteryResultStateEnum.UNLOTTERY.getState().equals(lotteryBatchPO.getState()), "已通知，无法删除！");
+
+            //2.删除摇号批次信息
             int result = mapper.deleteById(id);
             log.info("删除摇号批次成功，id：{}",id);
+
+            //3.删除对应的摇号结果记录
+            lotteryResultService.batchDeleteByLotteryBatchId(id);
             return result;
         }catch (Exception e){
             log.error("删除摇号批次失败：{}，失败原因：{}",id,e);
@@ -190,6 +244,33 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
             parkingAmount += parkingLot.getAmount();
         }
         return parkingAmount;
+    }
+
+    /**
+     * 钉钉通知所有用户摇号批次信息
+     * @param id
+     */
+    @Override
+    public Integer notifyAllUserByBatchId(Long id) {
+        LotteryBatchPO lotteryBatchPO = mapper.selectById(id);
+        //1.钉钉通知
+        //1.1查询所有用户
+        List<UserProfilePO> userProfilePOS = userProfileService.queryBaseList();
+        List<String> jobNumList = userProfilePOS.stream().filter(userProfilePO -> StringUtils.isNotBlank(userProfilePO.getJobNumber())).map(UserProfilePO::getJobNumber).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(jobNumList)){
+            throw new BusinessException("未找到公司员工，无法通知！");
+        }
+
+        String notifyMessage = String.format(message, DateUtil.format(lotteryBatchPO.getBatchNum(), "yyyy-MM-dd"), DateUtil.format(lotteryBatchPO.getApplyStartTime(), "yyyy-MM-dd HH:mm:ss"),
+                DateUtil.format(lotteryBatchPO.getApplyEndTime(), "yyyy-MM-dd HH:mm:ss"), DateUtil.format(lotteryBatchPO.getValidStartDate(), "yyyy-MM-dd"),
+                DateUtil.format(lotteryBatchPO.getValidEndDate(), "yyyy-MM-dd"));
+
+        dingTalkBean.sendTextMessage(notifyMessage,jobNumList);
+
+        //2.修改批次状态为已通知
+        lotteryBatchPO.setState(LotteryBatchStateEnum.HAVE_NOTIFIED.getState());
+        return mapper.updateById(lotteryBatchPO);
+
     }
 
 

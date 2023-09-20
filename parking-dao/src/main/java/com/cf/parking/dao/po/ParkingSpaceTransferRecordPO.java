@@ -5,6 +5,7 @@ import java.util.Date;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -36,15 +37,19 @@ public class ParkingSpaceTransferRecordPO
     private String acceptUserName;
 
     /** 转赠有效开始日期 */
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
     private Date validStartDate;
 
     /** 转赠有效截止日期 */
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
     private Date validEndDate;
 
     /** 创建时间 */
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
     private Date createTm;
 
     /** 更新时间 */
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
     private Date updateTm;
 
 }

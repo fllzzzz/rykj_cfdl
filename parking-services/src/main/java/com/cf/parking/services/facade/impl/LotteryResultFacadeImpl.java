@@ -14,7 +14,6 @@ import com.cf.parking.dao.po.UserVerifyPO;
 import com.cf.parking.facade.bo.LotteryResultBO;
 import com.cf.parking.facade.bo.LotteryResultDetailBO;
 import com.cf.parking.facade.dto.LotteryResultDTO;
-import com.cf.parking.facade.dto.TextMessageDTO;
 import com.cf.parking.facade.dto.UserSpaceDTO;
 import com.cf.parking.facade.facade.LotteryResultFacade;
 import com.cf.parking.services.enums.EnableStateEnum;
@@ -49,7 +48,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -113,7 +111,7 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
     @Resource
     private ParkInvokeService parkInvokeService;
     
-    @Autowired
+    @Resource
     private DingTalkBean dingTalkBean;
     
     private final String  message = "恭喜您抽中车库%s车位,有效期为%s~%s";

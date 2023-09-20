@@ -207,13 +207,15 @@ public class UserProfileService extends ServiceImpl<UserProfilePOMapper, UserPro
     }
 
     /**
-     * 修改用户默认停车场为"装配楼2期5F停车场"
+     * 如果当前用户的停车场不是默认的，则审核时修改用户默认停车场为"装配楼2期5F停车场"
      * @param userId
      */
-    public Integer setDefaultParkingLotByUserId(Long userId) {
+    public void setDefaultParkingLotByUserId(Long userId) {
         UserProfilePO userProfilePO = userProfilePOMapper.selectById(userId);
-        userProfilePO.setParkingLotRegion(DEFAULT_PARKINGLOT);
-        return userProfilePOMapper.updateById(userProfilePO);
+        if (StringUtils.isEmpty(userProfilePO.getParkingLotRegion()) || DEFAULT_PARKINGLOT.equals(userProfilePO.getParkingLotRegion())){
+            userProfilePO.setParkingLotRegion(DEFAULT_PARKINGLOT);
+            userProfilePOMapper.updateById(userProfilePO);
+        }
     }
 
     /**

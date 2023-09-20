@@ -1,5 +1,6 @@
 package com.cf.parking.api.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -23,6 +24,10 @@ public class ParkingSpaceTransferRecordRsp {
     @ApiModelProperty(value = "转赠停车场编号")
     private String parkingLotCode;
 
+    /** 转赠停车场名称 */
+    @ApiModelProperty(value = "转赠停车场名称")
+    private String parkingLotRegion;
+
     /** 申请人userId */
     @ApiModelProperty(value = "申请人userId")
     private Long userId;
@@ -33,15 +38,19 @@ public class ParkingSpaceTransferRecordRsp {
 
     /** 转赠有效开始日期 */
     @ApiModelProperty(value = "转赠有效开始日期")
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
     private Date validStartDate;
 
     /** 转赠有效截止日期 */
     @ApiModelProperty(value = "转赠有效截止日期")
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
     private Date validEndDate;
 
     /** 创建时间 */
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
     private Date createTm;
 
     /** 更新时间 */
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
     private Date updateTm;
 }

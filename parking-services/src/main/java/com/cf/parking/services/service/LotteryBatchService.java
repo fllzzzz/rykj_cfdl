@@ -7,6 +7,7 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,7 @@ import com.cf.parking.dao.po.ParkingLotPO;
 import com.cf.parking.facade.dto.LotteryBatchOptDTO;
 import com.cf.parking.facade.facade.LotteryBatchFacade;
 import java.util.Date;
+import java.util.List;
 import javax.annotation.Resource;
 
 
@@ -94,9 +96,13 @@ public class LotteryBatchService extends ServiceImpl<LotteryBatchMapper, Lottery
      * @return
      */
     public LotteryBatchPO getNotifiedLatestBatchInfo() {
-        return lotteryBatchMapper.selectOne(new LambdaQueryWrapper<LotteryBatchPO>()
-                .ne(LotteryBatchPO::getState, LotteryBatchStateEnum.NEED_NOTIFY.getState())
-                .orderByDesc(LotteryBatchPO::getBatchNum));
+		List<LotteryBatchPO> batchPOList = lotteryBatchMapper.selectList(new LambdaQueryWrapper<LotteryBatchPO>()
+				.ne(LotteryBatchPO::getState, LotteryBatchStateEnum.NEED_NOTIFY.getState())
+				.orderByDesc(LotteryBatchPO::getBatchNum));
+		if (CollectionUtils.isNotEmpty(batchPOList)){
+			return batchPOList.get(0);
+		}
+		return null;
     }
 
 

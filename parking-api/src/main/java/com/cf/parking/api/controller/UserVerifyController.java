@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.*;
@@ -58,7 +59,11 @@ public class UserVerifyController {
     private LotteryBlackListService lotteryBlackListService;
 
     private UserSessionDTO getUser() {
-        return userAuthenticationServer.getCurrentUser();
+        UserSessionDTO userSessionDTO = new UserSessionDTO();
+        userSessionDTO.setUserId(1668559697477717L);
+        userSessionDTO.setServerName("魏慧");
+        return userSessionDTO;
+//        return userAuthenticationServer.getCurrentUser();
     }
 
 
@@ -117,15 +122,13 @@ public class UserVerifyController {
     /**
      * 获取个人车牌号列表
      */
-    @ApiOperation(value = "获取个人车辆列表", notes = "小程序端个人的车辆列表")
+    @ApiOperation(value = "获取个人车辆列表——小程序", notes = "小程序端个人的车辆列表")
     @PostMapping("/vehicleList")
     public Result<List<String>> vehicleList()
     {
         //1.获取当前登录用户的信息
-        Long userId = getUser().getUserId();
-        if (ObjectUtils.isEmpty(userId)){
-            throw new BusinessException("请先登录！");
-        }
+        UserSessionDTO user = getUserSessionDTO();
+        Long userId = user.getUserId();
 
         List<String> platNoList = userVerifyFacade.getPlatNoListByUserId(userId);
         return Result.buildSuccessResult(platNoList);
@@ -134,15 +137,13 @@ public class UserVerifyController {
     /**
      * 获取个人车辆审核详细信息
      */
-    @ApiOperation(value = "获取个人车辆审核详细信息", notes = "选择停车场后，自动调用查询")
+    @ApiOperation(value = "获取个人车辆审核详细信息——小程序", notes = "选择停车场后，自动调用查询")
     @PostMapping("/info")
     public Result<UserVerifyRsp> getInfo(@RequestBody UserVerifyReq param)
     {
         //1.获取当前登录用户的信息
-        Long userId = getUser().getUserId();
-        if (ObjectUtils.isEmpty(userId)){
-            throw new BusinessException("请先登录！");
-        }
+        UserSessionDTO user = getUserSessionDTO();
+        Long userId = user.getUserId();
 
         //2.参数校验
         AssertUtil.checkNull(param.getPlatNo(),"请选择车牌号！");
@@ -163,15 +164,13 @@ public class UserVerifyController {
      * 新增车辆审核
      */
     @UserAuthentication
-    @ApiOperation(value = "新增车辆审核", notes = "移动端个人中心模块点击车辆录入")
+    @ApiOperation(value = "新增车辆审核——小程序", notes = "移动端个人中心模块点击车辆录入")
     @PostMapping("/add")
     public Result add(UserVerifyOptReq param)
     {
         //1.获取当前登录用户的信息
-        Long userId = getUser().getUserId();
-        if (ObjectUtils.isEmpty(userId)){
-            return Result.buildErrorResult("请先登录！");
-        }
+        UserSessionDTO user = getUserSessionDTO();
+        Long userId = user.getUserId();
 
         //2.申请资格校验
         //2.1是否为黑名单判断
@@ -195,13 +194,21 @@ public class UserVerifyController {
             //4.参数生成（图片转换）
             dto = optReq2OptDto(param);
             dto.setUserId(userId);
-            dto.setUserName(getUser().getServerName());
+            dto.setUserName(user.getServerName());
         } catch (IOException e) {
-            log.error("用户{}上传车辆信息审核时图片转换异常:{}",getUser().getServerName(),e);
+            log.error("用户{}上传车辆信息审核时图片转换异常:{}",user.getServerName(),e);
             return Result.buildErrorResult("图片上传异常，请重试！");
         }
         Integer result = userVerifyFacade.add(dto);
         return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult("提交审核失败，请重试！");
+    }
+
+    private UserSessionDTO getUserSessionDTO() {
+        UserSessionDTO user = getUser();
+        if (ObjectUtils.isEmpty(user)){
+            throw new BusinessException("请先登录！");
+        }
+        return user;
     }
 
     private UserVerifyOptDTO optReq2OptDto(UserVerifyOptReq param) throws IOException {
@@ -210,14 +217,17 @@ public class UserVerifyController {
         dto.setUserName(getUser().getServerName());
         dto.setPlateNo(param.getPlateNo());
         //4.1三张图片转base64
-        dto.setVehicleImg(getBase64ImgStr(param.getVehicleImg().getInputStream()));
-        dto.setDrivingLicenseImg(getBase64ImgStr(param.getDrivingLicenseImg().getInputStream()));
-        dto.setDrivingPermitImg(getBase64ImgStr(param.getDrivingPermitImg().getInputStream()));
+        dto.setVehicleImg(getBase64ImgStr(param.getVehicleImg()));
+        dto.setDrivingLicenseImg(getBase64ImgStr(param.getDrivingLicenseImg()));
+        dto.setDrivingPermitImg(getBase64ImgStr(param.getDrivingPermitImg()));
         return dto;
     }
 
-    private String getBase64ImgStr(InputStream inputStream) throws IOException {
-        return Base64.getEncoder().encodeToString(IOUtils.toByteArray(inputStream));
+    private String getBase64ImgStr(MultipartFile file) throws IOException {
+        if (PictureInfoEnum.CONTENT_TYPE_JPG.getInfo().equals(file.getContentType())){
+            return PictureInfoEnum.BASE64_JPG_PRE.getInfo() + Base64.getEncoder().encodeToString(IOUtils.toByteArray(file.getInputStream()));
+        }
+        return PictureInfoEnum.BASE64_PNG_PRE.getInfo() + Base64.getEncoder().encodeToString(IOUtils.toByteArray(file.getInputStream()));
     }
 
     private void paramVerify(UserVerifyOptReq param) {
@@ -240,15 +250,13 @@ public class UserVerifyController {
     /**
      * 修改个人车辆审核详细信息
      */
-    @ApiOperation(value = "修改个人车辆审核详细信息", notes = "修改个人车辆审核详细信息")
+    @ApiOperation(value = "修改个人车辆审核详细信息——小程序", notes = "修改个人车辆审核详细信息")
     @PostMapping("/update")
-    public Result update(@RequestBody UserVerifyOptReq param)
+    public Result update(UserVerifyOptReq param)
     {
         //1.获取当前登录用户的信息
-        Long userId = getUser().getUserId();
-        if (ObjectUtils.isEmpty(userId)){
-            return Result.buildErrorResult("请先登录！");
-        }
+        UserSessionDTO user = getUserSessionDTO();
+        Long userId = user.getUserId();
 
         //2.1是否为黑名单判断
         LotteryBlackListPO lotteryBlackListPO = lotteryBlackListService.queryBlackUserInfo(userId);
@@ -267,9 +275,9 @@ public class UserVerifyController {
             dto = optReq2OptDto(param);
             dto.setId(param.getId());
             dto.setUserId(userId);
-            dto.setUserName(getUser().getServerName());
+            dto.setUserName(user.getServerName());
         } catch (IOException e) {
-            log.error("用户{}上传车辆信息审核时图片转换异常:{}",getUser().getServerName(),e);
+            log.error("用户{}上传车辆信息审核时图片转换异常:{}",user.getServerName(),e);
             return Result.buildErrorResult("图片上传异常，请重试！");
         }
 
@@ -278,19 +286,15 @@ public class UserVerifyController {
         return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult("提交审核失败，请重试！");
     }
 
-
-
-    //生成的base64
-    public static void main(String[] args) throws IOException {
-        File file = new File("D:\\d.png");
-        FileInputStream imageInFile = new FileInputStream(file);
-        byte[] imageData = new byte[(int)file.length()];
-        imageInFile.read(imageData);
-        imageInFile.close();
-
-        String base64Image = Base64.getEncoder()
-                .encodeToString(imageData);
-        //查看前需要拼接data:image/png;base64,
-        System.out.println("data:image/png;base64," + base64Image);
+    /**
+     * 删除个人车辆信息
+     */
+    @ApiOperation(value = "删除个人车辆信息——小程序", notes = "删除个人车辆信息")
+    @PostMapping("/delete")
+    public Result<String> delete(@RequestBody UserVerifyReq param)
+    {
+        AssertUtil.checkNull(param.getId(),"请选择要删除的记录！");
+        Integer result = userVerifyFacade.deleteById(param.getId());
+        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult("删除失败，请重试！");
     }
 }
