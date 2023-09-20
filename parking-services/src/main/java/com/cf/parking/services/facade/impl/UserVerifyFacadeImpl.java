@@ -16,9 +16,11 @@ import com.cf.parking.services.enums.UserVerifyStateEnum;
 import com.cf.parking.services.service.UserProfileService;
 import com.cf.parking.services.utils.PageUtils;
 import com.cf.support.bean.IdWorker;
+import com.cf.support.exception.BusinessException;
 import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -90,6 +92,15 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
      */
     @Override
     public Integer add(UserVerifyOptDTO dto) {
+        //1.新增时车牌唯一性判断
+        List<UserVerifyPO> poList = mapper.selectList(new LambdaQueryWrapper<UserVerifyPO>()
+                .eq(UserVerifyPO::getPlateNo, dto.getPlateNo())
+                .eq(UserVerifyPO::getUserId, dto.getUserId()));
+        if (CollectionUtils.isNotEmpty(poList)){
+            throw new BusinessException("车牌号已存在！");
+        }
+
+        //2.新增
         UserVerifyPO userVerifyPO = new UserVerifyPO();
         BeanUtils.copyProperties(dto,userVerifyPO);
         userVerifyPO.setId(idWorker.nextId());
@@ -170,8 +181,19 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
      */
     @Override
     public Integer update(UserVerifyOptDTO dto) {
-
         UserVerifyPO userVerifyPO = mapper.selectById(dto.getId());
+
+        //1.修改时判断车牌唯一性
+        List<UserVerifyPO> poList = mapper.selectList(new LambdaQueryWrapper<UserVerifyPO>()
+                .eq(UserVerifyPO::getPlateNo, dto.getPlateNo())
+                .eq(UserVerifyPO::getUserId, dto.getUserId()));
+        if (CollectionUtils.isNotEmpty(poList)){
+            if (!poList.get(0).getId().equals(dto.getId())){
+                throw new BusinessException("车牌号已存在！");
+            }
+        }
+
+        //2.修改
         BeanUtils.copyProperties(dto,userVerifyPO);
         userVerifyPO.setState(Integer.parseInt(UserVerifyStateEnum.UNAUDIT.getState()));
         userVerifyPO.setReason("");
