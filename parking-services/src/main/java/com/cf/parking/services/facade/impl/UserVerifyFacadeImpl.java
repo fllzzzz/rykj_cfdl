@@ -11,6 +11,7 @@ import com.cf.parking.facade.bo.UserVerifyBO;
 import com.cf.parking.facade.dto.UserVerifyDTO;
 import com.cf.parking.facade.dto.UserVerifyOptDTO;
 import com.cf.parking.facade.facade.UserVerifyFacade;
+import com.cf.parking.services.constant.ParkingConstants;
 import com.cf.parking.services.enums.UserVerifyStateEnum;
 import com.cf.parking.services.service.UserProfileService;
 import com.cf.parking.services.utils.PageUtils;
@@ -148,7 +149,7 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
         List<Long> userIds = poList.stream().filter(po->!ObjectUtils.isEmpty(po.getUserId())).map(UserVerifyPO::getUserId).collect(Collectors.toList());
         //2.2批量更新
         if (UserVerifyStateEnum.SUCCESS.getState().equals(dto.getState().toString())){
-            userProfileService.batchSetDefaultParkingLotByUserIds(userIds);
+            userProfileService.batchSetDefaultParkingLotByUserIds(userIds,ParkingConstants.DEFAULT_PARKINGLOT);
         }
     }
 

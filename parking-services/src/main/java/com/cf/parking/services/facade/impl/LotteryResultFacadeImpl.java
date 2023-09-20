@@ -14,7 +14,6 @@ import com.cf.parking.dao.po.UserVerifyPO;
 import com.cf.parking.facade.bo.LotteryResultBO;
 import com.cf.parking.facade.bo.LotteryResultDetailBO;
 import com.cf.parking.facade.dto.LotteryResultDTO;
-import com.cf.parking.facade.dto.TextMessageDTO;
 import com.cf.parking.facade.dto.UserSpaceDTO;
 import com.cf.parking.facade.facade.LotteryResultFacade;
 import com.cf.parking.services.enums.EnableStateEnum;
@@ -32,6 +31,7 @@ import com.cf.parking.services.service.LotteryResultDetailService;
 import com.cf.parking.services.service.LotteryRuleAssignService;
 import com.cf.parking.services.service.LotteryRuleRoundService;
 import com.cf.parking.services.service.ParkingLotService;
+import com.cf.parking.services.service.UserProfileService;
 import com.cf.parking.services.service.UserSpaceService;
 import com.cf.parking.services.service.UserVerifyService;
 import com.cf.parking.services.utils.AssertUtil;
@@ -45,6 +45,7 @@ import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
@@ -113,6 +114,10 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
     @Resource
     private ParkInvokeService parkInvokeService;
     
+    
+    @Resource
+    private UserProfileService userProfileService;
+    
     @Autowired
     private DingTalkBean dingTalkBean;
     
@@ -135,6 +140,7 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 		AssertUtil.checkTrue(EnableStateEnum.ENABLE.getState().equals(round.getState()),"摇号轮次未启用");
 		LotteryBatchPO batch = lotteryBatchService.getById(lottery.getBatchId());
 		AssertUtil.checkNull(batch, "批次数据不存在");
+		AssertUtil.checkTrue(batch.getApplyEndTime().compareTo(new Date()) < 0, "当前还处于申请日期内，不能进行摇号操作");
 		
 		//防并发
 		int num = lotteryResultMapper.updateByState(id,LotteryResultStateEnum.UNLOTTERY.getState(),LotteryResultStateEnum.UNCONFIRM.getState());
@@ -334,9 +340,13 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 							LotteryResultStateEnum.UNCONFIRM.getState(),
 							LotteryResultStateEnum.UNLOTTERY.getState()))
 				);
+		//查询中奖数据
 		List<LotteryResultDetailPO> detailList = lotteryResultDetailService.queryDetailListByResultId(id);
 		if (!CollectionUtils.isEmpty(detailList)) {
 			List<String> openIdList = detailList.stream().map(item -> item.getUserJobNumber()).collect(Collectors.toList());
+			log.info("中奖人员工号：{},摇中停车场：{}",JSON.toJSONString(openIdList),JSON.toJSONString(parking));
+			List<Long> userIdList = detailList.stream().map(item -> item.getUserId()).collect(Collectors.toList());;
+			userProfileService.batchSetDefaultParkingLotByUserIds(userIdList,parking.getRegion());
 			dingTalkBean.sendTextMessage(String.format(message, parking.getRegion(),DateUtil.format(batch.getValidStartDate(),"yyyy-MM-dd"),
 					DateUtil.format(batch.getValidEndDate(),"yyyy-MM-dd")) ,openIdList);
 		}
@@ -348,6 +358,7 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 			List<LotteryApplyRecordPO> applyList = lotteryApplyRecordService.queryLotteryApplyList(lottery.getBatchId(), null);
 			List<String> spaceList = userSpaceService.querySpaceListByBatchId(lottery.getBatchId());
 			List<String> applyIdList = applyList.stream().map(item -> item.getJobNumber()).collect(Collectors.toList());
+			log.info("未中奖人员工号：{}",JSON.toJSONString(applyIdList));
 			applyIdList.removeAll(spaceList);
 			dingTalkBean.sendTextMessage("很遗憾，您本次摇号未中奖",applyIdList);
 		}
