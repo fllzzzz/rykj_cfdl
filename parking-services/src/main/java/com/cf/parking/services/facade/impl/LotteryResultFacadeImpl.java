@@ -121,7 +121,7 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
     @Autowired
     private DingTalkBean dingTalkBean;
     
-    private final String  message = "恭喜您抽中车库%s车位,有效期为%s~%s";
+    private final String  message = "恭喜您抽中%s车位,有效期为%s~%s";
     
     
     
