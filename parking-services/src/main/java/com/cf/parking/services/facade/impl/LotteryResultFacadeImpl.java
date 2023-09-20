@@ -318,6 +318,7 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 	}
 
 
+	@Transactional(rollbackFor = Exception.class)
 	@Override
 	public void notify(Long id) {
 		LotteryResultPO lottery = lotteryResultMapper.selectById(id);
@@ -365,7 +366,7 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 			List<String> applyIdList = applyList.stream().map(item -> item.getJobNumber()).collect(Collectors.toList());
 			log.info("未中奖人员工号：{}",JSON.toJSONString(applyIdList));
 			applyIdList.removeAll(spaceList);
-			userProfileService.batchSetParkingLotByJobNum(applyIdList,parking.getRegion());
+			//userProfileService.batchSetParkingLotByJobNum(applyIdList,parking.getRegion());
 			dingTalkBean.sendTextMessage("很遗憾，您本次摇号未中奖",applyIdList);
 		}
 		
