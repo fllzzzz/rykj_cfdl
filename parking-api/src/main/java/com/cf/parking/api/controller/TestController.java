@@ -13,6 +13,7 @@ import com.cf.parking.facade.facade.ScheduleDataFacade;
 import com.cf.parking.services.integration.GatewayHikvisionFeign;
 import com.cf.parking.services.integration.ParkInvokeService;
 import com.cf.parking.services.job.parking.ParkingSpaceTask;
+import com.cf.support.bean.DingTalkBean;
 import com.cf.support.result.PageResponse;
 import com.cf.support.result.Result;
 import com.cf.support.utils.BeanConvertorUtils;
@@ -53,6 +54,10 @@ public class TestController {
 	
 	@Resource
 	private ParkInvokeService parkInvokeService ;
+	
+	@Resource
+	private DingTalkBean dingTalkBean;
+	
 
 	/**
 	 * 执行获取车位信息
@@ -211,6 +216,13 @@ public class TestController {
 		YardPageBO result = parkInvokeService.queryYard(dto);
 		System.out.println(JSON.toJSONString(result));
 		return Result.buildSuccessResult(result);
+	}
+	
+	@PostMapping("/sendDingMessage")
+	@ApiOperation(value = "发送钉钉消息", notes = "发送钉钉消息")
+	public Result sendDingMessage() {
+		dingTalkBean.sendTextMessage("测试消息", Arrays.asList("28492530271177557","013622186224083959","16931906975949266"));
+		return Result.buildSuccessResult();
 	}
 	
 }
