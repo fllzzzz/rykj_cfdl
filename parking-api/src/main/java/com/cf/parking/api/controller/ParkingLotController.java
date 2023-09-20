@@ -258,6 +258,9 @@ public class ParkingLotController
     public Result<List<SpaceNumRsp>> getParkingLotPieChart()
     {
         List<SpaceNumBO> spaceNumBOList = parkingLotFacade.getParkingLotPieChart();
+//        spaceNumBOList.add(new SpaceNumBO().setName("停车场1").setValue(20L));
+//        spaceNumBOList.add(new SpaceNumBO().setName("停车场2").setValue(15L));
+//        spaceNumBOList.add(new SpaceNumBO().setName("停车场2").setValue(8L));
         return Result.buildSuccessResult(BeanConvertorUtils.copyList(spaceNumBOList,SpaceNumRsp.class));
     }
 

@@ -284,9 +284,19 @@ public class ParkingLotFacadeImpl implements ParkingLotFacade
      */
     @Override
     public List<SpaceNumBO> getParkingLotPieChart() {
-        HikvisionResult<List<SpaceNumDTO>> hikvisionResult = gatewayHikvisionFeign.remainSpaceNum(FeignUrlConstant.SPACE_NUM_URL, new ParkSyscodeDTO());
+        HikvisionResult<List<SpaceNumDTO>> hikvisionResult;
+        try{
+            hikvisionResult = gatewayHikvisionFeign.remainSpaceNum(FeignUrlConstant.SPACE_NUM_URL, new ParkSyscodeDTO());
+        }catch (Exception e){
+            log.info("调用海康接口停车场列表错误:{}", e);
+            throw new BusinessException("海康接口查询失败！");
+        }
         log.info("所有停车场列表:{}", hikvisionResult);
-        return BeanConvertorUtils.copyList(hikvisionResult.getData(), SpaceNumBO.class);
+        List<SpaceNumDTO> data = hikvisionResult.getData();
+        if (CollectionUtils.isNotEmpty(data)){
+            return data.stream().map(spaceNumDTO -> new SpaceNumBO().setValue(Long.parseLong(spaceNumDTO.getLeftPlace())).setName(spaceNumDTO.getParkName())).collect(Collectors.toList());
+        }
+        return BeanConvertorUtils.copyList(data, SpaceNumBO.class);
     }
 
     private List<ParkingLotTreeBO> getParkingLotTreeChildren(ParkingLotTreeBO treeBO) {
