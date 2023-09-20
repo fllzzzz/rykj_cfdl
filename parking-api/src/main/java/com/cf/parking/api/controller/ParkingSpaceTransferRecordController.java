@@ -1,6 +1,8 @@
 package com.cf.parking.api.controller;
 
 import javax.annotation.Resource;
+
+import com.alibaba.fastjson.JSON;
 import com.cf.parking.api.request.ParkingSpaceTransferRecordReq;
 import com.cf.parking.api.request.TransferReq;
 import com.cf.parking.api.response.ParkingSpaceTransferRecordRsp;
@@ -62,7 +64,7 @@ public class ParkingSpaceTransferRecordController
         UserSessionDTO user = getUserSessionDTO();
         Long userId = user.getUserId();
         param.setUserId(userId);
-
+        log.info("转赠记录查询参数：{}",JSON.toJSONString(param));
         //2.参数转换
         ParkingSpaceTransferRecordDTO dto = new ParkingSpaceTransferRecordDTO();
         BeanUtils.copyProperties(param,dto);
