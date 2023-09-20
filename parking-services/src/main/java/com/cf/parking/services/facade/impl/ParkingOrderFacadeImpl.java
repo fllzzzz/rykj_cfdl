@@ -14,6 +14,7 @@ import com.cf.parking.facade.enums.*;
 import com.cf.parking.facade.facade.DingTalkMessageFacade;
 import com.cf.parking.facade.facade.OrderDelayFacade;
 import com.cf.parking.facade.facade.ParkingOrderFacade;
+import com.cf.parking.services.constant.ParkingConstants;
 import com.cf.parking.services.job.order.OrderDelayJobUtil;
 import com.cf.parking.services.properties.DingTalkProperties;
 import com.cf.parking.services.service.*;
@@ -125,7 +126,7 @@ public class ParkingOrderFacadeImpl implements ParkingOrderFacade {
         Date orderTime = param.getOrderTime();
         ParkingOrderPO parkingOrderPO = new ParkingOrderPO().setUserId(userId).setOrderTime(orderTime);
         List<ParkingOrderPO> parkingOrderPOS = parkingOrderService.getOrderListByUserIdAndOrderTime(parkingOrderPO).stream().filter(item ->
-                DateFormatUtils.format(orderTime, "yyyy-MM-dd").equals(DateFormatUtils.format(item.getOrderTime(), "yyyy-MM-dd"))
+                DateFormatUtils.format(orderTime, ParkingConstants.SHORT_DATE_FORMAT).equals(DateFormatUtils.format(item.getOrderTime(), ParkingConstants.SHORT_DATE_FORMAT))
         ).collect(Collectors.toList());
         // 获取当天12点
         Date twelveClockTime = this.getSpecifiedTime(orderTime, 12);

@@ -170,3 +170,8 @@ alter table user_space add index batch_id_idx(batch_id,round_id);
 alter table user_space add index schedule_date_idx(schedule_date);
 
 alter table user_space add column  fail_reason varchar(256) default '' comment '失败原因';
+
+alter table lottery_apply_record add index job_number_idx (job_number);
+alter table user_profile add index job_number_idx (job_number);
+
+alter table lottery_batch add unique index batch_num_idx (batch_num);

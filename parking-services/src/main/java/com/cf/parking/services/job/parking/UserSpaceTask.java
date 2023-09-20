@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import com.alibaba.fastjson.JSON;
 import com.cf.parking.dao.po.LotteryResultPO;
 import com.cf.parking.facade.constant.RedisConstant;
+import com.cf.parking.services.constant.ParkingConstants;
 import com.cf.parking.services.enums.LotteryResultStateEnum;
 import com.cf.parking.services.job.annotation.TaskLock;
 import com.cf.parking.services.service.LotteryResultService;
@@ -43,7 +44,7 @@ public class UserSpaceTask {
 	public void dealExpiredSpace() {
 		
 		try {
-			String time = DateUtil.format(new Date(), "yyyy-MM-dd");
+			String time = DateUtil.format(new Date(), ParkingConstants.SHORT_DATE_FORMAT);
 			log.info("删除过期车定时任务：{}",time);
 			userSpaceService.deleteExpiredSpace(time);
 		} catch (Exception e) {
@@ -60,7 +61,7 @@ public class UserSpaceTask {
 	public void parkingDown() {
 		
 		try {
-			String time = DateUtil.format(new Date(), "yyyy-MM-dd");
+			String time = DateUtil.format(new Date(), ParkingConstants.SHORT_DATE_FORMAT);
 			log.info("按照表里的定时器时间进行下发闸机：{}",time);
 			userSpaceService.parkingDownOnStartTtime(time);
 		} catch (Exception e) {

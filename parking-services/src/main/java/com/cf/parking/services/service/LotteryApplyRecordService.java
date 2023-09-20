@@ -3,9 +3,11 @@ package com.cf.parking.services.service;
 import java.util.List;
 import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cf.parking.dao.mapper.LotteryApplyRecordMapper;
@@ -33,6 +35,22 @@ public class LotteryApplyRecordService extends ServiceImpl<LotteryApplyRecordMap
 				.eq(LotteryApplyRecordPO::getBatchId, batchId)
 				.eq(StringUtils.hasText(parkingLot),LotteryApplyRecordPO::getParkingLotCode, parkingLot)
 				);
+	}
+
+
+
+
+	/**
+	 * 
+	 * @param openIdList 工号
+	 * @param result 结果
+	 */
+	public void updateResultByJobNum(List<String> openIdList, String result) {
+		if (CollectionUtils.isEmpty(openIdList)) {
+			return;
+		}
+		LotteryApplyRecordPO record = new LotteryApplyRecordPO().setResult(result);
+		applyRecordMapper.update(record, new LambdaUpdateWrapper<LotteryApplyRecordPO>().in(LotteryApplyRecordPO::getJobNumber, openIdList));
 	}
 
 	

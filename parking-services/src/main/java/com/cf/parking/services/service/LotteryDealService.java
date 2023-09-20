@@ -18,6 +18,7 @@ import com.cf.parking.dao.po.LotteryResultPO;
 import com.cf.parking.dao.po.ParkingLotPO;
 import com.cf.parking.dao.po.UserSpacePO;
 import com.cf.parking.dao.po.UserVerifyPO;
+import com.cf.parking.services.constant.ParkingConstants;
 import com.cf.parking.services.enums.UserSpaceStateEnum;
 import com.cf.support.bean.IdWorker;
 import com.cf.support.exception.BusinessException;
@@ -142,7 +143,7 @@ public class LotteryDealService {
 								.setPlateNo(verify.getPlateNo())
 								.setParkingLot(outSpace.getParkingLot())
 								//转让人车位起始日期比今天晚的话就取转让人车位起始日期，否则就取当前日期+1的日期
-								.setScheduleDate(outSpace.getStartDate().compareTo(DateUtil.endOfDay(new Date())) > 0 ? DateUtil.format(outSpace.getStartDate(), "yyyy-MM-dd")  :  DateUtil.format(DateUtil.beginOfDay( DateUtil.tomorrow()), "yyyy-MM-dd"))
+								.setScheduleDate(outSpace.getStartDate().compareTo(DateUtil.endOfDay(new Date())) > 0 ? DateUtil.format(outSpace.getStartDate(), ParkingConstants.SHORT_DATE_FORMAT)  :  DateUtil.format(DateUtil.beginOfDay( DateUtil.tomorrow()), ParkingConstants.SHORT_DATE_FORMAT))
 								.setStartDate(outSpace.getStartDate())
 								.setEndDate(outSpace.getEndDate())
 								.setState(UserSpaceStateEnum.UNSYNC.getState())
@@ -201,7 +202,7 @@ public class LotteryDealService {
 						if (outSpace.getEndDate().compareTo(park.getStartDate()) < 0) {
 							park.setUpdateTm(new Date())
 									//转让人车位起始日期比今天晚的话就取转让人车位起始日期，否则就取当前日期+1的日期
-									.setScheduleDate(outSpace.getStartDate().compareTo(DateUtil.endOfDay(new Date())) > 0 ? DateUtil.format(outSpace.getStartDate(), "yyyy-MM-dd")  :  DateUtil.format(DateUtil.beginOfDay( DateUtil.tomorrow()), "yyyy-MM-dd"))
+									.setScheduleDate(outSpace.getStartDate().compareTo(DateUtil.endOfDay(new Date())) > 0 ? DateUtil.format(outSpace.getStartDate(), ParkingConstants.SHORT_DATE_FORMAT)  :  DateUtil.format(DateUtil.beginOfDay( DateUtil.tomorrow()), ParkingConstants.SHORT_DATE_FORMAT))
 									.setStartDate(outSpace.getStartDate())
 									.setState(UserSpaceStateEnum.UNSYNC.getState())
 									.setBatchId(outSpace.getBatchId())
@@ -214,7 +215,7 @@ public class LotteryDealService {
 						if (park.getEndDate().compareTo(outSpace.getStartDate()) < 0) {
 							park.setUpdateTm(new Date())
 									//转让人车位起始日期比今天晚的话就取转让人车位起始日期，否则就取当前日期+1的日期
-									.setScheduleDate(outSpace.getStartDate().compareTo(DateUtil.endOfDay(new Date())) > 0 ? DateUtil.format(outSpace.getStartDate(), "yyyy-MM-dd")  :  DateUtil.format(DateUtil.beginOfDay( DateUtil.tomorrow()), "yyyy-MM-dd"))
+									.setScheduleDate(outSpace.getStartDate().compareTo(DateUtil.endOfDay(new Date())) > 0 ? DateUtil.format(outSpace.getStartDate(), ParkingConstants.SHORT_DATE_FORMAT)  :  DateUtil.format(DateUtil.beginOfDay( DateUtil.tomorrow()), ParkingConstants.SHORT_DATE_FORMAT))
 									.setEndDate(outSpace.getEndDate())
 									.setState(UserSpaceStateEnum.UNSYNC.getState())
 									.setBatchId(outSpace.getBatchId())
@@ -237,7 +238,7 @@ public class LotteryDealService {
 								.setPlateNo(plateNo)
 								.setParkingLot(outSpace.getParkingLot())
 								//转让人车位起始日期比今天晚的话就取转让人车位起始日期，否则就取当前日期+1的日期
-								.setScheduleDate(outSpace.getStartDate().compareTo(DateUtil.endOfDay(new Date())) > 0 ? DateUtil.format(outSpace.getStartDate(), "yyyy-MM-dd")  :  DateUtil.format(DateUtil.beginOfDay( DateUtil.tomorrow()), "yyyy-MM-dd"))
+								.setScheduleDate(outSpace.getStartDate().compareTo(DateUtil.endOfDay(new Date())) > 0 ? DateUtil.format(outSpace.getStartDate(), ParkingConstants.SHORT_DATE_FORMAT)  :  DateUtil.format(DateUtil.beginOfDay( DateUtil.tomorrow()), ParkingConstants.SHORT_DATE_FORMAT))
 								.setStartDate(outSpace.getStartDate())
 								.setEndDate(outSpace.getEndDate())
 								.setState(UserSpaceStateEnum.UNSYNC.getState())
@@ -261,7 +262,7 @@ public class LotteryDealService {
 								.setPlateNo(verify.getPlateNo())
 								.setParkingLot(outSpace.getParkingLot())
 								//转让人车位起始日期比今天晚的话就取转让人车位起始日期，否则就取当前日期+1的日期
-								.setScheduleDate(outSpace.getStartDate().compareTo(DateUtil.endOfDay(new Date())) > 0 ? DateUtil.format(outSpace.getStartDate(), "yyyy-MM-dd")  :  DateUtil.format(DateUtil.beginOfDay( DateUtil.tomorrow()), "yyyy-MM-dd"))
+								.setScheduleDate(outSpace.getStartDate().compareTo(DateUtil.endOfDay(new Date())) > 0 ? DateUtil.format(outSpace.getStartDate(), ParkingConstants.SHORT_DATE_FORMAT)  :  DateUtil.format(DateUtil.beginOfDay( DateUtil.tomorrow()), ParkingConstants.SHORT_DATE_FORMAT))
 								.setStartDate(outSpace.getStartDate())
 								.setEndDate(outSpace.getEndDate())
 								.setState(UserSpaceStateEnum.UNSYNC.getState())

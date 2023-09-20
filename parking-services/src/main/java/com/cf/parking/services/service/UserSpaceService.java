@@ -24,6 +24,7 @@ import com.cf.parking.facade.dto.UserSpaceDTO;
 import com.cf.parking.facade.dto.UserSpaceFuncTimeDTO;
 import com.cf.parking.facade.dto.UserSpacePageDTO;
 import com.cf.parking.facade.dto.UserSpaceValidityDTO;
+import com.cf.parking.services.constant.ParkingConstants;
 import com.cf.parking.services.enums.ParkingRemoteCodeEnum;
 import com.cf.parking.services.enums.UserSpaceStateEnum;
 import com.cf.parking.services.integration.ParkInvokeService;
@@ -49,7 +50,6 @@ import java.util.stream.Collectors;
 public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> implements IService<UserSpacePO> {
     // 每次批量保存最大的数量
     private final Integer MAX_BATCH_SAVE_NUM = 500;
-    private final String DATE_FORMAT_STR = "yyyy-MM-dd";
 
     @Resource
 	private IdWorker idWorker;
@@ -104,8 +104,8 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
                 startTime = eachFuncTime.getStartTime();
                 endTime = eachFuncTime.getEndTime();
             }
-            userSpacePO.setStartDate(DateUtil.parse(startTime, DATE_FORMAT_STR));
-            DateTime endDate = DateUtil.parse(endTime, DATE_FORMAT_STR);
+            userSpacePO.setStartDate(DateUtil.parse(startTime, ParkingConstants.SHORT_DATE_FORMAT));
+            DateTime endDate = DateUtil.parse(endTime, ParkingConstants.SHORT_DATE_FORMAT);
             userSpacePO.setEndDate(endDate);
             // 精确到天，结束时间大于等于当前时间
             if (!this.judgeDateBefore(new Date(), endDate)) {
@@ -205,9 +205,9 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
      * @return true:结束时间大于当前时间
      */
     private boolean judgeDateBefore(Date now, Date endDate) {
-        String nowStr = DateUtil.format(now, DATE_FORMAT_STR);
+        String nowStr = DateUtil.format(now, ParkingConstants.SHORT_DATE_FORMAT);
         // 精确到天
-        DateTime nowDate = DateUtil.parse(nowStr, DATE_FORMAT_STR);
+        DateTime nowDate = DateUtil.parse(nowStr, ParkingConstants.SHORT_DATE_FORMAT);
         // 判断
         if (endDate.compareTo(nowDate) >= 0) {
             return true;
@@ -224,7 +224,7 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 	public List<UserSpacePO> querySpaceListByJobNum(List<String> jobNumList) {
 		return CollectionUtils.isEmpty(jobNumList) ? Collections.emptyList(): userSpaceMapper.selectList(new LambdaQueryWrapper<UserSpacePO>()
 					.in(UserSpacePO::getJobNumber, jobNumList)
-					.ge(UserSpacePO::getEndDate, DateUtil.format(new Date(), "yyyy-MM-dd"))
+					.ge(UserSpacePO::getEndDate, DateUtil.format(new Date(), ParkingConstants.SHORT_DATE_FORMAT))
 				);
 	}
 
@@ -343,7 +343,7 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 					.setBatchNum(lottery.getBatchNum())
 					.setRoundId(lottery.getRoundId())
 					//到这一步且userSpacePO不为空，代表目前该车牌存在其它车库的车位，所以定时时间这里应该是车位生效的有效期，到时间后会有定时任务去下发闸机系统
-		 			.setScheduleDate(userSpacePO == null ? null : DateUtil.format(batch.getValidStartDate(), DATE_FORMAT_STR) );
+		 			.setScheduleDate(userSpacePO == null ? null : DateUtil.format(batch.getValidStartDate(), ParkingConstants.SHORT_DATE_FORMAT) );
 		 return userSpace;
 			 
 	}
@@ -416,7 +416,7 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 	public void syncSpace() {
 		UserSpacePO space = userSpaceMapper.selectOne(new LambdaQueryWrapper<UserSpacePO>()
 					.ne(UserSpacePO::getState, UserSpaceStateEnum.SUCCESS.getState())
-					.ge(UserSpacePO::getEndDate, DateUtil.format(new Date(), "yyyy-MM-dd"))
+					.ge(UserSpacePO::getEndDate, DateUtil.format(new Date(), ParkingConstants.SHORT_DATE_FORMAT))
 					.last(" and ifnull(schedule_date,'') = '' limit 1 ")
 				);
 		log.info("获取到待同步车位信息：{}",JSON.toJSONString(space));
