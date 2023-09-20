@@ -332,7 +332,7 @@ public class LotteryDealService {
 				.setId(idWorker.nextId())
 				.setParkingLotCode(outSpace.getParkingLot())
 				.setUpdateTm(new Date())
-				.setUserId(acceptId)
+				.setUserId(userId)
 				.setValidEndDate(outSpace.getEndDate())
 				.setValidStartDate(outSpace.getStartDate())				;
 	}
