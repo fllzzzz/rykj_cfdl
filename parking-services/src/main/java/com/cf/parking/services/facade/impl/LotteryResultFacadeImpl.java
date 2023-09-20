@@ -153,7 +153,7 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 		AssertUtil.checkNull(parkingLot, "停车场信息不存在，请检查设置");
 		AssertUtil.checkTrue(LotteryEnableStateEnum.ENABLE.getState().equals(parkingLot.getType()), "停车场的配置为不可参加摇号，请检查设置");
 		//获取报名的人员,要符合个人中心的车库在这次摇号的车库中这个条件
-		List<LotteryApplyRecordPO> applyList = lotteryApplyRecordService.queryLotteryApplyList(lottery.getBatchId(),parklotCode);
+		List<LotteryApplyRecordPO> applyList = lotteryApplyRecordService.queryLotteryApplyList(lottery.getBatchId(),null);
 		log.info("获取到报名摇号的人员信息：{}",JSON.toJSONString(applyList));
 		if (CollectionUtils.isEmpty(applyList)) {
 			log.info("无报名摇号人员，程序退出");

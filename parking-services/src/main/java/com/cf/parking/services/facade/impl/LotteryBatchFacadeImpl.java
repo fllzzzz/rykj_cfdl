@@ -163,6 +163,7 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Integer update(LotteryBatchOptDTO dto) {
         LotteryBatchPO po = new LotteryBatchPO();
         BeanUtils.copyProperties(dto,po);
@@ -172,11 +173,10 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
         Long[] roundIdArr = dto.getRoundIdArr();
         String roundId = Arrays.toString(roundIdArr).replaceAll("\\s+","");
         po.setRoundId(roundId);
-        try{
             //1.修改前判断是否已通知
             LotteryBatchPO lotteryBatchPO = mapper.selectById(dto.getId());
             AssertUtil.checkNull(lotteryBatchPO, "批次记录不存在");
-            AssertUtil.checkTrue(!LotteryResultStateEnum.UNLOTTERY.getState().equals(lotteryBatchPO.getState()), "已通知，无法删除！");
+            AssertUtil.checkTrue(LotteryBatchStateEnum.NEED_NOTIFY.getState().equals(lotteryBatchPO.getState()), "状态不是待通知，不能进行修改");
 
             //1.修改摇号批次
             int result = mapper.updateById(po);
@@ -203,10 +203,6 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
                 lotteryResultPOList.clear();
             }
             return result;
-        }catch (Exception e){
-            log.error("修改摇号批次失败：{}，失败原因：{}",po,e);
-            return 0;
-        }
     }
 
     /**
@@ -258,9 +254,14 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
         for (Long roundId : roundIdArr) {
             //1.根据轮数查询停车场编码
             LotteryRuleRoundPO round = lotteryRuleRoundFacade.getLotteryRuleRoundByRoundId(roundId);
+            if (round == null) {
+            	continue;
+            }
             //2.根据停车场编码查询车位数量
             ParkingLotPO parkingLot = parkingLotService.selectParkingLotByCode(round.getParkingLotCode());
-            AssertUtil.checkNull(parkingLot, "轮次对应的停车场不存在");
+            if (parkingLot == null) {
+            	continue;
+            }
             parkingAmount += parkingLot.getAmount();
         }
         return parkingAmount;

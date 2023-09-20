@@ -214,7 +214,7 @@ public class LotteryApplyRecordFacadeImpl implements LotteryApplyRecordFacade
 
         LotteryApplyRecordPO insertApplyRecordPO = new LotteryApplyRecordPO();
         insertApplyRecordPO.setId(idWorker.nextId()).setBatchId(batchId).setBatchNum(batchPO.getBatchNum())
-                .setParkingLotCode("todo").setValidStartDate(batchPO.getValidStartDate())
+                .setParkingLotCode(null).setValidStartDate(batchPO.getValidStartDate())
                 .setValidEndDate(batchPO.getValidEndDate()).setUserId(userId)
                 .setUserName(userProfile.getName()).setJobNumber(userProfile.getJobNumber())
                 .setApplyState(LotteryApplyRecordStateEnum.HAVE_APPLIED.getState())
@@ -240,8 +240,7 @@ public class LotteryApplyRecordFacadeImpl implements LotteryApplyRecordFacade
         if (null == lotteryApplyRecordPO){
             throw new BusinessException("未找到报名记录！");
         }
-        lotteryApplyRecordPO.setApplyState(LotteryApplyRecordStateEnum.CANCEL.getState()).setUpdateTm(new Date());
-        return mapper.updateById(lotteryApplyRecordPO);
+        return mapper.deleteById(lotteryApplyRecordPO.getId());
     }
 
 
