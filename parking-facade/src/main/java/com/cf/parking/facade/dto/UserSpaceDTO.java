@@ -39,7 +39,7 @@ public class UserSpaceDTO extends PageRequest implements Serializable {
     private String state;
 
     /** 期号 */
-    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date batchNum;
 
     /** 摇号轮数id */

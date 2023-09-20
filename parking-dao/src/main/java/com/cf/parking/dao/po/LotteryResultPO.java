@@ -28,7 +28,7 @@ public class LotteryResultPO
     private Long batchId;
 
     /** 期号 */
-    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date batchNum;
     
     /** 轮数 */

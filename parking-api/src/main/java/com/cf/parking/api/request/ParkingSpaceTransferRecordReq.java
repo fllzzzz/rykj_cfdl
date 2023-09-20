@@ -21,12 +21,12 @@ public class ParkingSpaceTransferRecordReq extends PageRequest {
 
     /** 转赠日期（起） */
     @ApiModelProperty(value = "转赠日期（起）")
-    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date validStartDate;
 
     /** 转赠日期（止） */
     @ApiModelProperty(value = "转赠日期（止）")
-    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date validEndDate;
 
     /** userId */

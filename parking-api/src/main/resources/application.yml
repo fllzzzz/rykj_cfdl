@@ -11,6 +11,9 @@ spring:
   jackson:
     serialization:
       WRITE_DATES_AS_TIMESTAMPS: true
+    #直接显示日期时，时区转换
+    date-format: yyyy-MM-dd,yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
 
 mybatis-plus:
   mapper-locations: classpath*:/mapping/*.xml

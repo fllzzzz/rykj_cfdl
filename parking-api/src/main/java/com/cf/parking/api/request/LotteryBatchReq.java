@@ -25,12 +25,12 @@ public class LotteryBatchReq extends PageRequest {
 
     /** 开始期号 */
     @ApiModelProperty(value = "开始期号")
-    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date startDate;
 
     /** 结束期号 */
     @ApiModelProperty(value = "结束期号")
-    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date endDate;
 
     /** 摇号规则轮数 */

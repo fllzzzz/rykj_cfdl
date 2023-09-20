@@ -25,12 +25,12 @@ public class LotteryResultReq extends PageRequest {
 
     /** 开始期号 */
     @ApiModelProperty(value = "开始期号")
-    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date startDate;
 
     /** 结束期号 */
     @ApiModelProperty(value = "结束期号")
-    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date endDate;
 
     /** 状态（0：待摇号；1：待确认；2：确认中；3：待发布；4：待归档；5：已归档） */

@@ -20,19 +20,19 @@ public class LotteryApplyBO {
     private Long batchId;
 
     /** 报名开始时间 */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date applyStartTime;
 
     /** 报名结束时间 */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date applyEndTime;
 
     /** 车位有效开始日期 */
-    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date validStartDate;
 
     /** 车位有效结束日期 */
-    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date validEndDate;
 
     /** 摇号结果 */

@@ -17,11 +17,11 @@ import java.util.Date;
 @Accessors(chain = true)
 public class ParkingSpaceTransferRecordDTO extends PageRequest {
     /** 转赠日期（起） */
-    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date validStartDate;
 
     /** 转赠日期（止） */
-    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date validEndDate;
 
     /** userId */

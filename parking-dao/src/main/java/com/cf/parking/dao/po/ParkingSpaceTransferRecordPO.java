@@ -37,19 +37,19 @@ public class ParkingSpaceTransferRecordPO
     private String acceptUserName;
 
     /** 转赠有效开始日期 */
-    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date validStartDate;
 
     /** 转赠有效截止日期 */
-    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date validEndDate;
 
     /** 创建时间 */
-    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date createTm;
 
     /** 更新时间 */
-    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date updateTm;
 
 }
