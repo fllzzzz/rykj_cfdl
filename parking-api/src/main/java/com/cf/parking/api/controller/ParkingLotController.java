@@ -10,10 +10,10 @@ import com.cf.parking.dao.po.UserProfilePO;
 import com.cf.parking.facade.bo.ParkingLotAreaBO;
 import com.cf.parking.facade.bo.ParkingLotBO;
 import com.cf.parking.facade.bo.ParkingLotTreeBO;
+import com.cf.parking.facade.bo.SpaceNumBO;
 import com.cf.parking.facade.constant.ParkingSysCodeConstant;
 import com.cf.parking.facade.dto.*;
 import com.cf.parking.facade.facade.ParkingLotFacade;
-import com.cf.parking.services.integration.GatewayHikvisionFeign;
 import com.cf.parking.services.service.UserProfileService;
 import com.cf.parking.services.utils.AssertUtil;
 import com.cf.parking.services.utils.PageUtils;
@@ -56,9 +56,6 @@ public class ParkingLotController
 
     @Resource
     private UserProfileService userProfileService;
-
-    @Resource
-    private GatewayHikvisionFeign gatewayHikvisionFeign;
 
     @Resource
     private UserAuthenticationServer userAuthenticationServer;
@@ -256,14 +253,12 @@ public class ParkingLotController
     /**
      * 查询停车场列表
      */
-    @ApiOperation(value = "查询停车场列表——小程序端", notes = "查询停车场列表——小程序端")
+    @ApiOperation(value = "查询停车场车位数量饼图——小程序端", notes = "查询停车场车位数量饼图——小程序端")
     @PostMapping("/parkingLot/pieChart")
-    public Result getParkingLotPieChart()
+    public Result<List<SpaceNumRsp>> getParkingLotPieChart()
     {
-        return Result.buildSuccessResult("此接口展示无法调通");
-//        HikvisionResult<List<SpaceNumDTO>> hikvisionResult = gatewayHikvisionFeign.remainSpaceNum(FeignUrlConstant.SPACE_NUM_URL, new ParkSyscodeDTO());
-//        log.info("停车场列表:{}", hikvisionResult);
-//        return Result.buildSuccessResult(hikvisionResult.getData());
+        List<SpaceNumBO> spaceNumBOList = parkingLotFacade.getParkingLotPieChart();
+        return Result.buildSuccessResult(BeanConvertorUtils.copyList(spaceNumBOList,SpaceNumRsp.class));
     }
 
 

@@ -1,5 +1,6 @@
 package com.cf.parking.services.facade.impl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -129,6 +130,8 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
             log.info("新增摇号批次成功  ——  {}",po);
 
             //2.自动生成对应批次的摇号结果记录（选择了几轮就生成几条记录）
+            List<LotteryResultPO> lotteryResultPOList = new ArrayList<>();
+
             for (Long round : roundIdArr) {
             	LotteryResultPO lotteryResultPO = new LotteryResultPO()
                         .setId(idWorker.nextId())
@@ -138,7 +141,12 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
                         .setState(LotteryResultStateEnum.UNLOTTERY.getState())
                         .setCreateTm(new Date())
                         .setUpdateTm(new Date());
-                lotteryResultService.insert(lotteryResultPO);
+                lotteryResultPOList.add(lotteryResultPO);
+            }
+
+            if (CollectionUtils.isNotEmpty(lotteryResultPOList)){
+                lotteryResultService.saveBatch(lotteryResultPOList);
+                lotteryResultPOList.clear();
             }
 
             return result;
@@ -178,6 +186,7 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
             lotteryResultService.batchDeleteByLotteryBatchId(po.getId());
 
             //3.生成新的摇号结果
+            List<LotteryResultPO> lotteryResultPOList = new ArrayList<>();
             for (Long round : roundIdArr) {
             	LotteryResultPO lotteryResultPO = new LotteryResultPO()
                         .setId(idWorker.nextId())
@@ -187,7 +196,11 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
                         .setState(LotteryResultStateEnum.UNLOTTERY.getState())
                         .setCreateTm(new Date())
                         .setUpdateTm(new Date());
-                lotteryResultService.insert(lotteryResultPO);
+                lotteryResultPOList.add(lotteryResultPO);
+            }
+            if (CollectionUtils.isNotEmpty(lotteryResultPOList)){
+                lotteryResultService.saveBatch(lotteryResultPOList);
+                lotteryResultPOList.clear();
             }
             return result;
         }catch (Exception e){
