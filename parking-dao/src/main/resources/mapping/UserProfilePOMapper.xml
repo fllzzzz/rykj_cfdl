@@ -182,7 +182,7 @@
 		update user_profile set parking_lot_region = #{parkingLot}
 		where job_number in
 		<foreach collection="jobNumList" item="jobNum" separator="," open="(" close=")">
-			#{"jobNum"}
+			#{jobNum}
 		</foreach>
     </update>
 </mapper>
