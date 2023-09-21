@@ -2,6 +2,7 @@ package com.cf.parking.api.controller;
 
 import javax.annotation.Resource;
 
+import com.alibaba.fastjson.JSON;
 import com.cf.parking.api.request.LotteryBatchOptReq;
 import com.cf.parking.api.request.LotteryBatchReq;
 import com.cf.parking.api.response.LotteryBatchRsp;
@@ -48,6 +49,7 @@ public class LotteryBatchController
     @PostMapping("/parkingAmountByRound")
     public Result<Long> parkingAmountByRound(@RequestBody LotteryBatchOptReq param)
     {
+    	log.info("根据摇号轮数查询车位数量入参：{}",JSON.toJSONString(param));
         AssertUtil.checkNull(param.getRoundIdArr(),"请选择摇号轮数！");
 
         Long parkingAmount = lotteryBatchFacade.getParkingAmountByRound(param.getRoundIdArr());
@@ -61,6 +63,7 @@ public class LotteryBatchController
     @PostMapping("/list")
     public Result<PageResponse<LotteryBatchRsp>> list(@RequestBody LotteryBatchReq param)
     {
+    	log.info("查询摇号批次列表入参：{}",JSON.toJSONString(param));
         LotteryBatchDTO dto = new LotteryBatchDTO();
         BeanUtils.copyProperties(param,dto);
 
@@ -78,6 +81,7 @@ public class LotteryBatchController
     @PostMapping("/add")
     public Result add(@RequestBody LotteryBatchOptReq param)
     {
+    	log.info("新增摇号批次入参：{}",JSON.toJSONString(param));
         //1.参数校验
         if (null == param.getRoundIdArr() || param.getRoundIdArr().length == 0){
             return  Result.buildErrorResult("请选择摇号轮数！");
@@ -99,6 +103,8 @@ public class LotteryBatchController
     @PostMapping("/update")
     public Result edit(@RequestBody LotteryBatchOptReq param)
     {
+    	log.info("修改摇号批次入参：{}",JSON.toJSONString(param));
+    	
         //1.参数校验
         if (null == param.getRoundIdArr() || param.getRoundIdArr().length == 0){
             return  Result.buildErrorResult("请选择摇号轮数！");
@@ -120,6 +126,7 @@ public class LotteryBatchController
 	@PostMapping("/delete")
     public Result delete(@RequestBody LotteryBatchReq param)
     {
+    	log.info("删除摇号批次入参：{}",JSON.toJSONString(param));
         AssertUtil.checkNull(param.getId(),"请选择要删除的批次！");
 
         Integer result = lotteryBatchFacade.deleteById(param.getId());
@@ -133,6 +140,7 @@ public class LotteryBatchController
     @PostMapping("/notify")
     public Result notify(@RequestBody LotteryBatchReq param)
     {
+    	log.info("下发钉钉通知入参：{}",JSON.toJSONString(param));
         AssertUtil.checkNull(param.getId(),"请选择要通知的批次！");
 
         Integer result = lotteryBatchFacade.notifyAllUserByBatchId(param.getId());
@@ -147,6 +155,7 @@ public class LotteryBatchController
     @PostMapping("/viewResult")
     public Result<PageResponse<LotteryResultDetailPageRsp>> viewResult(@RequestBody LotteryBatchReq param)
     {
+    	log.info("结果查看入参：{}",JSON.toJSONString(param));
         AssertUtil.checkNull(param.getId(),"请选择摇号批次！");
         AssertUtil.checkNull(param.getRoundId(),"请选择摇号轮数！");
         LotteryBatchDTO dto = new LotteryBatchDTO();
