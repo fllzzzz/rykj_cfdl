@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import com.alibaba.fastjson.JSON;
 import com.cf.parking.dao.po.LotteryApplyRecordPO;
@@ -127,6 +128,7 @@ public class LotteryDealService {
 	 * @param verifyList 受让人车牌
 	 * @param inJobNum 受让人工号
 	 */
+	@Transactional(rollbackFor = Exception.class)
 	public void transfer(List<UserSpacePO> outSpaceList, List<UserVerifyPO> verifyList, String inJobNum) {
 		log.info("转让人车位：{},受让人车位：{},受让人工号：{}",JSON.toJSONString(outSpaceList),JSON.toJSONString(verifyList),inJobNum);
 		List<UserSpacePO> addList = new ArrayList<>();
