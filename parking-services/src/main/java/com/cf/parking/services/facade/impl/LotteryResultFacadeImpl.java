@@ -228,7 +228,7 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 		//1.更新状态为已归档
 		LotteryResultPO po = lotteryResultMapper.selectById(id);
 		po.setState(LotteryResultStateEnum.HAVE_ARCHIVED.getState());
-		lotteryResultMapper.updateById(po);
+		int result = lotteryResultMapper.updateById(po);
 
 		//2.查看相同期号下是否还有其他未归档的记录。如果没有，将该期摇号批次表状态变为已结束
 		List<LotteryResultPO> lotteryResultPOList = lotteryResultMapper.selectList(new LambdaQueryWrapper<LotteryResultPO>()
@@ -238,7 +238,7 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 		if (CollectionUtils.isEmpty(lotteryResultPOList)){
 			lotteryBatchService.endByBatchId(po.getBatchId());
 		}
-		return null;
+		return result;
 	}
 
 	/**

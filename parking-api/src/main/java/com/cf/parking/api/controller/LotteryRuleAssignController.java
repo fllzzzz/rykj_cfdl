@@ -7,17 +7,14 @@ import com.cf.parking.api.request.LotteryRuleAssignReq;
 import com.cf.parking.api.response.*;
 import com.cf.parking.dao.po.DepartmentPO;
 import com.cf.parking.dao.po.UserProfilePO;
-import com.cf.parking.facade.bo.LotteryBlackListBO;
 import com.cf.parking.facade.bo.LotteryRuleAssignBO;
-import com.cf.parking.facade.constant.ParkingSysCodeConstant;
-import com.cf.parking.facade.dto.LotteryBlackListDTO;
-import com.cf.parking.facade.dto.LotteryBlackListOptDTO;
 import com.cf.parking.facade.dto.LotteryRuleAssignDTO;
 import com.cf.parking.facade.dto.LotteryRuleAssignOptDTO;
 import com.cf.parking.facade.facade.LotteryRuleAssignFacade;
 import com.cf.parking.services.service.DepartmentService;
 import com.cf.parking.services.service.UserProfileService;
 import com.cf.parking.services.utils.AssertUtil;
+import com.cf.support.authertication.AdminUserAuthentication;
 import com.cf.support.result.PageResponse;
 import com.cf.support.result.Result;
 import com.cf.support.utils.BeanConvertorUtils;
@@ -33,7 +30,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -57,9 +53,12 @@ public class LotteryRuleAssignController
     @Resource
     private UserProfileService userProfileService;
 
+    //————————————————PC端————————————————————
+
     /**
      * 人员列表
      */
+    @AdminUserAuthentication
     @ApiOperation(value = "人员列表", notes = "停车场分配模块中需要使用到人员列表")
     @PostMapping("/userList")
     public Result<List<UserProfileBaseRsp>> userList()
@@ -76,6 +75,7 @@ public class LotteryRuleAssignController
     /**
      * 部门列表
      */
+    @AdminUserAuthentication
     @ApiOperation(value = "部门列表", notes = "停车场分配模块中需要使用到部门列表")
     @PostMapping("/departmentList")
     public Result<List<DepartmentBaseRsp>> departmentList()
@@ -89,13 +89,10 @@ public class LotteryRuleAssignController
     }
 
 
-
-
-
-
     /**
      * 查询摇号规则-停车场分配列表
      */
+    @AdminUserAuthentication
     @ApiOperation(value = "查询摇号规则-停车场分配列表", notes = "根据条件分页查询")
     @PostMapping("/list")
     public Result<PageResponse<LotteryRuleAssignRsp>> list(@RequestBody LotteryRuleAssignReq param)
@@ -112,6 +109,7 @@ public class LotteryRuleAssignController
     /**
      * 新增摇号规则-停车场分配
      */
+    @AdminUserAuthentication
     @ApiOperation(value = "新增摇号规则-停车场分配", notes = "点击新增按钮")
     @PostMapping("/add")
     public Result add(@RequestBody LotteryRuleAssignOptReq param)
@@ -131,6 +129,7 @@ public class LotteryRuleAssignController
     /**
      * 修改摇号规则-停车场分配
      */
+    @AdminUserAuthentication
     @ApiOperation(value = "修改摇号规则-停车场分配", notes = "点击修改按钮")
     @PostMapping("/update")
     public Result update(@RequestBody LotteryRuleAssignOptReq param) {
@@ -156,6 +155,7 @@ public class LotteryRuleAssignController
     /**
      * 删除摇号规则-停车场分配
      */
+    @AdminUserAuthentication
     @ApiOperation(value = "删除摇号规则-停车场分配", notes = "点击删除按钮")
     @PostMapping("/delete")
     public Result delete(@RequestBody LotteryRuleAssignReq param)

@@ -16,7 +16,6 @@ import com.cf.support.exception.BusinessException;
 import com.cf.support.utils.BeanConvertorUtils;
 import com.cf.parking.facade.bo.AdminScoreRecordBO;
 import com.cf.parking.facade.dto.AdminScoresPageDTO;
-import io.swagger.models.auth.In;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -209,17 +208,19 @@ public class UserProfileService extends ServiceImpl<UserProfilePOMapper, UserPro
     }
 
     /**
-     * 如果当前用户的停车场不是默认的，则审核时修改用户默认停车场为"装配楼2期5F停车场"
+     * 如果当前用户没有停车场，则审核时修改用户默认停车场为"装配楼2期5F停车场"
      * @param userId
      */
     public Integer setDefaultParkingLotByUserId(Long userId) {
         UserProfilePO userProfilePO = userProfilePOMapper.selectById(userId);
-        userProfilePO.setParkingLotRegion(ParkingConstants.DEFAULT_PARKINGLOT);
+        if (StringUtils.isBlank(userProfilePO.getParkingLotRegion())) {
+            userProfilePO.setParkingLotRegion(ParkingConstants.DEFAULT_PARKINGLOT);
+        }
         return userProfilePOMapper.updateById(userProfilePO);
     }
 
     /**
-     * 批量修改用户默认停车场为"装配楼2期5F停车场"
+     * 批量修改用户停车场
      * @param userIds
      * @return
      */

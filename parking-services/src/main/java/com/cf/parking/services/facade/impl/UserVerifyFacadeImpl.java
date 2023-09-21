@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cf.parking.dao.mapper.UserVerifyMapper;
+import com.cf.parking.dao.po.UserProfilePO;
 import com.cf.parking.dao.po.UserVerifyPO;
 import com.cf.parking.facade.bo.UserVerifyBO;
 import com.cf.parking.facade.dto.UserVerifyDTO;
@@ -153,13 +154,16 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
     public void batchAudit(UserVerifyOptDTO dto) {
         //1.批量审核
         Integer result = mapper.batchAudit(dto.getIds(), dto.getState(), dto.getReason());
-        //2.如果是审核通过，修改用户默认停车场
+        //2.如果是审核通过，为停车场信息为空的用户默认停车场
         //2.1查询用户ids
         List<UserVerifyPO> poList = mapper.selectBatchIds(dto.getIds());
         List<Long> userIds = poList.stream().filter(po->!ObjectUtils.isEmpty(po.getUserId())).map(UserVerifyPO::getUserId).collect(Collectors.toList());
         //2.2批量更新
-        if (UserVerifyStateEnum.SUCCESS.getState().equals(dto.getState().toString())){
-            userProfileService.batchSetDefaultParkingLotByUserIds(userIds,ParkingConstants.DEFAULT_PARKINGLOT);
+        if (CollectionUtils.isNotEmpty(userIds) && UserVerifyStateEnum.SUCCESS.getState().equals(dto.getState().toString())){
+            //为停车场信息为空的用户默认停车场
+            List<UserProfilePO> userProfilePOList = userProfileService.selectList(userIds);
+            List<Long> changeUserIds = userProfilePOList.stream().filter(po -> StringUtils.isBlank(po.getParkingLotRegion())).map(UserProfilePO::getUserId).collect(Collectors.toList());
+            userProfileService.batchSetDefaultParkingLotByUserIds(changeUserIds,ParkingConstants.DEFAULT_PARKINGLOT);
         }
     }
 

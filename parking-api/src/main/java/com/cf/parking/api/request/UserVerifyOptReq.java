@@ -52,19 +52,19 @@ public class UserVerifyOptReq {
      * 车辆照片
      */
     @ApiModelProperty(value = "车辆照片")
-    private MultipartFile vehicleImg;
+    private String vehicleImg;
 
     /**
      * 行驶证照片path
      */
     @ApiModelProperty(value = "行驶证照片")
-    private MultipartFile drivingPermitImg;
+    private String drivingPermitImg;
 
     /**
      * 驾驶证照片path
      */
     @ApiModelProperty(value = "驾驶证照片")
-    private MultipartFile drivingLicenseImg;
+    private String drivingLicenseImg;
 
     /**
      * 状态(0:默认，1:待审核，2:审核不通过,3:审核通过)

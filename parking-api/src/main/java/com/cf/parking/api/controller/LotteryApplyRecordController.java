@@ -11,6 +11,7 @@ import com.cf.parking.facade.bo.LotteryApplyRecordBO;
 import com.cf.parking.facade.dto.LotteryApplyRecordDTO;
 import com.cf.parking.facade.facade.LotteryApplyRecordFacade;
 import com.cf.parking.services.utils.AssertUtil;
+import com.cf.support.authertication.UserAuthentication;
 import com.cf.support.authertication.UserAuthenticationServer;
 import com.cf.support.authertication.token.dto.UserSessionDTO;
 import com.cf.support.exception.BusinessException;
@@ -57,6 +58,7 @@ public class LotteryApplyRecordController
     /**
      * 打开页面，摇号信息展示
      */
+    @UserAuthentication
     @ApiOperation(value = "摇号信息展示————小程序", notes = "打开申请页面，摇号信息展示")
     @PostMapping("/info")
     public Result<LotteryApplyRsp>  info()
@@ -73,6 +75,7 @@ public class LotteryApplyRecordController
     /**
      * 申请摇号
      */
+    @UserAuthentication
     @ApiOperation(value = "申请摇号————小程序", notes = "点击申请摇号")
     @PostMapping("/apply")
     public Result  apply(@RequestBody LotteryApplyRecordReq param)
@@ -101,6 +104,7 @@ public class LotteryApplyRecordController
     /**
      * 取消摇号
      */
+    @UserAuthentication
     @ApiOperation(value = "取消摇号————小程序", notes = "点击取消摇号")
     @PostMapping("/cancel")
     public Result  cancel(@RequestBody LotteryApplyRecordReq param)
@@ -121,6 +125,7 @@ public class LotteryApplyRecordController
     /**
      * 查询摇号申请记录列表
      */
+    @UserAuthentication
     @ApiOperation(value = "查询摇号申请记录列表————小程序", notes = "根据条件分页查询")
     @PostMapping("/list")
     public Result<PageResponse<LotteryApplyRecordPageRsp>>  getApplyRecordList(@RequestBody LotteryApplyRecordReq param)
