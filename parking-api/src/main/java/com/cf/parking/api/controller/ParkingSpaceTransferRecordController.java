@@ -18,6 +18,8 @@ import com.cf.support.exception.BusinessException;
 import com.cf.support.result.PageResponse;
 import com.cf.support.result.Result;
 import com.cf.support.utils.BeanConvertorUtils;
+
+import cn.hutool.core.date.DateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -60,6 +62,9 @@ public class ParkingSpaceTransferRecordController
     @PostMapping("/list")
     public Result<PageResponse<ParkingSpaceTransferRecordRsp>> list(@RequestBody ParkingSpaceTransferRecordReq param)
     {
+    	if (param.getValidEndDate() != null) {
+    		param.setValidEndDate(DateUtil.endOfDay(param.getValidEndDate()));
+    	}
         //1.获取当前登录用户的信息
         UserSessionDTO user = getUserSessionDTO();
         Long userId = user.getUserId();
