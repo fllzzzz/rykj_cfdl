@@ -23,7 +23,6 @@ public class MvcConfigurer implements WebMvcConfigurer {
         execludePathList.add("/error");
         execludePathList.add("/ops/heart");
         execludePathList.add("/ops/ready");
-        execludePathList.add("/user/verify/**");
     }
 
     /**
