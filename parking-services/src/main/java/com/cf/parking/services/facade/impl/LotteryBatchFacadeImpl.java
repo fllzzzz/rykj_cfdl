@@ -210,9 +210,9 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
      * @param id
      * @return
      */
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Integer deleteById(Long id) {
-        try{
             //1.删除前判断是否已通知
             LotteryBatchPO lotteryBatchPO = mapper.selectById(id);
             AssertUtil.checkNull(lotteryBatchPO, "批次记录不存在");
@@ -225,10 +225,6 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
             //3.删除对应的摇号结果记录
             lotteryResultService.batchDeleteByLotteryBatchId(id);
             return result;
-        }catch (Exception e){
-            log.error("删除摇号批次失败：{}，失败原因：{}",id,e);
-            return 0;
-        }
     }
 
     /**

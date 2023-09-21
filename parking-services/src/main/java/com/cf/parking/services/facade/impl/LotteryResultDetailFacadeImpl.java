@@ -1,7 +1,5 @@
 package com.cf.parking.services.facade.impl;
 
-import java.util.List;
-
 import com.cf.parking.dao.mapper.LotteryResultDetailMapper;
 import com.cf.parking.facade.facade.LotteryResultDetailFacade;
 import org.springframework.beans.factory.annotation.Autowired;
