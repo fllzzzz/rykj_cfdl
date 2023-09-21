@@ -58,7 +58,6 @@ public class ParkingLotService extends ServiceImpl<ParkingLotMapper, ParkingLotP
 		if (parking == null) {
 			return;
 		}
-		result.add(parking.getRegionCode());
 		
 		if (parking.getParentId() == 0) {
 			List<JSONObject> jsonList = JSON.parseArray(parking.getRegionCode(), JSONObject.class);
@@ -66,6 +65,7 @@ public class ParkingLotService extends ServiceImpl<ParkingLotMapper, ParkingLotP
 				jsonList.forEach(item -> result.add(item.getString(REGIONCODE)));
 			}
 		} else {
+			result.add(parking.getRegionCode());
 			recursionParking(result,parking.getParentId());
 		}
 	}

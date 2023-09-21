@@ -240,9 +240,10 @@ public class TestController {
 	public Result addCar() {
 		UserSpaceDTO dto = new UserSpaceDTO();
 		dto.setPlateNo("浙A7D51K")
-		.setParkingLot("4680b7e1ec414a5ebdf48127f73acd71")
-		.setJobNumber("013622186224083959")
-		.setName("张华健")
+		.setParkingLot("4680b7e1ec414a5ebdf48127f73acd71,5a277524d2bc408bbd3097e7ccaf2208,2457999fe2914251976fd333d2816fb2,"
+				+ "aaed725983664c7aa0a1a4dddba3f05c,6dc5132a6a7046c09ffd7be54d27ea49")
+		.setJobNumber("CFDL13914")
+		.setName("陈科狄")
 		.setStartDate(DateUtil.beginOfMonth(new Date()))
 		.setEndDate(DateUtil.endOfMonth(DateUtil.nextMonth()));
 		ParkBaseRespBO<ParkBaseDetailRespBO> result = parkInvokeService.replaceCarInfo(dto);

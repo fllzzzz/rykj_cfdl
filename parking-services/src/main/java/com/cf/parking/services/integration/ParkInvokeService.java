@@ -26,6 +26,7 @@ import com.cf.parking.services.constant.ParkingConstants;
 import com.cf.parking.services.enums.ParkingRemoteCodeEnum;
 import com.cf.parking.services.properties.ParkingProperties;
 import com.cf.parking.services.utils.AssertUtil;
+import com.cf.parking.services.utils.HttpClientUtils;
 import com.cf.support.exception.BusinessException;
 import com.cf.support.utils.HttpClientUtil;
 import com.cf.support.utils.RedisUtil;
@@ -66,7 +67,7 @@ public class ParkInvokeService {
 			AssertUtil.checkNull(info.getLicensePlate(), "权限期限结束时间不能为空");
 
 			Map<String,String> header = getHeaderToken();
-			String reponseContent = HttpClientUtil.post(parkingProperties.getHost() + parkingProperties.getAddCarmanagementUrl(), JSON.toJSONString(info),header);
+			String reponseContent = HttpClientUtils.postJsonWithoutSSL(parkingProperties.getHost() + parkingProperties.getAddCarmanagementUrl(), JSON.toJSONString(info),header);
 			log.info("调用添加车辆接口入参：{},出参:{}",JSON.toJSONString(info),JSON.toJSONString(reponseContent));
 			ParkBaseRespBO<ParkBaseDetailRespBO> resp = JSON.parseObject(reponseContent, new TypeReference<ParkBaseRespBO<ParkBaseDetailRespBO>>() {} );
 			return resp;
