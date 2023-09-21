@@ -26,7 +26,7 @@ public interface UserProfilePOMapper extends BaseMapper<UserProfilePO> {
 
 	/**
 	 * 根据工号设置停车场
-	 * @param applyIdList
+	 * @param jobNumList
 	 * @param parkingLot
 	 */
 	void batchSetParkingLotByJobNum(@Param("jobNumList")List<String> jobNumList,@Param("parkingLot") String parkingLot);

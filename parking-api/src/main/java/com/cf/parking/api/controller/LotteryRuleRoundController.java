@@ -5,17 +5,13 @@ import javax.annotation.Resource;
 import com.cf.parking.api.request.LotteryRuleRoundOptReq;
 import com.cf.parking.api.request.LotteryRuleRoundReq;
 import com.cf.parking.api.response.*;
-import com.cf.parking.dao.po.UserProfilePO;
-import com.cf.parking.facade.bo.LotteryBlackListBO;
-import com.cf.parking.facade.bo.LotteryRuleAssignBO;
 import com.cf.parking.facade.bo.LotteryRuleRoundBO;
 import com.cf.parking.facade.bo.LotteryRuleRoundBaseBO;
-import com.cf.parking.facade.dto.LotteryBlackListDTO;
-import com.cf.parking.facade.dto.LotteryRuleAssignDTO;
 import com.cf.parking.facade.dto.LotteryRuleRoundDTO;
 import com.cf.parking.facade.dto.LotteryRuleRoundOptDTO;
 import com.cf.parking.facade.facade.LotteryRuleRoundFacade;
 import com.cf.parking.services.utils.AssertUtil;
+import com.cf.support.authertication.AdminUserAuthentication;
 import com.cf.support.result.PageResponse;
 import com.cf.support.result.Result;
 import com.cf.support.utils.BeanConvertorUtils;
@@ -31,7 +27,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 摇号规则-轮数Controller
@@ -49,10 +44,12 @@ public class LotteryRuleRoundController
     private LotteryRuleRoundFacade lotteryRuleRoundFacade;
 
 
+    //————————————————PC端————————————————————
 
     /**
      * 查询摇号规则-轮数名称列表
      */
+    @AdminUserAuthentication
     @ApiOperation(value = "查询摇号规则轮数名称列表", notes = "下拉选择时使用")
     @PostMapping("/baseList")
     public Result<List<LotteryRuleRoundBaseRsp>> baseList()
@@ -65,6 +62,7 @@ public class LotteryRuleRoundController
     /**
      * 查询摇号规则-轮数列表
      */
+    @AdminUserAuthentication
     @ApiOperation(value = "查询摇号规则-轮数列表", notes = "根据条件分页查询")
     @PostMapping("/list")
     public Result<PageResponse<LotteryRuleRoundRsp>> list(@RequestBody LotteryRuleRoundReq param)
@@ -82,6 +80,7 @@ public class LotteryRuleRoundController
     /**
      * 新增摇号规则-轮数
      */
+    @AdminUserAuthentication
     @ApiOperation(value = "新增摇号规则-轮数", notes = "点击新增按钮")
     @PostMapping("/add")
     public Result add(@RequestBody LotteryRuleRoundOptReq param)
@@ -101,6 +100,7 @@ public class LotteryRuleRoundController
     /**
      * 修改摇号规则-轮数
      */
+    @AdminUserAuthentication
     @ApiOperation(value = "修改摇号规则-轮数", notes = "点击修改按钮")
     @PostMapping("/update")
     public Result edit(@RequestBody LotteryRuleRoundOptReq param)
@@ -126,6 +126,7 @@ public class LotteryRuleRoundController
     /**
      * 删除摇号规则-轮数
      */
+    @AdminUserAuthentication
     @ApiOperation(value = "删除摇号规则-轮数", notes = "点击删除按钮")
     @PostMapping("/delete")
     public Result delete(@RequestBody LotteryRuleRoundReq param)

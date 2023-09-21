@@ -45,9 +45,12 @@ public class LotteryResultController
     @Resource
     private LotteryResultFacade lotteryResultFacade;
 
+    //————————————————PC端————————————————————
+
     /**
      * 查询摇号结果列表
      */
+    @AdminUserAuthentication
     @ApiOperation(value = "查询摇号结果列表", notes = "根据条件分页查询")
     @PostMapping("/list")
     public Result<PageResponse<LotteryResultPageRsp>> list(@RequestBody LotteryResultReq param)
@@ -63,6 +66,7 @@ public class LotteryResultController
     /**
      * 开始摇号
      */
+    @AdminUserAuthentication
     @ApiOperation(value = "开始摇号", notes = "点击开始摇号按钮")
     @PostMapping("/start")
     public Result start(@RequestBody LotteryResultReq param)
@@ -75,6 +79,7 @@ public class LotteryResultController
     /**
      * 结果确认
      */
+    @AdminUserAuthentication
     @ApiOperation(value = "结果确认", notes = "点击结果确认按钮")
     @PostMapping("/confirm")
     public Result confirm(@RequestBody LotteryResultReq param)
@@ -86,6 +91,7 @@ public class LotteryResultController
     /**
      * 结果发布
      */
+    @AdminUserAuthentication
     @ApiOperation(value = "结果发布", notes = "点击结果发布按钮")
 	@PostMapping("/publish")
     public Result publish(@RequestBody LotteryResultReq param)
@@ -96,6 +102,8 @@ public class LotteryResultController
         return Result.buildSuccessResult();
     }
 
+
+    @AdminUserAuthentication
     @ApiOperation(value = "一键同步", notes = "点击一键同步按钮")
 	@PostMapping("/syncRetry")
     public Result syncRetry(@RequestBody LotteryResultRetryReq param)
@@ -112,6 +120,7 @@ public class LotteryResultController
      * 结果归档
      *
      */
+    @AdminUserAuthentication
     @ApiOperation(value = "结果归档", notes = "点击结果归档按钮")
     @PostMapping("/archive")
     public Result archive(@RequestBody LotteryResultReq param)
@@ -125,6 +134,7 @@ public class LotteryResultController
     /**
      * 摇号结果查询
      */
+    @AdminUserAuthentication
     @ApiOperation(value = "摇号结果查询", notes = "摇号结果查询")
     @PostMapping("/lotteryResult")
     public Result<PageResponse<LotteryResultDetailPageRsp>> lotteryResult(@RequestBody LotteryResultReq param)
@@ -142,6 +152,7 @@ public class LotteryResultController
     /**
      * 确认结果查询（用户车位表中的记录）
      */
+    @AdminUserAuthentication
     @ApiOperation(value = "确认结果查询", notes = "确认结果查询")
     @PostMapping("/confirmResult")
     public Result<List<LotteryResultDetailPageRsp>> confirmResult(@RequestBody UserSpacePageReq param)

@@ -10,6 +10,7 @@ import com.cf.parking.facade.dto.LotteryBlackListDTO;
 import com.cf.parking.facade.dto.LotteryBlackListOptDTO;
 import com.cf.parking.facade.facade.LotteryBlackListFacade;
 import com.cf.parking.services.utils.AssertUtil;
+import com.cf.support.authertication.AdminUserAuthentication;
 import com.cf.support.result.PageResponse;
 import com.cf.support.result.Result;
 import com.cf.support.utils.BeanConvertorUtils;
@@ -38,10 +39,12 @@ public class LotteryBlackListController
     @Resource
     private LotteryBlackListFacade lotteryBlackListFacade;
 
+    //————————————————PC端————————————————————
 
     /**
      * 查询摇号黑名单列表
      */
+    @AdminUserAuthentication
     @ApiOperation(value = "查询摇号黑名单列表", notes = "根据条件分页查询")
     @PostMapping("/list")
     public Result<PageResponse<LotteryBlackListRsp>> list(@RequestBody LotteryBlackListReq param)
@@ -58,6 +61,7 @@ public class LotteryBlackListController
     /**
      * 新增摇号黑名单
      */
+    @AdminUserAuthentication
     @ApiOperation(value = "新增摇号黑名单", notes = "点击新增按钮")
     @PostMapping("/add")
     public Result add(@RequestBody LotteryBlackListOptReq param)
@@ -74,6 +78,7 @@ public class LotteryBlackListController
     /**
      * 修改摇号黑名单
      */
+    @AdminUserAuthentication
     @ApiOperation(value = "修改摇号黑名单", notes = "点击修改按钮")
     @PostMapping("/update")
     public Result update(@RequestBody LotteryBlackListOptReq param)
@@ -89,6 +94,7 @@ public class LotteryBlackListController
     /**
      * 移出摇号黑名单
      */
+    @AdminUserAuthentication
     @ApiOperation(value = "移出摇号黑名单", notes = "点击移出按钮")
     @PostMapping("/move")
     public Result remove(@RequestBody LotteryBlackListReq param)

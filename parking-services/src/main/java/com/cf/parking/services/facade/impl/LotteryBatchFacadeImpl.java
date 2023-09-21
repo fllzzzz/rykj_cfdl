@@ -18,6 +18,7 @@ import com.cf.parking.facade.dto.LotteryBatchOptDTO;
 import com.cf.parking.facade.facade.LotteryBatchFacade;
 import com.cf.parking.services.enums.LotteryBatchStateEnum;
 import com.cf.parking.services.enums.LotteryResultStateEnum;
+import com.cf.parking.services.service.LotteryBatchService;
 import com.cf.parking.services.service.LotteryResultService;
 import com.cf.parking.services.service.ParkingLotService;
 import com.cf.parking.services.service.UserProfileService;
@@ -63,6 +64,9 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
 
     @Resource
     private UserProfileService userProfileService;
+
+    @Resource
+    private LotteryBatchService lotteryBatchService;
 
     @Resource
     private DingTalkBean dingTalkBean;
@@ -292,6 +296,21 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
         lotteryBatchPO.setState(LotteryBatchStateEnum.HAVE_NOTIFIED.getState());
         return mapper.updateById(lotteryBatchPO);
 
+    }
+
+    /**
+     * 判断本期车位有效期是否正确（本期车位有效开始日期要晚于上一批车位有效截止日期）
+     * @param validStartDate
+     * @return
+     */
+    @Override
+    public boolean judgeValidStartDateUsable(Date validStartDate) {
+        //1.查询上期（当前数据库内最新一期状态为非“待通知”的）
+        LotteryBatchPO batchPO = lotteryBatchService.getNotifiedLatestBatchInfo();
+        if (null != batchPO){
+            return validStartDate.compareTo(batchPO.getValidEndDate()) >= 1;
+        }
+        return true;
     }
 
 

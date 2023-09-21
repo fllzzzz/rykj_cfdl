@@ -77,6 +77,7 @@
         <knife4j.version>2.0.6</knife4j.version>
         <logback-classic.version>1.2.3</logback-classic.version>
         <logback-kafka.version>0.2.0-RC1</logback-kafka.version>
+        <thumbnailator.version>0.4.20</thumbnailator.version>
         
     </properties>
 
@@ -369,6 +370,13 @@
 	      <version>${logback-kafka.version}</version>
 	      <scope>runtime</scope>
 	    </dependency>
+
+        <!--图片压缩-->
+        <dependency>
+            <groupId>net.coobird</groupId>
+            <artifactId>thumbnailator</artifactId>
+            <version>${thumbnailator.version}</version>
+        </dependency>
 		
 
         </dependencies>

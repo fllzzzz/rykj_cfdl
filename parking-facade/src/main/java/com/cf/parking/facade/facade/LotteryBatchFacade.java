@@ -6,6 +6,7 @@ import com.cf.parking.facade.dto.LotteryBatchDTO;
 import com.cf.parking.facade.dto.LotteryBatchOptDTO;
 import com.cf.support.result.PageResponse;
 
+import java.util.Date;
 
 
 /**
@@ -66,4 +67,11 @@ public interface LotteryBatchFacade
      * @param id
      */
     Integer notifyAllUserByBatchId(Long id);
+
+    /**
+     * 判断本期车位有效期是否正确（本期车位有效开始日期要晚于上一批车位有效截止日期）
+     * @param validStartDate
+     * @return
+     */
+    boolean judgeValidStartDateUsable(Date validStartDate);
 }

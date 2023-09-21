@@ -32,7 +32,6 @@ import java.util.List;
  * @author
  * @date 2023-09-05
  */
-//@UserAuthentication
 @Api(tags = "车位转赠记录管理模块——摇号系统")
 @Slf4j
 @RestController
@@ -48,10 +47,13 @@ public class ParkingSpaceTransferRecordController
     private UserSessionDTO getUser() {
         return userAuthenticationServer.getCurrentUser();
     }
-    
+
+    //————————————————小程序端————————————————————
+
     /**
      * 查询车位转赠记录列表
      */
+    @UserAuthentication
     @ApiOperation(value = "查询车位转赠记录列表————小程序", notes = "根据条件分页查询")
     @PostMapping("/list")
     public Result<PageResponse<ParkingSpaceTransferRecordRsp>> list(@RequestBody ParkingSpaceTransferRecordReq param)
@@ -80,6 +82,7 @@ public class ParkingSpaceTransferRecordController
     }
 
 
+    @UserAuthentication
     @ApiOperation(value = "车位转赠————小程序", notes = "车位转赠")
     @PostMapping("/transfer")
     public Result transfer( @RequestBody String jobNum){

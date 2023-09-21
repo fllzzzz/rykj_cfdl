@@ -17,6 +17,8 @@ import com.cf.parking.facade.facade.ParkingLotFacade;
 import com.cf.parking.services.service.UserProfileService;
 import com.cf.parking.services.utils.AssertUtil;
 import com.cf.parking.services.utils.PageUtils;
+import com.cf.support.authertication.AdminUserAuthentication;
+import com.cf.support.authertication.UserAuthentication;
 import com.cf.support.authertication.UserAuthenticationServer;
 import com.cf.support.authertication.token.dto.UserSessionDTO;
 import com.cf.support.exception.BusinessException;
@@ -69,6 +71,7 @@ public class ParkingLotController
     /**
      * 停车场基础信息列表
      */
+    @AdminUserAuthentication
     @ApiOperation(value = "停车场'区域-区域编号'列表", notes = "其他模块中需要使用停车场信息时调用此方法")
     @PostMapping("/baseList")
     public Result<List<ParkingLotBaseRsp>> baseList()
@@ -82,6 +85,7 @@ public class ParkingLotController
     /**
      * 查询停车场树形列表
      */
+    @AdminUserAuthentication
     @ApiOperation(value = "查询停车场树形列表", notes = "查询停车场树形列表")
     @PostMapping("/treeList")
     public Result<List<ParkingLotTreeRsp>> treeList()
@@ -95,6 +99,7 @@ public class ParkingLotController
     /**
      * 园区列表
      */
+    @AdminUserAuthentication
     @ApiOperation(value = "园区列表", notes = "页面左侧园区列表")
     @PostMapping("/areaList")
     public Result<List<ParkingLotAreaRsp>> areaList(@RequestBody ParkingLotReq req)
@@ -107,6 +112,7 @@ public class ParkingLotController
     /**
      * 查询停车场列表
      */
+    @AdminUserAuthentication
     @ApiOperation(value = "查询停车场列表", notes = "根据条件分页查询")
     @PostMapping("/list")
     public Result<PageResponse<ParkingLotRsp>> list(@RequestBody ParkingLotReq param)
@@ -125,6 +131,7 @@ public class ParkingLotController
     /**
      * 新增园区
      */
+    @AdminUserAuthentication
     @ApiOperation(value = "新增园区", notes = "点击园区新增按钮")
     @PostMapping("/addArea")
     public Result addArea(@RequestBody ParkingLotAreaOptReq param)
@@ -149,6 +156,7 @@ public class ParkingLotController
     /**
      * 修改园区
      */
+    @AdminUserAuthentication
     @ApiOperation(value = "修改园区", notes = "点击园区右侧的修改按钮")
     @PostMapping("/updateArea")
     public Result updateArea(@RequestBody ParkingLotAreaOptReq param)
@@ -173,6 +181,7 @@ public class ParkingLotController
     /**
      * 新增停车场
      */
+    @AdminUserAuthentication
     @ApiOperation(value = "新增停车场", notes = "点击新增按钮")
     @PostMapping("/add")
     public Result add(@RequestBody ParkingLotOptReq param)
@@ -192,6 +201,7 @@ public class ParkingLotController
     /**
      * 修改停车场
      */
+    @AdminUserAuthentication
     @ApiOperation(value = "修改停车场", notes = "点击修改按钮")
     @PostMapping("/update")
     public Result update(@RequestBody ParkingLotOptReq param)
@@ -218,6 +228,7 @@ public class ParkingLotController
     /**
      * 删除停车场
      */
+    @AdminUserAuthentication
     @ApiOperation(value = "删除停车场", notes = "点击删除按钮")
     @PostMapping("/delete")
     public Result delete(@RequestBody ParkingLotReq param)
@@ -233,6 +244,7 @@ public class ParkingLotController
     /**
      * 查询个人停车场
      */
+    @UserAuthentication
     @ApiOperation(value = "查询个人停车场——小程序端", notes = "查询个人停车场——小程序端")
     @PostMapping("/parkingLot/name")
     public Result<String> getParkingLotInfo()
@@ -253,14 +265,12 @@ public class ParkingLotController
     /**
      * 查询停车场列表
      */
+//    @UserAuthentication
     @ApiOperation(value = "查询停车场车位数量饼图——小程序端", notes = "查询停车场车位数量饼图——小程序端")
     @PostMapping("/parkingLot/pieChart")
     public Result<List<SpaceNumRsp>> getParkingLotPieChart()
     {
         List<SpaceNumBO> spaceNumBOList = parkingLotFacade.getParkingLotPieChart();
-//        spaceNumBOList.add(new SpaceNumBO().setName("停车场1").setValue(20L));
-//        spaceNumBOList.add(new SpaceNumBO().setName("停车场2").setValue(15L));
-//        spaceNumBOList.add(new SpaceNumBO().setName("停车场2").setValue(8L));
         return Result.buildSuccessResult(BeanConvertorUtils.copyList(spaceNumBOList,SpaceNumRsp.class));
     }
 

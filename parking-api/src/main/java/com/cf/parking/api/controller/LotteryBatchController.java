@@ -12,6 +12,8 @@ import com.cf.parking.facade.dto.LotteryBatchDTO;
 import com.cf.parking.facade.dto.LotteryBatchOptDTO;
 import com.cf.parking.facade.facade.LotteryBatchFacade;
 import com.cf.parking.services.utils.AssertUtil;
+import com.cf.support.authertication.AdminUserAuthentication;
+import com.cf.support.exception.BusinessException;
 import com.cf.support.result.PageResponse;
 import com.cf.support.result.Result;
 import com.cf.support.utils.BeanConvertorUtils;
@@ -41,9 +43,12 @@ public class LotteryBatchController
     @Resource
     private LotteryBatchFacade lotteryBatchFacade;
 
+    //————————————————PC端————————————————————
+
     /**
      * 根据摇号轮数查询车位数量
      */
+    @AdminUserAuthentication
     @ApiOperation(value = "根据摇号轮数查询车位数量", notes = "根据摇号轮数查询车位数量")
     @PostMapping("/parkingAmountByRound")
     public Result<Long> parkingAmountByRound(@RequestBody LotteryBatchOptReq param)
@@ -57,6 +62,7 @@ public class LotteryBatchController
     /**
      * 查询摇号批次列表
      */
+    @AdminUserAuthentication
     @ApiOperation(value = "查询摇号批次列表", notes = "根据条件分页查询")
     @PostMapping("/list")
     public Result<PageResponse<LotteryBatchRsp>> list(@RequestBody LotteryBatchReq param)
@@ -74,34 +80,55 @@ public class LotteryBatchController
      * 新增摇号批次
      * (新增摇号批次时自动生成摇号结果)
      */
+    @AdminUserAuthentication
     @ApiOperation(value = "新增摇号批次", notes = "点击新增按钮")
     @PostMapping("/add")
     public Result add(@RequestBody LotteryBatchOptReq param)
     {
         //1.参数校验
-        if (null == param.getRoundIdArr() || param.getRoundIdArr().length == 0){
-            return  Result.buildErrorResult("请选择摇号轮数！");
+        paramVerify(param);
+
+        //2.判断本期车位有效期是否正确（本期车位有效开始日期要晚于上一批车位有效截止日期）
+        if (!lotteryBatchFacade.judgeValidStartDateUsable(param.getValidStartDate())){
+            return Result.buildErrorResult("车位有效期不能晚于上一期！");
         }
 
-        //2.参数转换
+        //3.参数转换
         LotteryBatchOptDTO dto = new LotteryBatchOptDTO();
         BeanUtils.copyProperties(param,dto);
 
+        //4.新增
         Integer result = lotteryBatchFacade.add(dto);
         return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult("批次新增失败，请重试！");
+    }
+
+    private void paramVerify(LotteryBatchOptReq param) {
+        if (null == param.getRoundIdArr() || param.getRoundIdArr().length == 0){
+            throw new BusinessException("请选择摇号轮数！");
+        }
+        AssertUtil.checkNull(param.getBatchNum(),"期号不能为空！");
+        AssertUtil.checkNull(param.getParkingAmount(),"车位数量不能为空！");
+        AssertUtil.checkNull(param.getApplyStartTime(),"报名开始时间不能为空！");
+        AssertUtil.checkNull(param.getApplyEndTime(),"报名结束时间不能为空！");
+        AssertUtil.checkNull(param.getValidStartDate(),"车位有效开始日期不能为空！");
+        AssertUtil.checkNull(param.getValidEndDate(),"车位有效结束日期不能为空！");
     }
 
     /**
      * 修改摇号批次
      * (修改前要判断是否已通知)
      */
+    @AdminUserAuthentication
     @ApiOperation(value = "修改摇号批次", notes = "点击修改按钮")
     @PostMapping("/update")
     public Result edit(@RequestBody LotteryBatchOptReq param)
     {
         //1.参数校验
-        if (null == param.getRoundIdArr() || param.getRoundIdArr().length == 0){
-            return  Result.buildErrorResult("请选择摇号轮数！");
+        paramVerify(param);
+
+        //2.判断本期车位有效期是否正确（本期车位有效开始日期要晚于上一批车位有效截止日期）
+        if (!lotteryBatchFacade.judgeValidStartDateUsable(param.getValidStartDate())){
+            return Result.buildErrorResult("车位有效期不能晚于上一期！");
         }
 
         //2.参数转换
@@ -114,8 +141,9 @@ public class LotteryBatchController
 
     /**
      * 删除摇号批次
-     * (修改前要判断是否已通知)
+     * (删除前要判断是否已通知)
      */
+    @AdminUserAuthentication
     @ApiOperation(value = "删除摇号批次", notes = "点击删除按钮")
 	@PostMapping("/delete")
     public Result delete(@RequestBody LotteryBatchReq param)
@@ -129,6 +157,7 @@ public class LotteryBatchController
     /**
      * 下发钉钉通知
      */
+    @AdminUserAuthentication
     @ApiOperation(value = "下发钉钉通知", notes = "点击通知按钮")
     @PostMapping("/notify")
     public Result notify(@RequestBody LotteryBatchReq param)
@@ -143,6 +172,7 @@ public class LotteryBatchController
     /**
      * 结果查看
      */
+    @AdminUserAuthentication
     @ApiOperation(value = "结果查看", notes = "点击结果查看按钮")
     @PostMapping("/viewResult")
     public Result<PageResponse<LotteryResultDetailPageRsp>> viewResult(@RequestBody LotteryBatchReq param)

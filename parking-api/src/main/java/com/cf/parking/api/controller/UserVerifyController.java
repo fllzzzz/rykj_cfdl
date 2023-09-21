@@ -22,8 +22,8 @@ import com.cf.support.utils.BeanConvertorUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import net.coobird.thumbnailator.Thumbnails;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.poi.util.IOUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -45,7 +45,6 @@ import java.util.List;
 @Api(tags = "车辆审核模块——摇号系统")
 @Slf4j
 @RestController
-@AdminUserAuthentication
 @RequestMapping("/user/verify")
 public class UserVerifyController {
 
@@ -59,7 +58,11 @@ public class UserVerifyController {
     private LotteryBlackListService lotteryBlackListService;
 
     private UserSessionDTO getUser() {
-        return userAuthenticationServer.getCurrentUser();
+        UserSessionDTO userSessionDTO = new UserSessionDTO();
+        userSessionDTO.setServerName("魏慧");
+        userSessionDTO.setUserId(1668559697477717L);
+        return userSessionDTO;
+//        return userAuthenticationServer.getCurrentUser();
     }
 
 
@@ -68,6 +71,7 @@ public class UserVerifyController {
     /**
      * 查询车辆审核列表
      */
+    @AdminUserAuthentication
     @ApiOperation(value = "查询车辆审核列表", notes = "根据条件分页查询")
     @PostMapping("/list")
     public Result<PageResponse<UserVerifyRsp>> list(@RequestBody UserVerifyReq param)
@@ -84,6 +88,7 @@ public class UserVerifyController {
     /**
      * 审核车辆
      */
+    @AdminUserAuthentication
     @ApiOperation(value = "审核车辆", notes = "审核界面点击确定按钮")
     @PostMapping("/audit")
     public Result audit(@RequestBody UserVerifyOptReq param)
@@ -97,6 +102,7 @@ public class UserVerifyController {
     /**
      * 批量审核车辆
      */
+    @AdminUserAuthentication
     @ApiOperation(value = "批量审核车辆", notes = "点击批量审核按钮")
     @PostMapping("/batchAudit")
     public Result batchAudit(@RequestBody UserVerifyOptReq param)
@@ -118,6 +124,7 @@ public class UserVerifyController {
     /**
      * 获取个人车牌号列表
      */
+//    @UserAuthentication
     @ApiOperation(value = "获取个人车辆列表——小程序", notes = "小程序端个人的车辆列表")
     @PostMapping("/vehicleList")
     public Result<List<String>> vehicleList()
@@ -133,6 +140,7 @@ public class UserVerifyController {
     /**
      * 获取个人车辆审核详细信息
      */
+//    @UserAuthentication
     @ApiOperation(value = "获取个人车辆审核详细信息——小程序", notes = "选择停车场后，自动调用查询")
     @PostMapping("/info")
     public Result<UserVerifyRsp> getInfo(@RequestBody UserVerifyReq param)
@@ -157,12 +165,59 @@ public class UserVerifyController {
     }
 
     /**
+     * 单张文件上传(转为base64返回给前端)
+     */
+//    @UserAuthentication
+    @ApiOperation(value = "单张文件上传——小程序", notes = "单张文件上传")
+    @PostMapping("/imageUpload")
+    public Result<String> imageUpload(MultipartFile image)  {
+        //1.参数校验
+        if (null == image){
+            return Result.buildErrorResult("未接收到图片！");
+        }
+        if (!PictureInfoEnum.CONTENT_TYPE_JPG.getInfo().equals(image.getContentType()) &&
+                !PictureInfoEnum.CONTENT_TYPE_PNG.getInfo().equals(image.getContentType())){
+            throw new BusinessException("请上传JPG或PNG类型的图片");
+        }
+
+        //2.图片压缩
+        byte[] compressedBytes;
+        try {
+            compressedBytes = imageCompress(image);
+            log.info("压缩后文件大小：{}kb",compressedBytes.length/1024);
+        } catch (IOException e) {
+            log.error("图片压缩失败：{}",e);
+            return Result.buildErrorResult("图片压缩失败,请重试！");
+        }
+
+        //2.图片转为base64
+        String base64ImgStr = null;
+        try {
+            base64ImgStr = getBase64ImgStr(compressedBytes,image.getContentType());
+        } catch (IOException e) {
+            log.error("图片转base64失败：{}",e);
+            return Result.buildErrorResult("图片转换失败，请重试！");
+        }
+
+        log.info("转换后的base64：{}",base64ImgStr);
+        return Result.buildSuccessResult(base64ImgStr);
+    }
+
+    //图片压缩
+    private byte[] imageCompress(MultipartFile image) throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        //scale:0-1,表示占原图片的长宽比；outputQuality：0-1，表示压缩质量，1最好，0最差；outputFormat：jpg，将图片压缩后的格式设置成jpg，因为png格式是一种无损的图片格式，无法正确压缩
+        Thumbnails.of(image.getInputStream()).scale(1).outputQuality(0.4f).outputFormat("jpg").toOutputStream(outputStream);
+        return outputStream.toByteArray();
+    }
+
+    /**
      * 新增车辆审核
      */
-    @UserAuthentication
+//    @UserAuthentication
     @ApiOperation(value = "新增车辆审核——小程序", notes = "移动端个人中心模块点击车辆录入")
     @PostMapping("/add")
-    public Result add(UserVerifyOptReq param)
+    public Result add(@RequestBody UserVerifyOptReq param)
     {
         //1.获取当前登录用户的信息
         UserSessionDTO user = getUserSessionDTO();
@@ -185,16 +240,12 @@ public class UserVerifyController {
         //3.参数校验
         paramVerify(param);
 
-        UserVerifyOptDTO dto;
-        try {
-            //4.参数生成（图片转换）
-            dto = optReq2OptDto(param);
-            dto.setUserId(userId);
-            dto.setUserName(user.getServerName());
-        } catch (IOException e) {
-            log.error("用户{}上传车辆信息审核时图片转换异常:{}",user.getServerName(),e);
-            return Result.buildErrorResult("图片上传异常，请重试！");
-        }
+        //4.参数转换
+        UserVerifyOptDTO  dto = BeanConvertorUtils.map(param, UserVerifyOptDTO.class);
+        dto.setUserId(getUser().getUserId());
+        dto.setUserName(getUser().getServerName());
+
+        //5.新增
         Integer result = userVerifyFacade.add(dto);
         return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult("提交审核失败，请重试！");
     }
@@ -207,48 +258,28 @@ public class UserVerifyController {
         return user;
     }
 
-    private UserVerifyOptDTO optReq2OptDto(UserVerifyOptReq param) throws IOException {
-        UserVerifyOptDTO dto = new UserVerifyOptDTO();
-        dto.setUserId(getUser().getUserId());
-        dto.setUserName(getUser().getServerName());
-        dto.setPlateNo(param.getPlateNo());
-        //4.1三张图片转base64
-        dto.setVehicleImg(getBase64ImgStr(param.getVehicleImg()));
-        dto.setDrivingLicenseImg(getBase64ImgStr(param.getDrivingLicenseImg()));
-        dto.setDrivingPermitImg(getBase64ImgStr(param.getDrivingPermitImg()));
-        return dto;
-    }
-
-    private String getBase64ImgStr(MultipartFile file) throws IOException {
-        if (PictureInfoEnum.CONTENT_TYPE_JPG.getInfo().equals(file.getContentType())){
-            return PictureInfoEnum.BASE64_JPG_PRE.getInfo() + Base64.getEncoder().encodeToString(IOUtils.toByteArray(file.getInputStream()));
-        }
-        return PictureInfoEnum.BASE64_PNG_PRE.getInfo() + Base64.getEncoder().encodeToString(IOUtils.toByteArray(file.getInputStream()));
+    private String getBase64ImgStr(byte[] compressedBytes,String contentType) throws IOException {
+//        if (PictureInfoEnum.CONTENT_TYPE_JPG.getInfo().equals(contentType)){
+            return PictureInfoEnum.BASE64_JPG_PRE.getInfo() + Base64.getEncoder().encodeToString(compressedBytes);
+//        }
+//        return PictureInfoEnum.BASE64_PNG_PRE.getInfo() + Base64.getEncoder().encodeToString(compressedBytes);
     }
 
     private void paramVerify(UserVerifyOptReq param) {
         AssertUtil.checkNull(param.getPlateNo(),"请输入车牌号！");
         AssertUtil.checkNull(param.getVehicleImg(),"请上传车辆照片！");
-        picContentTypeVerify(param.getVehicleImg().getContentType());
         AssertUtil.checkNull(param.getDrivingLicenseImg(),"请上传驾驶证照片！");
-        picContentTypeVerify(param.getDrivingLicenseImg().getContentType());
         AssertUtil.checkNull(param.getDrivingPermitImg(),"请上传行驶证照片！");
-        picContentTypeVerify(param.getDrivingPermitImg().getContentType());
     }
 
-    private void picContentTypeVerify(String contentType) {
-        if (!PictureInfoEnum.CONTENT_TYPE_JPG.getInfo().equals(contentType) &&
-                !PictureInfoEnum.CONTENT_TYPE_PNG.getInfo().equals(contentType)){
-            throw new BusinessException("请上传JPG或PNG类型的图片");
-        }
-    }
 
     /**
      * 修改个人车辆审核详细信息
      */
+//    @UserAuthentication
     @ApiOperation(value = "修改个人车辆审核详细信息——小程序", notes = "修改个人车辆审核详细信息")
     @PostMapping("/update")
-    public Result update(UserVerifyOptReq param)
+    public Result update(@RequestBody UserVerifyOptReq param)
     {
         //1.获取当前登录用户的信息
         UserSessionDTO user = getUserSessionDTO();
@@ -265,19 +296,13 @@ public class UserVerifyController {
         paramVerify(param);
 
         //4.参数转换
-        UserVerifyOptDTO dto;
-        try {
-            //4.参数生成（图片转换）
-            dto = optReq2OptDto(param);
-            dto.setId(param.getId());
-            dto.setUserId(userId);
-            dto.setUserName(user.getServerName());
-        } catch (IOException e) {
-            log.error("用户{}上传车辆信息审核时图片转换异常:{}",user.getServerName(),e);
-            return Result.buildErrorResult("图片上传异常，请重试！");
-        }
+        UserVerifyOptDTO  dto = BeanConvertorUtils.map(param, UserVerifyOptDTO.class);
+        dto.setId(param.getId());
+        dto.setUserId(getUser().getUserId());
+        dto.setUserName(getUser().getServerName());
 
-        //4.修改
+
+        //5.修改
         Integer result = userVerifyFacade.update(dto);
         return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult("提交审核失败，请重试！");
     }
@@ -285,6 +310,7 @@ public class UserVerifyController {
     /**
      * 删除个人车辆信息
      */
+//    @UserAuthentication
     @ApiOperation(value = "删除个人车辆信息——小程序", notes = "删除个人车辆信息")
     @PostMapping("/delete")
     public Result<String> delete(@RequestBody UserVerifyReq param)
