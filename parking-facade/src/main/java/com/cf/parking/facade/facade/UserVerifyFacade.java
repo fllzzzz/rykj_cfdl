@@ -70,4 +70,11 @@ public interface UserVerifyFacade {
      * @return
      */
     Integer deleteById(Long id);
+
+    /**
+     * 根据id查询车辆审核记录详细信息
+     * @param id
+     * @return
+     */
+    UserVerifyBO getUserVerifyInfoById(Long id);
 }

@@ -68,6 +68,11 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
                 .orderByDesc(UserVerifyPO::getCreateTm);
 
         Page<UserVerifyPO> poPage = mapper.selectPage(page, queryWrapper);
+        poPage.getRecords().forEach(userVerifyPO -> {
+            userVerifyPO.setVehicleImg("");
+            userVerifyPO.setDrivingLicenseImg("");
+            userVerifyPO.setDrivingPermitImg("");
+        });
         List<UserVerifyBO> boList = BeanConvertorUtils.copyList(poPage.getRecords(), UserVerifyBO.class);
         return PageUtils.toResponseList(page,boList);
     }
@@ -224,6 +229,18 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
     @Override
     public Integer deleteById(Long id) {
         return mapper.deleteById(id);
+    }
+
+
+    /**
+     * 根据id查询车辆审核记录详细信息
+     * @param id
+     * @return
+     */
+    @Override
+    public UserVerifyBO getUserVerifyInfoById(Long id) {
+        UserVerifyPO po = mapper.selectById(id);
+        return BeanConvertorUtils.map(po, UserVerifyBO.class);
     }
 
 }

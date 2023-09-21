@@ -84,6 +84,22 @@ public class UserVerifyController {
         return Result.buildSuccessResult(new PageResponse(verifyRsps,result.getPageNo(),result.getTotal(),result.getPageSize()));
     }
 
+    /**
+     * 获取单条审核车辆审核详细信息
+     */
+    @UserAuthentication
+    @ApiOperation(value = "获取个人车辆审核详细信息——小程序", notes = "选择停车场后，自动调用查询")
+    @PostMapping("/infoById")
+    public Result<UserVerifyRsp> getInfoById(@RequestBody UserVerifyReq param)
+    {
+        //1.参数校验
+        AssertUtil.checkNull(param.getId(),"请选择要审核的记录！");
+
+        //2.查询
+        UserVerifyBO bo = userVerifyFacade.getUserVerifyInfoById(param.getId());
+        return Result.buildSuccessResult(BeanConvertorUtils.map(bo, UserVerifyRsp.class));
+    }
+
 
     /**
      * 审核车辆

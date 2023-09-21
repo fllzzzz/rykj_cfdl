@@ -15,6 +15,7 @@ import com.cf.parking.services.service.DepartmentService;
 import com.cf.parking.services.service.UserProfileService;
 import com.cf.parking.services.utils.AssertUtil;
 import com.cf.support.authertication.AdminUserAuthentication;
+import com.cf.support.authertication.UserAuthentication;
 import com.cf.support.result.PageResponse;
 import com.cf.support.result.Result;
 import com.cf.support.utils.BeanConvertorUtils;
@@ -58,7 +59,6 @@ public class LotteryRuleAssignController
     /**
      * 人员列表
      */
-    @AdminUserAuthentication
     @ApiOperation(value = "人员列表", notes = "停车场分配模块中需要使用到人员列表")
     @PostMapping("/userList")
     public Result<List<UserProfileBaseRsp>> userList()
@@ -75,7 +75,6 @@ public class LotteryRuleAssignController
     /**
      * 部门列表
      */
-    @AdminUserAuthentication
     @ApiOperation(value = "部门列表", notes = "停车场分配模块中需要使用到部门列表")
     @PostMapping("/departmentList")
     public Result<List<DepartmentBaseRsp>> departmentList()
