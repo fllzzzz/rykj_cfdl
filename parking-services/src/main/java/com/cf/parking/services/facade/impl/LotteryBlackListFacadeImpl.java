@@ -87,10 +87,7 @@ public class LotteryBlackListFacadeImpl implements LotteryBlackListFacade
         } catch (DataIntegrityViolationException e){
             log.error("添加黑名单重复：{}，失败原因：{}",po,e);
             throw new BusinessException("该用户已在黑名单，无须重复添加");
-        } catch (Exception e){
-            log.error("添加黑名单失败：{}，失败原因：{}",po,e);
-            return 0;
-        }
+        } 
     }
 
     /**

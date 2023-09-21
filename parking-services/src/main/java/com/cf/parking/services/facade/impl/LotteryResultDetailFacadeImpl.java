@@ -1,11 +1,7 @@
 package com.cf.parking.services.facade.impl;
 
-
-import com.cf.parking.dao.mapper.LotteryResultDetailMapper;
 import com.cf.parking.facade.facade.LotteryResultDetailFacade;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
 
 /**
  * 摇号结果详情Service业务层处理
@@ -16,7 +12,7 @@ import javax.annotation.Resource;
 @Service
 public class LotteryResultDetailFacadeImpl implements LotteryResultDetailFacade
 {
-    @Resource
-    private LotteryResultDetailMapper lotteryResultDetailMapper;
-
+    
+	
+	
 }
