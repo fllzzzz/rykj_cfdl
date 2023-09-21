@@ -127,6 +127,9 @@ public class ParkingSpaceTransferRecordFacadeImpl implements ParkingSpaceTransfe
 
 	private void setParkingLotRegionByCode(ParkingSpaceTransferRecordBO bo) {
 		ParkingLotPO parkingLotPO = parkingLotService.selectParkingLotByCode(bo.getParkingLotCode());
+		if (parkingLotPO == null) {
+			return;
+		}
 		bo.setParkingLotRegion(parkingLotPO.getRegion());
 	}
 
