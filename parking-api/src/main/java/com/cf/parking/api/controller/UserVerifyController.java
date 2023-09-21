@@ -58,11 +58,11 @@ public class UserVerifyController {
     private LotteryBlackListService lotteryBlackListService;
 
     private UserSessionDTO getUser() {
-        UserSessionDTO userSessionDTO = new UserSessionDTO();
-        userSessionDTO.setServerName("魏慧");
-        userSessionDTO.setUserId(1668559697477717L);
-        return userSessionDTO;
-//        return userAuthenticationServer.getCurrentUser();
+//        UserSessionDTO userSessionDTO = new UserSessionDTO();
+//        userSessionDTO.setServerName("魏慧");
+//        userSessionDTO.setUserId(1668559697477717L);
+//        return userSessionDTO;
+        return userAuthenticationServer.getCurrentUser();
     }
 
 
@@ -124,7 +124,7 @@ public class UserVerifyController {
     /**
      * 获取个人车牌号列表
      */
-//    @UserAuthentication
+    @UserAuthentication
     @ApiOperation(value = "获取个人车辆列表——小程序", notes = "小程序端个人的车辆列表")
     @PostMapping("/vehicleList")
     public Result<List<String>> vehicleList()
@@ -140,7 +140,7 @@ public class UserVerifyController {
     /**
      * 获取个人车辆审核详细信息
      */
-//    @UserAuthentication
+    @UserAuthentication
     @ApiOperation(value = "获取个人车辆审核详细信息——小程序", notes = "选择停车场后，自动调用查询")
     @PostMapping("/info")
     public Result<UserVerifyRsp> getInfo(@RequestBody UserVerifyReq param)
@@ -167,7 +167,7 @@ public class UserVerifyController {
     /**
      * 单张文件上传(转为base64返回给前端)
      */
-//    @UserAuthentication
+    @UserAuthentication
     @ApiOperation(value = "单张文件上传——小程序", notes = "单张文件上传")
     @PostMapping("/imageUpload")
     public Result<String> imageUpload(MultipartFile image)  {
@@ -193,7 +193,7 @@ public class UserVerifyController {
         //2.图片转为base64
         String base64ImgStr = null;
         try {
-            base64ImgStr = getBase64ImgStr(compressedBytes,image.getContentType());
+            base64ImgStr = getBase64ImgStr(compressedBytes);
         } catch (IOException e) {
             log.error("图片转base64失败：{}",e);
             return Result.buildErrorResult("图片转换失败，请重试！");
@@ -214,7 +214,7 @@ public class UserVerifyController {
     /**
      * 新增车辆审核
      */
-//    @UserAuthentication
+    @UserAuthentication
     @ApiOperation(value = "新增车辆审核——小程序", notes = "移动端个人中心模块点击车辆录入")
     @PostMapping("/add")
     public Result add(@RequestBody UserVerifyOptReq param)
@@ -243,7 +243,6 @@ public class UserVerifyController {
         //4.参数转换
         UserVerifyOptDTO  dto = BeanConvertorUtils.map(param, UserVerifyOptDTO.class);
         dto.setUserId(getUser().getUserId());
-        dto.setUserName(getUser().getServerName());
 
         //5.新增
         Integer result = userVerifyFacade.add(dto);
@@ -258,11 +257,8 @@ public class UserVerifyController {
         return user;
     }
 
-    private String getBase64ImgStr(byte[] compressedBytes,String contentType) throws IOException {
-//        if (PictureInfoEnum.CONTENT_TYPE_JPG.getInfo().equals(contentType)){
-            return PictureInfoEnum.BASE64_JPG_PRE.getInfo() + Base64.getEncoder().encodeToString(compressedBytes);
-//        }
-//        return PictureInfoEnum.BASE64_PNG_PRE.getInfo() + Base64.getEncoder().encodeToString(compressedBytes);
+    private String getBase64ImgStr(byte[] compressedBytes) throws IOException {
+        return PictureInfoEnum.BASE64_JPG_PRE.getInfo() + Base64.getEncoder().encodeToString(compressedBytes);
     }
 
     private void paramVerify(UserVerifyOptReq param) {

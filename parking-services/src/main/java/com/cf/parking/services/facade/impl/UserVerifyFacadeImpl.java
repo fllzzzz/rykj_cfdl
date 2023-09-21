@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cf.parking.dao.mapper.UserVerifyMapper;
+import com.cf.parking.dao.po.UserInfoPO;
 import com.cf.parking.dao.po.UserProfilePO;
 import com.cf.parking.dao.po.UserVerifyPO;
 import com.cf.parking.facade.bo.UserVerifyBO;
@@ -104,6 +105,10 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
         UserVerifyPO userVerifyPO = new UserVerifyPO();
         BeanUtils.copyProperties(dto,userVerifyPO);
         userVerifyPO.setId(idWorker.nextId());
+        UserInfoPO userInfoPO = userProfileService.getUserInfoByUserId(dto.getUserId());
+        if (null != userInfoPO){
+            userVerifyPO.setUserName(userInfoPO.getName());
+        }
         userVerifyPO.setState(Integer.parseInt(UserVerifyStateEnum.UNAUDIT.getState()));
         userVerifyPO.setCreateTm(new Date());
         userVerifyPO.setUpdateTm(new Date());
