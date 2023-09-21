@@ -2,6 +2,8 @@ package com.cf.parking.api.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.cf.parking.api.request.BlackListBatchAddReq;
+import com.cf.parking.facade.bo.ParkBaseDetailRespBO;
+import com.cf.parking.facade.bo.ParkBaseRespBO;
 import com.cf.parking.facade.bo.ParkingCarQueryRespBO;
 import com.cf.parking.facade.bo.YardPageBO;
 import com.cf.parking.facade.constant.FeignUrlConstant;
@@ -17,6 +19,8 @@ import com.cf.support.bean.DingTalkBean;
 import com.cf.support.result.PageResponse;
 import com.cf.support.result.Result;
 import com.cf.support.utils.BeanConvertorUtils;
+
+import cn.hutool.core.date.DateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 
@@ -203,8 +208,9 @@ public class TestController {
 	@ApiOperation(value = "查询车位", notes = "查询车位")
 	public Result queryCar() {
 		ParkingCarQueryDTO dto = new ParkingCarQueryDTO();
+		dto.setCarOwner("陈科狄");
 		ParkingCarQueryRespBO result = parkInvokeService.queryCarInfo(dto);
-		System.out.println(JSON.toJSONString(result));
+		log.info("查询车位信息：{}",JSON.toJSONString(result));
 		return Result.buildSuccessResult(result);
 	}
 	
@@ -214,7 +220,7 @@ public class TestController {
 	public Result queryYard() {
 		QueryYardDTO dto = new QueryYardDTO();
 		YardPageBO result = parkInvokeService.queryYard(dto);
-		System.out.println(JSON.toJSONString(result));
+		log.info("查询车库:{}",JSON.toJSONString(result));
 		return Result.buildSuccessResult(result);
 	}
 	
@@ -224,10 +230,36 @@ public class TestController {
 		try {
 			dingTalkBean.sendTextMessage("测试消息", Arrays.asList("28492530271177557","013622186224083959","16931906975949266"));
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error("发送钉钉消息{}",e);
 		}
 		return Result.buildSuccessResult();
+	}
+	
+	
+	@PostMapping("/addCar")
+	@ApiOperation(value = "添加车位", notes = "添加车位")
+	public Result addCar() {
+		UserSpaceDTO dto = new UserSpaceDTO();
+		dto.setPlateNo("浙A7D51K")
+		.setParkingLot("4680b7e1ec414a5ebdf48127f73acd71,5a277524d2bc408bbd3097e7ccaf2208,2457999fe2914251976fd333d2816fb2,"
+				+ "aaed725983664c7aa0a1a4dddba3f05c,6dc5132a6a7046c09ffd7be54d27ea49")
+		.setJobNumber("CFDL13914")
+		.setName("陈科狄")
+		.setStartDate(new Date())
+		.setEndDate(DateUtil.endOfMonth(DateUtil.nextMonth()));
+		ParkBaseRespBO<ParkBaseDetailRespBO> result = parkInvokeService.replaceCarInfo(dto);
+		log.info("添加车位:{}",JSON.toJSONString(result));
+		return Result.buildSuccessResult(result);
+	}
+	
+	@PostMapping("/delCar")
+	@ApiOperation(value = "删除车位", notes = "删除车位")
+	public Result delCar() {
+		ParkingDeleteCarDTO dto = new ParkingDeleteCarDTO();
+		dto.setId(Arrays.asList("ceds0000016kd2hEKska"));
+		ParkBaseRespBO<ParkBaseDetailRespBO> result = parkInvokeService.deleteCarInfo(dto);
+		log.info("删除车位:{}",JSON.toJSONString(result));
+		return Result.buildSuccessResult(result);
 	}
 	
 }

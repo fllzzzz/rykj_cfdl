@@ -9,7 +9,9 @@ package com.cf.parking.services.enums;
 public enum ParkingRemoteCodeEnum {
 
 	RESP_SUCCESS("0","请求状态码"),
-	BUS_CODE("200","业务状态码");
+	BUS_CODE("200","业务成功状态码"),
+	UNAUTH("405230602","未授权")
+	;
 	
 	private String state;
 	

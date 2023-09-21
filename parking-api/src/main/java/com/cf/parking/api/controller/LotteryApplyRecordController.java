@@ -2,6 +2,7 @@ package com.cf.parking.api.controller;
 
 import javax.annotation.Resource;
 
+import com.alibaba.fastjson.JSON;
 import com.cf.parking.api.request.LotteryApplyRecordReq;
 import com.cf.parking.api.response.LotteryApplyRecordPageRsp;
 import com.cf.parking.api.response.LotteryApplyRsp;
@@ -79,6 +80,7 @@ public class LotteryApplyRecordController
     @PostMapping("/apply")
     public Result  apply(@RequestBody LotteryApplyRecordReq param)
     {
+    	log.info("申请摇号入参：{}",JSON.toJSONString(param));
         //1.获取当前登录用户的信息
         UserSessionDTO user = getUserSessionDTO();
         Long userId = user.getUserId();
@@ -107,6 +109,7 @@ public class LotteryApplyRecordController
     @PostMapping("/cancel")
     public Result  cancel(@RequestBody LotteryApplyRecordReq param)
     {
+    	log.info("取消摇号入参：{}",JSON.toJSONString(param));
         //1.获取当前登录用户的信息
         UserSessionDTO user = getUserSessionDTO();
         Long userId = user.getUserId();
@@ -127,6 +130,7 @@ public class LotteryApplyRecordController
     @PostMapping("/list")
     public Result<PageResponse<LotteryApplyRecordPageRsp>>  getApplyRecordList(@RequestBody LotteryApplyRecordReq param)
     {
+    	log.info("查询摇号申请记录入参：{}",JSON.toJSONString(param));
         //1.获取当前登录用户的信息
         UserSessionDTO user = getUserSessionDTO();
         Long userId = user.getUserId();

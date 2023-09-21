@@ -72,6 +72,7 @@ public class LotteryResultController
     public Result start(@RequestBody LotteryResultReq param)
     {
     	AssertUtil.checkNull(param.getId(), "id不能为空");
+    	log.info("开始摇号：结果id：{}",param.getId());
     	lotteryResultFacade.lottery(param.getId());
         return Result.buildSuccessResult();
     }
@@ -85,6 +86,8 @@ public class LotteryResultController
     public Result confirm(@RequestBody LotteryResultReq param)
     {
     	lotteryResultFacade.confirm(param.getId());
+    	log.info("结果确认：结果id：{}",param.getId());
+    	
         return Result.buildSuccessResult();
     }
 
@@ -98,6 +101,8 @@ public class LotteryResultController
     {
     	AssertUtil.checkNull(param, "参数不能为空");
     	AssertUtil.checkNull(param.getId() ,"id不能为空");
+    	
+    	log.info("结果发布：结果id：{}",param.getId());
     	lotteryResultFacade.notify(param.getId());
         return Result.buildSuccessResult();
     }

@@ -56,7 +56,7 @@ public class UserSpaceTask {
 	/**
 	 * 针对一人多库的任务，是在生效期开始当天进行下发闸机
 	 */
-	@Scheduled(cron = "0 10 0 * * ? ") //间隔1天
+	@Scheduled(cron = "0 10 0/3 * * ? ") //间隔1天
 	@TaskLock(key = RedisConstant.PARKING_DOWN_LOCK_KEY)
 	public void parkingDown() {
 		

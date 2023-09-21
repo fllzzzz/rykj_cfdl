@@ -25,6 +25,7 @@ import com.esotericsoftware.minlog.Log;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 /**
@@ -58,12 +59,16 @@ public class ParkingSpaceTransferRecordFacadeImpl implements ParkingSpaceTransfe
 	@Resource
 	private ParkingLotService parkingLotService;
     
+	
+	
+	
+	@Transactional(rollbackFor = Exception.class)
 	@Override
 	public void transfer(String outJobNum, String inJobNum) {
 		log.info("转让开始，转让人：{},受让人：{}",outJobNum,inJobNum);;
 		List<UserSpacePO> spaceList = userSpaceService.querySpaceGroupByExpireDate(outJobNum);
 
-		AssertUtil.checkTrue(!CollectionUtils.isEmpty(spaceList), "该用户无车位，无法进行转赠");
+		AssertUtil.checkTrue(!CollectionUtils.isEmpty(spaceList), "您无车位，无法进行转赠");
 		//移除当天到期的车位信息
 		Iterator<UserSpacePO> iterator = spaceList.iterator();
 		while(iterator.hasNext()) {
@@ -73,7 +78,7 @@ public class ParkingSpaceTransferRecordFacadeImpl implements ParkingSpaceTransfe
 				iterator.remove();
 			}
 		}
-		AssertUtil.checkTrue(!CollectionUtils.isEmpty(spaceList), "该用户车位为当天到期或已到期，无法进行转赠");
+		AssertUtil.checkTrue(!CollectionUtils.isEmpty(spaceList), "您的车位为当天到期或已到期，无法进行转赠");
 		
 		UserPO user = userService.selectByOpenId(inJobNum);
 		AssertUtil.checkNull(user, "受让人不存在"); 
@@ -122,6 +127,9 @@ public class ParkingSpaceTransferRecordFacadeImpl implements ParkingSpaceTransfe
 
 	private void setParkingLotRegionByCode(ParkingSpaceTransferRecordBO bo) {
 		ParkingLotPO parkingLotPO = parkingLotService.selectParkingLotByCode(bo.getParkingLotCode());
+		if (parkingLotPO == null) {
+			return;
+		}
 		bo.setParkingLotRegion(parkingLotPO.getRegion());
 	}
 

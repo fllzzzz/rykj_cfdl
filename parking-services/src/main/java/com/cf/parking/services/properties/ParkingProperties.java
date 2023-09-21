@@ -26,6 +26,11 @@ public class ParkingProperties {
     private String queryyardUrl;
     
     /**
+     * 删除车辆url
+     */
+    private String deleteCarUrl;
+    
+    /**
      * 获取token地址
      */
     private String tokenUrl;

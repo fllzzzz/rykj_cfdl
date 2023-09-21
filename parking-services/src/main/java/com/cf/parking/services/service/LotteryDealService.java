@@ -16,6 +16,8 @@ import com.cf.parking.dao.po.LotteryBatchPO;
 import com.cf.parking.dao.po.LotteryResultDetailPO;
 import com.cf.parking.dao.po.LotteryResultPO;
 import com.cf.parking.dao.po.ParkingLotPO;
+import com.cf.parking.dao.po.ParkingSpaceTransferRecordPO;
+import com.cf.parking.dao.po.UserPO;
 import com.cf.parking.dao.po.UserSpacePO;
 import com.cf.parking.dao.po.UserVerifyPO;
 import com.cf.parking.services.constant.ParkingConstants;
@@ -41,9 +43,18 @@ public class LotteryDealService {
 	@Resource
 	private LotteryResultService lotteryResultService; 
 	
+	@Resource
+	private ParkingSpaceTransferRecordService parkingSpaceTransferRecordService;
 	
 	@Resource
 	private UserSpaceService userSpaceService;
+	
+	@Resource
+	private UserService userService;
+	
+	
+	
+	
 	
 	/**
 	 * 摇号
@@ -112,7 +123,7 @@ public class LotteryDealService {
 
 	/**
 	 * 执行转让操作
-	 * @param spaceList 转让人车位
+	 * @param outSpaceList 转让人车位
 	 * @param verifyList 受让人车牌
 	 * @param inJobNum 受让人工号
 	 */
@@ -120,6 +131,11 @@ public class LotteryDealService {
 		log.info("转让人车位：{},受让人车位：{},受让人工号：{}",JSON.toJSONString(outSpaceList),JSON.toJSONString(verifyList),inJobNum);
 		List<UserSpacePO> addList = new ArrayList<>();
 		List<UserSpacePO> updateList = new ArrayList<>();
+		
+		//获取转让人
+		UserPO outUser = userService.selectByOpenId(outSpaceList.get(0).getJobNumber());
+		//转让记录
+		List<ParkingSpaceTransferRecordPO> transferList = new ArrayList<>();
 		
 		//获取车牌集合
 		List<String> plateList = verifyList.stream().map(item -> item.getPlateNo()).collect(Collectors.toList());
@@ -133,6 +149,8 @@ public class LotteryDealService {
 		
 		if (CollectionUtils.isEmpty(spaceList)) { //受让人无车位
 			for(UserSpacePO outSpace : outSpaceList ) {
+				
+				transferList.add(initTransferInfo(outSpace,outUser.getUserId(), verifyList.get(0).getUserId(),verifyList.get(0).getUserName()));
 				verifyList.forEach(verify -> {
 						UserSpacePO po = new UserSpacePO()
 								.setCreateTm(new Date())
@@ -151,6 +169,7 @@ public class LotteryDealService {
 								.setBatchNum(outSpace.getBatchNum())
 								.setRoundId(outSpace.getRoundId());
 						addList.add(po);
+						
 					});
 			}
 					
@@ -187,6 +206,7 @@ public class LotteryDealService {
 			List<UserSpacePO> parkSpaceList = new ArrayList<>();
 			//根据转让的车库和有效期进行初始化车位数据
 			for(UserSpacePO outSpace : outSpaceList) {
+				transferList.add(initTransferInfo(outSpace,outUser.getUserId(), verifyList.get(0).getUserId(),verifyList.get(0).getUserName()));
 				if (parkLotList.contains(outSpace.getParkingLot())) {//有该车库车位
 					tempList.addAll(plateList);
 					//查出车位信息进行合并
@@ -287,8 +307,34 @@ public class LotteryDealService {
 			userSpaceService.updateBatchById(updateList);
 		}
 		
+		if (!CollectionUtils.isEmpty(transferList)) {
+			parkingSpaceTransferRecordService.saveBatch(transferList);
+		}
+		
 		//把转让人的车位有效期更改为今天
 		userSpaceService.updateEndDate(outSpaceList.get(0).getJobNumber(),new Date());
+		
+	}
+
+	/**
+	 * 生成转让记录
+	 * @param userId 转让人
+	 * @param outSpace 转让车位
+	 * @param acceptId 受让人
+	 * @param acceptName
+	 * @return
+	 */
+	private ParkingSpaceTransferRecordPO initTransferInfo(UserSpacePO outSpace,Long userId, Long acceptId, String acceptName) {
+		return new ParkingSpaceTransferRecordPO()
+				.setAcceptUserId(acceptId)
+				.setAcceptUserName(acceptName)
+				.setCreateTm(new Date())
+				.setId(idWorker.nextId())
+				.setParkingLotCode(outSpace.getParkingLot())
+				.setUpdateTm(new Date())
+				.setUserId(userId)
+				.setValidEndDate(outSpace.getEndDate())
+				.setValidStartDate(outSpace.getStartDate())				;
 	}
 			
 	
