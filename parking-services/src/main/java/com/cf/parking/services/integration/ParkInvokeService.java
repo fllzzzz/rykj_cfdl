@@ -20,6 +20,7 @@ import com.cf.parking.facade.bo.YardPageBO;
 import com.cf.parking.facade.constant.RedisConstant;
 import com.cf.parking.facade.dto.Carmanagement;
 import com.cf.parking.facade.dto.ParkingCarQueryDTO;
+import com.cf.parking.facade.dto.ParkingDeleteCarDTO;
 import com.cf.parking.facade.dto.QueryYardDTO;
 import com.cf.parking.facade.dto.UserSpaceDTO;
 import com.cf.parking.services.constant.ParkingConstants;
@@ -70,6 +71,10 @@ public class ParkInvokeService {
 			String reponseContent = HttpClientUtils.postJsonWithoutSSL(parkingProperties.getHost() + parkingProperties.getAddCarmanagementUrl(), JSON.toJSONString(info),header);
 			log.info("调用添加车辆接口入参：{},出参:{}",JSON.toJSONString(info),JSON.toJSONString(reponseContent));
 			ParkBaseRespBO<ParkBaseDetailRespBO> resp = JSON.parseObject(reponseContent, new TypeReference<ParkBaseRespBO<ParkBaseDetailRespBO>>() {} );
+			if (ParkingRemoteCodeEnum.UNAUTH.getState().equals(resp.getResCode())){
+				redisUtil.del(RedisConstant.PARKING_TOKEN);
+				throw new BusinessException("会话过期,请重试");
+			}
 			return resp;
 		} catch(HttpResponseException e) {
 			log.info("调用添加车辆接口入参：{},调用失败e={}",JSON.toJSONString(info),e);
@@ -94,7 +99,7 @@ public class ParkInvokeService {
 			AssertUtil.checkNull(dto, "参数不能为空");
 			Map<String,String> header = getHeaderToken();
 
-			String reponseContent = HttpClientUtil.post(parkingProperties.getHost() + parkingProperties.getQueryyardUrl(), JSON.toJSONString(dto),header);
+			String reponseContent = HttpClientUtils.postJsonWithoutSSL(parkingProperties.getHost() + parkingProperties.getQueryyardUrl(), JSON.toJSONString(dto),header);
 			log.info("调用查询车库接口入参：{},出参:{}",JSON.toJSONString(dto),JSON.toJSONString(reponseContent));
 			ParkBaseRespBO<YardPageBO> resp = JSON.parseObject(reponseContent, new TypeReference<ParkBaseRespBO<YardPageBO>>() {} );
 			if(ParkingRemoteCodeEnum.RESP_SUCCESS.getState().equals(resp.getResCode()) && resp.getResult() != null && 
@@ -102,6 +107,9 @@ public class ParkInvokeService {
 				YardPageBO result = resp.getResult();
 				result.setData(JSON.parseArray(JSON.toJSONString(result.getData()), YardDetailBO.class));
 				return result;
+			} else if (ParkingRemoteCodeEnum.UNAUTH.getState().equals(resp.getResCode())){
+				redisUtil.del(RedisConstant.PARKING_TOKEN);
+				throw new BusinessException("会话过期,请重试");
 			}
 			return null;
 		} catch(HttpResponseException e) {
@@ -127,12 +135,15 @@ public class ParkInvokeService {
 		try {
 			log.info("查询车辆信息入参：{}",JSON.toJSONString(dto));
 			Map<String,String> header = getHeaderToken();
-			String reponseContent = HttpClientUtil.post(parkingProperties.getHost() + parkingProperties.getQueryCarUrl(), JSON.toJSONString(dto),header);
+			String reponseContent = HttpClientUtils.postJsonWithoutSSL(parkingProperties.getHost() + parkingProperties.getQueryCarUrl(), JSON.toJSONString(dto),header);
 			log.info("查询车辆信息口入参：{},出参:{}",JSON.toJSONString(dto),JSON.toJSONString(reponseContent));
 			ParkBaseRespBO<ParkingCarQueryRespBO<ParkingCarInfoBO<ParkingYardBO>>> resp = JSON.parseObject(reponseContent, new TypeReference<ParkBaseRespBO<ParkingCarQueryRespBO<ParkingCarInfoBO<ParkingYardBO>>>>() {} );
 			if(ParkingRemoteCodeEnum.RESP_SUCCESS.getState().equals(resp.getResCode()) && resp.getResult() != null &&
 					ParkingRemoteCodeEnum.BUS_CODE.getState().equals(resp.getResult().getCode())) {
 				return resp.getResult();
+			} else if (ParkingRemoteCodeEnum.UNAUTH.getState().equals(resp.getResCode())){
+				redisUtil.del(RedisConstant.PARKING_TOKEN);
+				throw new BusinessException("会话过期,请重试");
 			}
 			return null;
 		} catch(HttpResponseException e) {
@@ -159,6 +170,36 @@ public class ParkInvokeService {
 	}
 
 	/**
+	 * 删除车辆
+	 * @param info
+	 * @return
+	 */
+	public ParkBaseRespBO<ParkBaseDetailRespBO> deleteCarInfo(ParkingDeleteCarDTO dto) {
+		try {
+			AssertUtil.checkNull(dto, "参数不能为空");
+			Map<String,String> header = getHeaderToken();
+			String reponseContent = HttpClientUtils.postJsonWithoutSSL(parkingProperties.getHost() + parkingProperties.getDeleteCarUrl(), JSON.toJSONString(dto),header);
+			log.info("调用删除车辆接口入参：{},出参:{}",JSON.toJSONString(dto),JSON.toJSONString(reponseContent));
+			ParkBaseRespBO<ParkBaseDetailRespBO> resp = JSON.parseObject(reponseContent, new TypeReference<ParkBaseRespBO<ParkBaseDetailRespBO>>() {} );
+			if (ParkingRemoteCodeEnum.UNAUTH.getState().equals(resp.getResCode())){
+				redisUtil.del(RedisConstant.PARKING_TOKEN);
+				throw new BusinessException("会话过期,请重试");
+			}
+			return resp;
+		} catch(HttpResponseException e) {
+			log.info("调用删除车辆接口入参：{},调用失败e={}",JSON.toJSONString(dto),e);
+			if(e.getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
+				redisUtil.del(RedisConstant.PARKING_TOKEN);
+			}
+			return ParkBaseRespBO.fail();
+			
+		} catch (Exception e) {
+			log.info("调用删除辆接口入参：{},e={}",JSON.toJSONString(dto),e);
+			return ParkBaseRespBO.fail();
+		}
+	}
+	
+	/**
 	 * 获取token
 	 * @return
 	 * @throws Exception
@@ -166,8 +207,7 @@ public class ParkInvokeService {
 	public String getToken() throws Exception {
 			ParkingTokenBO tokenBo = redisUtil.get(RedisConstant.PARKING_TOKEN,ParkingTokenBO.class);
 			if(tokenBo != null) {
-				log.info("已存在token={},给token续期",tokenBo);
-				redisUtil.expire(RedisConstant.PARKING_TOKEN, tokenBo.getExpires_in() - 10);
+				log.info("已存在token={}",tokenBo);
 				return tokenBo.getAccess_token();
 			}
 			Map<String,String> obj = new HashMap<>();

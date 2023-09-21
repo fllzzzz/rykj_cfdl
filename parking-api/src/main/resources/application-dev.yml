@@ -82,6 +82,7 @@ parking:
   queryyardUrl: /service/cfdl__ConvenientAccess/0.0.1/queryyard
   tokenUrl: /baas/auth/v1.0/oauth2/token
   queryCarUrl: /service/cfdl__ConvenientAccess/0.0.1/queryCarManagement
+  deleteCarUrl: /service/cfdl__ConvenientAccess/0.0.1/deleteCarmanagement
   grantType: client_credentials
   clientId: 7a01285f4b3b49f48061555d29741ebf
   clientSecret: 1158935bf67a854418c3d8c1e8462d46ce7eba3f98ee72a5

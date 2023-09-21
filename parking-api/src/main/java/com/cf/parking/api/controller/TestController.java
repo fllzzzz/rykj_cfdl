@@ -208,6 +208,7 @@ public class TestController {
 	@ApiOperation(value = "查询车位", notes = "查询车位")
 	public Result queryCar() {
 		ParkingCarQueryDTO dto = new ParkingCarQueryDTO();
+		dto.setCarOwner("陈科狄");
 		ParkingCarQueryRespBO result = parkInvokeService.queryCarInfo(dto);
 		log.info("查询车位信息：{}",JSON.toJSONString(result));
 		return Result.buildSuccessResult(result);
@@ -244,10 +245,20 @@ public class TestController {
 				+ "aaed725983664c7aa0a1a4dddba3f05c,6dc5132a6a7046c09ffd7be54d27ea49")
 		.setJobNumber("CFDL13914")
 		.setName("陈科狄")
-		.setStartDate(DateUtil.beginOfMonth(new Date()))
+		.setStartDate(new Date())
 		.setEndDate(DateUtil.endOfMonth(DateUtil.nextMonth()));
 		ParkBaseRespBO<ParkBaseDetailRespBO> result = parkInvokeService.replaceCarInfo(dto);
 		log.info("添加车位:{}",JSON.toJSONString(result));
+		return Result.buildSuccessResult(result);
+	}
+	
+	@PostMapping("/delCar")
+	@ApiOperation(value = "删除车位", notes = "删除车位")
+	public Result delCar() {
+		ParkingDeleteCarDTO dto = new ParkingDeleteCarDTO();
+		dto.setId(Arrays.asList("ceds0000016kd2hEKska"));
+		ParkBaseRespBO<ParkBaseDetailRespBO> result = parkInvokeService.deleteCarInfo(dto);
+		log.info("删除车位:{}",JSON.toJSONString(result));
 		return Result.buildSuccessResult(result);
 	}
 	
