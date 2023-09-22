@@ -3,6 +3,7 @@ package com.cf.parking.api.controller;
 import javax.annotation.Resource;
 
 import com.alibaba.fastjson.JSON;
+import com.cf.parking.api.annotation.AdminOptLogTitle;
 import com.cf.parking.api.request.LotteryBatchOptReq;
 import com.cf.parking.api.request.LotteryBatchReq;
 import com.cf.parking.api.response.LotteryBatchRsp;
@@ -83,6 +84,7 @@ public class LotteryBatchController
      * 新增摇号批次
      * (新增摇号批次时自动生成摇号结果)
      */
+    @AdminOptLogTitle("新增摇号批次")
     @AdminUserAuthentication
     @ApiOperation(value = "新增摇号批次", notes = "点击新增按钮")
     @PostMapping("/add")
@@ -122,6 +124,7 @@ public class LotteryBatchController
      * 修改摇号批次
      * (修改前要判断是否已通知)
      */
+    @AdminOptLogTitle("修改摇号批次信息")
     @AdminUserAuthentication
     @ApiOperation(value = "修改摇号批次", notes = "点击修改按钮")
     @PostMapping("/update")
@@ -149,6 +152,7 @@ public class LotteryBatchController
      * 删除摇号批次
      * (删除前要判断是否已通知)
      */
+    @AdminOptLogTitle("删除摇号批次")
     @AdminUserAuthentication
     @ApiOperation(value = "删除摇号批次", notes = "点击删除按钮")
 	@PostMapping("/delete")
@@ -164,6 +168,7 @@ public class LotteryBatchController
     /**
      * 下发钉钉通知
      */
+    @AdminOptLogTitle("通知钉钉用户摇号批次信息")
     @AdminUserAuthentication
     @ApiOperation(value = "下发钉钉通知", notes = "点击通知按钮")
     @PostMapping("/notify")

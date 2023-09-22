@@ -3,6 +3,7 @@ package com.cf.parking.api.controller;
 import javax.annotation.Resource;
 
 import com.alibaba.fastjson.JSON;
+import com.cf.parking.api.annotation.AdminOptLogTitle;
 import com.cf.parking.api.request.ParkingSpaceTransferRecordReq;
 import com.cf.parking.api.request.TransferReq;
 import com.cf.parking.api.response.ParkingSpaceTransferRecordRsp;
@@ -91,6 +92,12 @@ public class ParkingSpaceTransferRecordController
     }
 
 
+    /**
+     * 小程序用户车位转赠
+     * @param req
+     * @return
+     */
+    @AdminOptLogTitle("小程序用户车位转赠")
     @UserAuthentication
     @ApiOperation(value = "车位转赠————小程序", notes = "车位转赠")
     @PostMapping("/transfer")

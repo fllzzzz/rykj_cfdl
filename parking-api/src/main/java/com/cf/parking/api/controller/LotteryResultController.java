@@ -3,6 +3,7 @@ package com.cf.parking.api.controller;
 import javax.annotation.Resource;
 
 import com.alibaba.fastjson.JSON;
+import com.cf.parking.api.annotation.AdminOptLogTitle;
 import com.cf.parking.api.request.LotteryResultReq;
 import com.cf.parking.api.request.LotteryResultRetryReq;
 import com.cf.parking.api.request.UserSpacePageReq;
@@ -66,6 +67,7 @@ public class LotteryResultController
     /**
      * 开始摇号
      */
+    @AdminOptLogTitle("开始摇号")
     @AdminUserAuthentication
     @ApiOperation(value = "开始摇号", notes = "点击开始摇号按钮")
     @PostMapping("/start")
@@ -80,6 +82,7 @@ public class LotteryResultController
     /**
      * 结果确认
      */
+    @AdminOptLogTitle("摇号结果确认")
     @AdminUserAuthentication
     @ApiOperation(value = "结果确认", notes = "点击结果确认按钮")
     @PostMapping("/confirm")
@@ -94,6 +97,7 @@ public class LotteryResultController
     /**
      * 结果发布
      */
+    @AdminOptLogTitle("摇号结果发布")
     @AdminUserAuthentication
     @ApiOperation(value = "结果发布", notes = "点击结果发布按钮")
 	@PostMapping("/publish")
@@ -108,6 +112,7 @@ public class LotteryResultController
     }
 
 
+    @AdminOptLogTitle("摇号结果一键同步、下发闸机")
     @AdminUserAuthentication
     @ApiOperation(value = "一键同步", notes = "点击一键同步按钮")
 	@PostMapping("/syncRetry")
@@ -125,6 +130,7 @@ public class LotteryResultController
      * 结果归档
      *
      */
+    @AdminOptLogTitle("摇号结果归档")
     @AdminUserAuthentication
     @ApiOperation(value = "结果归档", notes = "点击结果归档按钮")
     @PostMapping("/archive")

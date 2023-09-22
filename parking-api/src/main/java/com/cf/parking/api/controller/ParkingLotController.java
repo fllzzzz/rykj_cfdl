@@ -2,6 +2,7 @@ package com.cf.parking.api.controller;
 
 import javax.annotation.Resource;
 
+import com.cf.parking.api.annotation.AdminOptLogTitle;
 import com.cf.parking.api.request.ParkingLotAreaOptReq;
 import com.cf.parking.api.request.ParkingLotOptReq;
 import com.cf.parking.api.request.ParkingLotReq;
@@ -131,6 +132,7 @@ public class ParkingLotController
     /**
      * 新增园区
      */
+    @AdminOptLogTitle("新增园区")
     @AdminUserAuthentication
     @ApiOperation(value = "新增园区", notes = "点击园区新增按钮")
     @PostMapping("/addArea")
@@ -156,6 +158,7 @@ public class ParkingLotController
     /**
      * 修改园区
      */
+    @AdminOptLogTitle("修改园区")
     @AdminUserAuthentication
     @ApiOperation(value = "修改园区", notes = "点击园区右侧的修改按钮")
     @PostMapping("/updateArea")
@@ -181,6 +184,7 @@ public class ParkingLotController
     /**
      * 新增停车场
      */
+    @AdminOptLogTitle("新增停车场")
     @AdminUserAuthentication
     @ApiOperation(value = "新增停车场", notes = "点击新增按钮")
     @PostMapping("/add")
@@ -201,6 +205,7 @@ public class ParkingLotController
     /**
      * 修改停车场
      */
+    @AdminOptLogTitle("修改停车场")
     @AdminUserAuthentication
     @ApiOperation(value = "修改停车场", notes = "点击修改按钮")
     @PostMapping("/update")
@@ -228,6 +233,7 @@ public class ParkingLotController
     /**
      * 删除停车场
      */
+    @AdminOptLogTitle("删除停车场")
     @AdminUserAuthentication
     @ApiOperation(value = "删除停车场", notes = "点击删除按钮")
     @PostMapping("/delete")
@@ -265,7 +271,7 @@ public class ParkingLotController
     /**
      * 查询停车场列表
      */
-//    @UserAuthentication
+    @UserAuthentication
     @ApiOperation(value = "查询停车场车位数量饼图——小程序端", notes = "查询停车场车位数量饼图——小程序端")
     @PostMapping("/parkingLot/pieChart")
     public Result<List<SpaceNumRsp>> getParkingLotPieChart()

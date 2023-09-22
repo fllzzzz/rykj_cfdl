@@ -2,6 +2,7 @@ package com.cf.parking.api.controller;
 
 import javax.annotation.Resource;
 
+import com.cf.parking.api.annotation.AdminOptLogTitle;
 import com.cf.parking.api.request.LotteryBlackListOptReq;
 import com.cf.parking.api.request.LotteryBlackListReq;
 import com.cf.parking.api.response.LotteryBlackListRsp;
@@ -61,6 +62,7 @@ public class LotteryBlackListController
     /**
      * 新增摇号黑名单
      */
+    @AdminOptLogTitle("新增摇号黑名单")
     @AdminUserAuthentication
     @ApiOperation(value = "新增摇号黑名单", notes = "点击新增按钮")
     @PostMapping("/add")
@@ -78,6 +80,7 @@ public class LotteryBlackListController
     /**
      * 修改摇号黑名单
      */
+    @AdminOptLogTitle("修改摇号黑名单")
     @AdminUserAuthentication
     @ApiOperation(value = "修改摇号黑名单", notes = "点击修改按钮")
     @PostMapping("/update")
@@ -94,6 +97,7 @@ public class LotteryBlackListController
     /**
      * 移出摇号黑名单
      */
+    @AdminOptLogTitle("移出摇号黑名单")
     @AdminUserAuthentication
     @ApiOperation(value = "移出摇号黑名单", notes = "点击移出按钮")
     @PostMapping("/move")

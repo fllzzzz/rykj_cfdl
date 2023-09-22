@@ -3,6 +3,7 @@ package com.cf.parking.api.controller;
 import javax.annotation.Resource;
 
 import com.alibaba.fastjson.JSON;
+import com.cf.parking.api.annotation.AdminOptLogTitle;
 import com.cf.parking.api.request.LotteryApplyRecordReq;
 import com.cf.parking.api.response.LotteryApplyRecordPageRsp;
 import com.cf.parking.api.response.LotteryApplyRsp;
@@ -75,6 +76,7 @@ public class LotteryApplyRecordController
     /**
      * 申请摇号
      */
+    @AdminOptLogTitle("小程序用户申请摇号")
     @UserAuthentication
     @ApiOperation(value = "申请摇号————小程序", notes = "点击申请摇号")
     @PostMapping("/apply")
@@ -104,6 +106,7 @@ public class LotteryApplyRecordController
     /**
      * 取消摇号
      */
+    @AdminOptLogTitle("小程序用户取消摇号")
     @UserAuthentication
     @ApiOperation(value = "取消摇号————小程序", notes = "点击取消摇号")
     @PostMapping("/cancel")

@@ -2,6 +2,7 @@ package com.cf.parking.api.controller;
 
 import javax.annotation.Resource;
 
+import com.cf.parking.api.annotation.AdminOptLogTitle;
 import com.cf.parking.api.request.LotteryRuleRoundOptReq;
 import com.cf.parking.api.request.LotteryRuleRoundReq;
 import com.cf.parking.api.response.*;
@@ -80,6 +81,7 @@ public class LotteryRuleRoundController
     /**
      * 新增摇号规则-轮数
      */
+    @AdminOptLogTitle("新增摇号规则-轮数")
     @AdminUserAuthentication
     @ApiOperation(value = "新增摇号规则-轮数", notes = "点击新增按钮")
     @PostMapping("/add")
@@ -100,6 +102,7 @@ public class LotteryRuleRoundController
     /**
      * 修改摇号规则-轮数
      */
+    @AdminOptLogTitle("修改摇号规则-轮数")
     @AdminUserAuthentication
     @ApiOperation(value = "修改摇号规则-轮数", notes = "点击修改按钮")
     @PostMapping("/update")
@@ -126,6 +129,7 @@ public class LotteryRuleRoundController
     /**
      * 删除摇号规则-轮数
      */
+    @AdminOptLogTitle("删除摇号规则-轮数")
     @AdminUserAuthentication
     @ApiOperation(value = "删除摇号规则-轮数", notes = "点击删除按钮")
     @PostMapping("/delete")

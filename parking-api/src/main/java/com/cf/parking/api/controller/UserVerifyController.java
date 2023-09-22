@@ -1,5 +1,6 @@
 package com.cf.parking.api.controller;
 
+import com.cf.parking.api.annotation.AdminOptLogTitle;
 import com.cf.parking.api.request.UserVerifyOptReq;
 import com.cf.parking.api.request.UserVerifyReq;
 import com.cf.parking.api.response.UserVerifyRsp;
@@ -58,10 +59,6 @@ public class UserVerifyController {
     private LotteryBlackListService lotteryBlackListService;
 
     private UserSessionDTO getUser() {
-//        UserSessionDTO userSessionDTO = new UserSessionDTO();
-//        userSessionDTO.setServerName("魏慧");
-//        userSessionDTO.setUserId(1668559697477717L);
-//        return userSessionDTO;
         return userAuthenticationServer.getCurrentUser();
     }
 
@@ -87,7 +84,7 @@ public class UserVerifyController {
     /**
      * 获取单条审核车辆审核详细信息
      */
-    @UserAuthentication
+    @AdminUserAuthentication
     @ApiOperation(value = "获取个人车辆审核详细信息——小程序", notes = "选择停车场后，自动调用查询")
     @PostMapping("/infoById")
     public Result<UserVerifyRsp> getInfoById(@RequestBody UserVerifyReq param)
@@ -104,6 +101,7 @@ public class UserVerifyController {
     /**
      * 审核车辆
      */
+    @AdminOptLogTitle("进行车辆审核")
     @AdminUserAuthentication
     @ApiOperation(value = "审核车辆", notes = "审核界面点击确定按钮")
     @PostMapping("/audit")
@@ -118,6 +116,7 @@ public class UserVerifyController {
     /**
      * 批量审核车辆
      */
+    @AdminOptLogTitle("批量审核车辆")
     @AdminUserAuthentication
     @ApiOperation(value = "批量审核车辆", notes = "点击批量审核按钮")
     @PostMapping("/batchAudit")
@@ -223,13 +222,14 @@ public class UserVerifyController {
     private byte[] imageCompress(MultipartFile image) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         //scale:0-1,表示占原图片的长宽比；outputQuality：0-1，表示压缩质量，1最好，0最差；outputFormat：jpg，将图片压缩后的格式设置成jpg，因为png格式是一种无损的图片格式，无法正确压缩
-        Thumbnails.of(image.getInputStream()).scale(1).outputQuality(0.4f).outputFormat("jpg").toOutputStream(outputStream);
+        Thumbnails.of(image.getInputStream()).scale(1).outputQuality(0.2f).outputFormat("jpg").toOutputStream(outputStream);
         return outputStream.toByteArray();
     }
 
     /**
      * 新增车辆审核
      */
+    @AdminOptLogTitle("小程序用户新增车辆信息")
     @UserAuthentication
     @ApiOperation(value = "新增车辆审核——小程序", notes = "移动端个人中心模块点击车辆录入")
     @PostMapping("/add")
@@ -288,7 +288,8 @@ public class UserVerifyController {
     /**
      * 修改个人车辆审核详细信息
      */
-//    @UserAuthentication
+    @AdminOptLogTitle("小程序用户修改车辆信息")
+    @UserAuthentication
     @ApiOperation(value = "修改个人车辆审核详细信息——小程序", notes = "修改个人车辆审核详细信息")
     @PostMapping("/update")
     public Result update(@RequestBody UserVerifyOptReq param)
@@ -322,7 +323,8 @@ public class UserVerifyController {
     /**
      * 删除个人车辆信息
      */
-//    @UserAuthentication
+    @AdminOptLogTitle("小程序用户删除车辆信息")
+    @UserAuthentication
     @ApiOperation(value = "删除个人车辆信息——小程序", notes = "删除个人车辆信息")
     @PostMapping("/delete")
     public Result<String> delete(@RequestBody UserVerifyReq param)
