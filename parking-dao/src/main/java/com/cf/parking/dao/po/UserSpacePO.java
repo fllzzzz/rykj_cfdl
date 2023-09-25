@@ -92,4 +92,9 @@ public class UserSpacePO {
      * 同步失败原因
      */
     private String failReason;
+    
+    /**
+     * 类型，1摇号，2默认
+     */
+    private Integer type;
 }

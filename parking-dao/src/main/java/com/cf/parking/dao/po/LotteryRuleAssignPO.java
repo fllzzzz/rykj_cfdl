@@ -46,4 +46,9 @@ public class LotteryRuleAssignPO
 
     /** 备注 */
     private String remark;
+    
+    /**
+     * 轮次id
+     */
+    private Long roundId;
 }

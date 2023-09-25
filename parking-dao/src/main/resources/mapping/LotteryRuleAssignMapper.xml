@@ -6,6 +6,7 @@
     <resultMap type="com.cf.parking.dao.po.LotteryRuleAssignPO" id="LotteryRuleAssignResult">
         <result property="id"    column="id"    />
         <result property="type"    column="type"    />
+        <result property="roundId"    column="round_id"    />
         <result property="code"    column="code"    />
         <result property="name"    column="name"    />
         <result property="parkingLotCode"    column="parking_lot_code"    />
@@ -16,7 +17,7 @@
     </resultMap>
 
     <sql id="selectLotteryRuleAssignVo">
-        select id, type, code, name, parking_lot_code, state, remark, create_tm, update_tm from lottery_rule_assign
+        select id, type, code, name, parking_lot_code, state, remark,round_id, create_tm, update_tm from lottery_rule_assign
     </sql>
 
 </mapper>

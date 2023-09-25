@@ -27,6 +27,7 @@ import com.cf.parking.facade.dto.UserSpaceValidityDTO;
 import com.cf.parking.services.constant.ParkingConstants;
 import com.cf.parking.services.enums.ParkingRemoteCodeEnum;
 import com.cf.parking.services.enums.UserSpaceStateEnum;
+import com.cf.parking.services.enums.UserSpaceTypeEnum;
 import com.cf.parking.services.integration.ParkInvokeService;
 import com.cf.support.bean.IdWorker;
 import com.cf.support.result.PageResponse;
@@ -221,9 +222,10 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 	 * @param jobNumList
 	 * @return
 	 */
-	public List<UserSpacePO> querySpaceListByJobNum(List<String> jobNumList) {
+	public List<UserSpacePO> querySpaceListByJobNum(List<String> jobNumList,Integer type) {
 		return CollectionUtils.isEmpty(jobNumList) ? Collections.emptyList(): userSpaceMapper.selectList(new LambdaQueryWrapper<UserSpacePO>()
 					.in(UserSpacePO::getJobNumber, jobNumList)
+					.eq(UserSpacePO::getType, type)
 					.ge(UserSpacePO::getEndDate, DateUtil.format(new Date(), ParkingConstants.SHORT_DATE_FORMAT))
 				);
 	}
@@ -321,6 +323,7 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 			.setState(UserSpaceStateEnum.UNSYNC.getState())
 			.setScheduleDate(null)
 			.setUpdateTm(new Date())
+			.setType(UserSpaceTypeEnum.LOTTERY.getState())
 			.setBatchId(lottery.getBatchId())
 			.setBatchNum(lottery.getBatchNum())
 			.setRoundId(lottery.getRoundId());
@@ -339,6 +342,7 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 					.setEndDate(batch.getValidEndDate())
 					.setStartDate(batch.getValidStartDate())
 					.setPlateNo(plateNo)
+					.setType(UserSpaceTypeEnum.LOTTERY.getState())
 					.setBatchId(lottery.getBatchId())
 					.setBatchNum(lottery.getBatchNum())
 					.setRoundId(lottery.getRoundId())
@@ -368,6 +372,7 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 						.setUpdateTm(new Date())
 						.setPlateNo(plateNo)
 						.setScheduleDate(null)
+						.setType(UserSpaceTypeEnum.LOTTERY.getState())
 						.setBatchId(lottery.getBatchId())
 						.setBatchNum(lottery.getBatchNum())
 						.setRoundId(lottery.getRoundId())
@@ -507,9 +512,11 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 	 * @param batchId
 	 * @return
 	 */
-	public List<String> querySpaceListByBatchId(Long batchId) {
+	public List<String> querySpaceListByBatchId(Long batchId,Integer type) {
 		return userSpaceMapper.selectList(new LambdaQueryWrapper<UserSpacePO>()
-					.eq(UserSpacePO::getBatchId, batchId))
+					.eq(UserSpacePO::getBatchId, batchId)
+					.eq(UserSpacePO::getType, type)
+				)
 				.stream().map(space -> space.getJobNumber())
 				.collect(Collectors.toList());
 	}

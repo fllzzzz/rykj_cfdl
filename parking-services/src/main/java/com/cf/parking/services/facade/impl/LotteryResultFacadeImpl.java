@@ -21,6 +21,7 @@ import com.cf.parking.services.enums.EnableStateEnum;
 import com.cf.parking.services.enums.LotteryEnableStateEnum;
 import com.cf.parking.services.enums.LotteryResultStateEnum;
 import com.cf.parking.services.enums.UserSpaceStateEnum;
+import com.cf.parking.services.enums.UserSpaceTypeEnum;
 import com.cf.parking.services.integration.ParkInvokeService;
 import com.cf.parking.services.service.DepartmentService;
 import com.cf.parking.services.service.EmployeeService;
@@ -180,7 +181,7 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 		blackJobNumList.clear();
 		employeeJobNumList.clear();
 		
-		applyList = lotteryRuleAssignService.dealApplyByRule(parkingLot, applyList);
+		applyList = lotteryRuleAssignService.dealApplyByRule(lottery.getBatchId(),applyList,round.getId());
 		lotteryDealService.doLottery(batch,lottery,parkingLot,applyList);
 		
 	}
@@ -261,14 +262,14 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 		AssertUtil.checkTrue(!CollectionUtils.isEmpty(detailList), "无摇号中签数据");
 		List<String> jobNumList = detailList.stream().map(item -> item.getUserJobNumber()).collect(Collectors.toList());
 		//根据本期人员的工号获取其中仍有车位的人员
-		List<UserSpacePO> spaceList = userSpaceService.querySpaceListByJobNum(jobNumList);
+		List<UserSpacePO> spaceList = userSpaceService.querySpaceListByJobNum(jobNumList,UserSpaceTypeEnum.LOTTERY.getState());
 		jobNumList.clear();
 		//查询车牌信息;
 		List<Long> userIdList = detailList.stream().map(item -> item.getUserId()).collect(Collectors.toList());
 		List<UserVerifyPO> verifyList = userVerifyService.queryVerifyListByUserIdList(userIdList);
 		userIdList.clear();
 		userSpaceService.initLotteryDetailIntoSpace(lottery,batch,detailList,spaceList,verifyList);
-	
+		
 	}
 
 	@Override
@@ -362,7 +363,7 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 		if (unfinshNum == 0) {
 			//申请列表
 			List<LotteryApplyRecordPO> applyList = lotteryApplyRecordService.queryLotteryApplyList(lottery.getBatchId(), null);
-			List<String> spaceList = userSpaceService.querySpaceListByBatchId(lottery.getBatchId());
+			List<String> spaceList = userSpaceService.querySpaceListByBatchId(lottery.getBatchId(),UserSpaceTypeEnum.LOTTERY.getState());
 			List<String> applyIdList = applyList.stream().map(item -> item.getJobNumber()).collect(Collectors.toList());
 			log.info("未中奖人员工号：{}",JSON.toJSONString(applyIdList));
 			applyIdList.removeAll(spaceList);

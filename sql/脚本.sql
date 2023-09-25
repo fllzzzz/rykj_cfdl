@@ -175,3 +175,9 @@ alter table lottery_apply_record add index job_number_idx (job_number);
 alter table user_profile add index job_number_idx (job_number);
 
 alter table lottery_batch add unique index batch_num_idx (batch_num);
+
+
+-- 20230924 
+alter table lottery_rule_assign add column round_id bigint comment '轮次id';
+alter table lottery_rule_assign add index round_idx(round_id);
+alter table user_space add column  type char(1) default '0' comment '类型，1摇号，2默认';
