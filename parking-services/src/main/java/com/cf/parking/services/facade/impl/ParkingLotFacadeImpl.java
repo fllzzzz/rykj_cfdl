@@ -130,18 +130,24 @@ public class ParkingLotFacadeImpl implements ParkingLotFacade
      */
     @Override
     public Integer add(ParkingLotOptDTO dto) {
+        //1.po对象生成
         ParkingLotPO po = new ParkingLotPO();
         BeanUtils.copyProperties(dto,po);
         po.setId(idWorker.nextId());
         po.setCreateTm(new Date());
         po.setUpdateTm(new Date());
+
+        //2.图片信息设置
+        setImageInfo(dto.getFiles(), po);
+
         try{
+            //3.新增
             int result = mapper.insert(po);
             log.info("新增停车场成功  ——  {}",po);
             return result;
         } catch (DataIntegrityViolationException e){
             log.error("新增停车场重复：{}，失败原因：{}",po,e);
-            throw new BusinessException("园区编码已存在，请修改后重试！");
+            throw new BusinessException("停车场编码已存在，请修改后重试！");
         } catch (Exception e){
             log.error("新增停车场失败：{}，失败原因：{}",po,e);
             return 0;
@@ -158,6 +164,7 @@ public class ParkingLotFacadeImpl implements ParkingLotFacade
         ParkingLotPO po = new ParkingLotPO();
         BeanUtils.copyProperties(dto,po);
         po.setUpdateTm(new Date());
+        setImageInfo(dto.getFiles(), po);
         try{
             int result = mapper.updateById(po);
             log.info("修改停车场成功  ——  {}",po);
@@ -168,6 +175,13 @@ public class ParkingLotFacadeImpl implements ParkingLotFacade
         } catch (Exception e){
             log.error("修改停车场失败：{}，失败原因：{}",po,e);
             return 0;
+        }
+    }
+
+    private void setImageInfo(List<ParkingLotImagesDTO> images, ParkingLotPO po) {
+        if (CollectionUtils.isNotEmpty(images)){
+            String imageInfo = JSON.toJSONString(images);
+            po.setImageInfo(imageInfo);
         }
     }
 

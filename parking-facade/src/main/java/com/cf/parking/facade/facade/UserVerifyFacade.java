@@ -6,6 +6,7 @@ import com.cf.parking.facade.dto.UserVerifyOptDTO;
 import com.cf.support.result.PageResponse;
 import com.cf.support.result.Result;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -20,7 +21,7 @@ public interface UserVerifyFacade {
      * @param dto
      * @return
      */
-    PageResponse<UserVerifyBO> getUserVerifyList(UserVerifyDTO dto);
+    PageResponse<UserVerifyBO> getPageUserVerifyList(UserVerifyDTO dto);
 
     /**
      * 获取摇车辆审核详细信息
@@ -77,4 +78,19 @@ public interface UserVerifyFacade {
      * @return
      */
     UserVerifyBO getUserVerifyInfoById(Long id);
+
+    /**
+     *车辆审核信息批量导出
+     * @param boList
+     * @return
+     */
+    void batchExport(List<UserVerifyBO> boList, HttpServletResponse response);
+
+
+    /**
+     * 根据条件查询所有符合条件的记录
+     * @param dto
+     * @return
+     */
+    List<UserVerifyBO> getAllUserVerifyList(UserVerifyDTO dto);
 }

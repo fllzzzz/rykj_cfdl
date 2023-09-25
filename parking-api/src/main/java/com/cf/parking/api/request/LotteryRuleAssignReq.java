@@ -22,6 +22,10 @@ public class LotteryRuleAssignReq extends PageRequest {
     @ApiModelProperty(value = "id，单个查询或删除时使用此字段")
     private Long id;
 
+    /** roundId */
+    @ApiModelProperty(value = "摇号规则-分配轮次id")
+    private Long roundId;
+
     /** 分配类型（1：按部门分配；2：按人员分配） */
     @ApiModelProperty(value = "分配类型（1：按部门分配；2：按人员分配）")
     private String type;

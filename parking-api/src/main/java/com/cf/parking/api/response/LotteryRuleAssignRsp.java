@@ -20,6 +20,10 @@ public class LotteryRuleAssignRsp {
     @ApiModelProperty(value = "id")
     private Long id;
 
+    /** 摇号规则-分配轮次id */
+    @ApiModelProperty(value = "摇号规则-分配轮次id")
+    private Long roundId;
+
     /** 分配类型（1：按部门分配；2：按人员分配） */
     @ApiModelProperty(value = "分配类型（1：按部门分配；2：按人员分配）")
     private String type;

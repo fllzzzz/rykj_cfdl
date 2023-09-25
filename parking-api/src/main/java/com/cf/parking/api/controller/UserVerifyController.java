@@ -3,6 +3,8 @@ package com.cf.parking.api.controller;
 import com.cf.parking.api.annotation.AdminOptLogTitle;
 import com.cf.parking.api.request.UserVerifyOptReq;
 import com.cf.parking.api.request.UserVerifyReq;
+import com.cf.parking.api.response.ExportAdminOrderRecordRsp;
+import com.cf.parking.api.response.ExportUserVerifyRsp;
 import com.cf.parking.api.response.UserVerifyRsp;
 import com.cf.parking.dao.po.LotteryBlackListPO;
 import com.cf.parking.facade.bo.UserVerifyBO;
@@ -20,11 +22,14 @@ import com.cf.support.exception.BusinessException;
 import com.cf.support.result.PageResponse;
 import com.cf.support.result.Result;
 import com.cf.support.utils.BeanConvertorUtils;
+import com.cf.support.utils.ExcelUtiles;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,6 +39,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletResponse;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.Base64;
 import java.util.List;
@@ -76,7 +84,7 @@ public class UserVerifyController {
         UserVerifyDTO dto = new UserVerifyDTO();
         BeanUtils.copyProperties(param,dto);
 
-        PageResponse<UserVerifyBO> result = userVerifyFacade.getUserVerifyList(dto);
+        PageResponse<UserVerifyBO> result = userVerifyFacade.getPageUserVerifyList(dto);
         List<UserVerifyRsp> verifyRsps = BeanConvertorUtils.copyList(result.getList(), UserVerifyRsp.class);
         return Result.buildSuccessResult(new PageResponse(verifyRsps,result.getPageNo(),result.getTotal(),result.getPageSize()));
     }
@@ -182,10 +190,10 @@ public class UserVerifyController {
     /**
      * 单张文件上传(转为base64返回给前端)
      */
-    @UserAuthentication
+//    @UserAuthentication
     @ApiOperation(value = "单张文件上传——小程序", notes = "单张文件上传")
     @PostMapping("/imageUpload")
-    public Result<String> imageUpload(MultipartFile image)  {
+    public Result<String> imageUpload(MultipartFile image) throws IOException {
         //1.参数校验
         if (null == image){
             return Result.buildErrorResult("未接收到图片！");
@@ -209,6 +217,7 @@ public class UserVerifyController {
         String base64ImgStr = null;
         try {
             base64ImgStr = getBase64ImgStr(compressedBytes);
+            base64ImgStr = Base64.getEncoder().encodeToString(compressedBytes);
         } catch (IOException e) {
             log.error("图片转base64失败：{}",e);
             return Result.buildErrorResult("图片转换失败，请重试！");
@@ -333,4 +342,32 @@ public class UserVerifyController {
         Integer result = userVerifyFacade.deleteById(param.getId());
         return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult("删除失败，请重试！");
     }
+
+    /**
+     * 车辆审核信息批量导出
+     */
+//    @UserAuthentication
+//    @AdminOptLogTitle("车辆审核信息批量导出")
+    @ApiOperation(value = "车辆审核信息批量导出", notes = "车辆审核信息批量导出")
+    @PostMapping("/batchExport")
+    public void batchExport(@RequestBody UserVerifyOptReq param, HttpServletResponse response)
+    {
+        //1.参数转换
+        UserVerifyDTO dto = new UserVerifyDTO();
+        BeanUtils.copyProperties(param,dto);
+
+        //2.查询符合条件的要导出的记录
+        List<UserVerifyBO> boList = userVerifyFacade.getAllUserVerifyList(dto);
+        List<ExportUserVerifyRsp> exportUserVerifyRsps = BeanConvertorUtils.copyList(boList, ExportUserVerifyRsp.class);
+
+        //3.对记录内的base64字符串转换成图片并进行导出
+        if (CollectionUtils.isEmpty(exportUserVerifyRsps)){
+            ExcelUtiles.exportExcel(exportUserVerifyRsps, "车辆审核记录", "车辆审核记录", ExportUserVerifyRsp.class, "车辆审核记录.xlsx", response);
+        }else {
+            userVerifyFacade.batchExport(boList,response);
+        }
+    }
+
+
+
 }

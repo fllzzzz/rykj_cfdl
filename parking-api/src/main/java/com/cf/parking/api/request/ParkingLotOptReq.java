@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author
@@ -50,5 +51,8 @@ public class ParkingLotOptReq {
     @ApiModelProperty(value = "备注")
     private String remark;
 
+    /** 上传的图片信息 */
+    @ApiModelProperty(value = "图片信息")
+    private List<ParkingLotImagesReq> files;
 
 }

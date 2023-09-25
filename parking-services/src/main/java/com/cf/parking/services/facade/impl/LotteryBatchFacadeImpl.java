@@ -29,6 +29,7 @@ import com.cf.support.bean.IdWorker;
 import com.cf.support.exception.BusinessException;
 import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
+import com.dingtalk.api.request.OapiMessageCorpconversationAsyncsendV2Request;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -74,7 +75,7 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
     @Resource
     private IdWorker idWorker;
 
-    private final String  message = "%s期摇号报名时间：%s~%s，车位有效期：%s~%s，您可在报名有效期内报名摇号。";
+    private final String  message = "%s期摇号报名时间：%s~%s，车位有效期：%s~%s，点击链接查看具体内容。";
 
     /**
      * 查询摇号批次列表
@@ -282,11 +283,18 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
             throw new BusinessException("未找到公司员工，无法通知！");
         }
 
-        String notifyMessage = String.format(message, DateUtil.format(lotteryBatchPO.getBatchNum(), "yyyy-MM-dd"), DateUtil.format(lotteryBatchPO.getApplyStartTime(), "yyyy-MM-dd HH:mm:ss"),
-                DateUtil.format(lotteryBatchPO.getApplyEndTime(), "yyyy-MM-dd HH:mm:ss"), DateUtil.format(lotteryBatchPO.getValidStartDate(), "yyyy-MM-dd"),
+        String notifyMessage = String.format(message, DateUtil.format(lotteryBatchPO.getBatchNum(), "yyyy-MM-dd"), DateUtil.format(lotteryBatchPO.getApplyStartTime(), "yyyy-MM-dd"),
+                DateUtil.format(lotteryBatchPO.getApplyEndTime(), "yyyy-MM-dd"), DateUtil.format(lotteryBatchPO.getValidStartDate(), "yyyy-MM-dd"),
                 DateUtil.format(lotteryBatchPO.getValidEndDate(), "yyyy-MM-dd"));
 
-        dingTalkBean.sendTextMessage(notifyMessage,jobNumList);
+//        dingTalkBean.sendTextMessage(notifyMessage,jobNumList);
+
+        OapiMessageCorpconversationAsyncsendV2Request.Link link = new OapiMessageCorpconversationAsyncsendV2Request.Link();
+        link.setTitle("摇号批次通知");
+        link.setMessageUrl("eapp://pages/my/my?showTabBar=true");
+        link.setText(notifyMessage);
+        link.setPicUrl("http://rongcloud-web.qiniudn.com/docs_demo_rongcloud_logo.png");
+        dingTalkBean.sendLinkMessage(link, jobNumList);
 
         //2.修改批次状态为已通知
         lotteryBatchPO.setState(LotteryBatchStateEnum.HAVE_NOTIFIED.getState());

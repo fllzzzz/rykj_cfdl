@@ -1,5 +1,6 @@
 package com.cf.parking.facade.bo;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.util.Date;
@@ -13,6 +14,9 @@ import java.util.Date;
 public class LotteryRuleAssignBO {
     /** id */
     private Long id;
+
+    /** 摇号规则-分配轮次id */
+    private Long roundId;
 
     /** 分配类型（1：按部门分配；2：按人员分配） */
     private String type;
