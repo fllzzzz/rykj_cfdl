@@ -1,6 +1,7 @@
 package com.cf.parking.services.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -23,6 +24,7 @@ import com.cf.parking.dao.po.UserSpacePO;
 import com.cf.parking.dao.po.UserVerifyPO;
 import com.cf.parking.services.constant.ParkingConstants;
 import com.cf.parking.services.enums.UserSpaceStateEnum;
+import com.cf.parking.services.enums.UserSpaceTypeEnum;
 import com.cf.support.bean.IdWorker;
 import com.cf.support.exception.BusinessException;
 import cn.hutool.core.date.DateUtil;
@@ -130,7 +132,7 @@ public class LotteryDealService {
 	 */
 	@Transactional(rollbackFor = Exception.class)
 	public void transfer(List<UserSpacePO> outSpaceList, List<UserVerifyPO> verifyList, String inJobNum) {
-		log.info("转让人车位：{},受让人车位：{},受让人工号：{}",JSON.toJSONString(outSpaceList),JSON.toJSONString(verifyList),inJobNum);
+		log.info("转让人车位：{},受让人车牌：{},受让人工号：{}",JSON.toJSONString(outSpaceList),JSON.toJSONString(verifyList),inJobNum);
 		List<UserSpacePO> addList = new ArrayList<>();
 		List<UserSpacePO> updateList = new ArrayList<>();
 		
@@ -149,7 +151,9 @@ public class LotteryDealService {
 		//受让人拥有的车库
 		List<String> parkLotList = spaceList.stream().map(item -> item.getParkingLot()).collect(Collectors.toList());
 		
-		if (CollectionUtils.isEmpty(spaceList)) { //受让人无车位
+		if (CollectionUtils.isEmpty(spaceList)) { //受让人无摇号车位
+			//这里没有去区分分配车位，原因是转让车位都是指定日期生效的，它生效之后，会把分配的车位覆盖掉
+			Date date = DateUtil.beginOfDay(new Date())  ;
 			for(UserSpacePO outSpace : outSpaceList ) {
 				
 				transferList.add(initTransferInfo(outSpace,outUser.getUserId(), verifyList.get(0).getUserId(),verifyList.get(0).getUserName()));
@@ -174,7 +178,7 @@ public class LotteryDealService {
 						
 					});
 			}
-					
+			
 		} else {
 		  /**
 			* 我们的日期都是整月出现的，且下一期的有效期开始时间大于上一期的结束时间，在批次设置里有校验

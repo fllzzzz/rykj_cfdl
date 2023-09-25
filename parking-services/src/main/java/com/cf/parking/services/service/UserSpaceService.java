@@ -242,6 +242,12 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 	public void initLotteryDetailIntoSpace(LotteryResultPO lottery, LotteryBatchPO batch, List<LotteryResultDetailPO> detailList,
 			List<UserSpacePO> spaceList, List<UserVerifyPO> verifyList) {
 		log.info("结果确认：batch={},detailList ={},spaceList = {}",JSON.toJSONString(batch),JSON.toJSONString(detailList),JSON.toJSONString(spaceList));
+		
+		List<String> pubJobNumList = detailList.stream().map(item -> item.getUserJobNumber()).collect(Collectors.toList());
+		//获取本期中签人员的非摇号车库
+		List<UserSpacePO> publicSpaceList = userSpaceService.querySpaceListByJobNum(pubJobNumList,UserSpaceTypeEnum.SETTING.getState());
+		pubJobNumList = publicSpaceList.stream().map(space -> space.getJobNumber()).collect(Collectors.toList());
+		publicSpaceList.clear();;
 		//已存在需要更新的
 		List<UserSpacePO> existSpaceList = new ArrayList<>();
 		//新增加的
@@ -289,7 +295,7 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 						initSpaceList.add(space);
 					}
 				} else {//无车位
-					UserSpacePO space = initUserSpace(lottery,batch,detail,plateNo);
+					UserSpacePO space = initUserSpace(lottery,batch,detail,plateNo,pubJobNumList);
 					initSpaceList.add(space);
 				}
 			}
@@ -355,12 +361,15 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 
 	/**
 	 * 初始化车位对象
-	 * @param lottery 
-	 * @param batch
-	 * @param detail
+	 * @param lottery 摇号结果
+	 * @param batch	摇号批次
+	 * @param detail 中签明细
+	 * @param plateNo 车牌
+	 * @param detail 有公共车位的人员工号
 	 * @return
 	 */
-	private UserSpacePO initUserSpace(LotteryResultPO lottery, LotteryBatchPO batch, LotteryResultDetailPO detail, String plateNo) {
+	private UserSpacePO initUserSpace(LotteryResultPO lottery, LotteryBatchPO batch, LotteryResultDetailPO detail,
+			String plateNo,List<String> pubJobNum) {
 		UserSpacePO userSpace = new UserSpacePO()
 						.setCreateTm(new Date())
 						.setEndDate(batch.getValidEndDate())
@@ -371,7 +380,8 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 						.setState(UserSpaceStateEnum.UNSYNC.getState())
 						.setUpdateTm(new Date())
 						.setPlateNo(plateNo)
-						.setScheduleDate(null)
+						//有公共车位的话，当期中签数据就在生效开始当天执行下发
+						.setScheduleDate(pubJobNum.contains(detail.getUserJobNumber()) ? DateUtil.format(batch.getValidStartDate(), ParkingConstants.SHORT_DATE_FORMAT) : null )
 						.setType(UserSpaceTypeEnum.LOTTERY.getState())
 						.setBatchId(lottery.getBatchId())
 						.setBatchNum(lottery.getBatchNum())
