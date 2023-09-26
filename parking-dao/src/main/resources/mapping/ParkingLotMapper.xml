@@ -13,11 +13,16 @@
         <result property="createTm"    column="create_tm"    />
         <result property="updateTm"    column="update_tm"    />
         <result property="remark"    column="remark"    />
+        <result property="imageInfo"    column="image_info"    />
     </resultMap>
 
     <sql id="selectParkingLotVo">
-        select id, parent_id,region, region_code, amount, type, create_tm, update_tm ,remark from parking_lot
+        select id, parent_id,region, region_code, amount, type, create_tm, update_tm ,remark,image_info from parking_lot
     </sql>
 
-
+    <!--  根据id查询包含图片信息的停车场对象信息  -->
+    <select id="selectParkingLotPOWithImageInfoById" resultMap="ParkingLotResult">
+        <include refid="selectParkingLotVo" />
+        where id = #{id}
+    </select>
 </mapper>

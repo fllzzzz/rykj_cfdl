@@ -75,7 +75,7 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
     @Resource
     private IdWorker idWorker;
 
-    private final String  message = "%s期摇号报名时间：%s~%s，车位有效期：%s~%s，点击链接查看具体内容。";
+    private final String  message = "%s期摇号报名时间已发布，点击查看详情。";
 
     /**
      * 查询摇号批次列表
@@ -283,11 +283,8 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
             throw new BusinessException("未找到公司员工，无法通知！");
         }
 
-        String notifyMessage = String.format(message, DateUtil.format(lotteryBatchPO.getBatchNum(), "yyyy-MM-dd"), DateUtil.format(lotteryBatchPO.getApplyStartTime(), "yyyy-MM-dd"),
-                DateUtil.format(lotteryBatchPO.getApplyEndTime(), "yyyy-MM-dd"), DateUtil.format(lotteryBatchPO.getValidStartDate(), "yyyy-MM-dd"),
-                DateUtil.format(lotteryBatchPO.getValidEndDate(), "yyyy-MM-dd"));
+        String notifyMessage = String.format(message, DateUtil.format(lotteryBatchPO.getBatchNum(), "yyyy-MM-dd"));
 
-//        dingTalkBean.sendTextMessage(notifyMessage,jobNumList);
 
         OapiMessageCorpconversationAsyncsendV2Request.Link link = new OapiMessageCorpconversationAsyncsendV2Request.Link();
         link.setTitle("摇号批次通知");

@@ -1,20 +1,17 @@
-package com.cf.parking.facade.dto;
+package com.cf.parking.facade.bo;
 
 import lombok.Data;
-import lombok.experimental.Accessors;
 
 /**
  * @author
- * @date 2023/9/25
+ * @date 2023/9/26
  */
 @Data
-@Accessors(chain = true)
-public class ParkingLotImagesDTO {
+public class ParkingLotImageInfoBO {
 
     /** 图片名称 */
     private String name;
 
     /** 图片信息（base64字符串） */
     private String url;
-
 }

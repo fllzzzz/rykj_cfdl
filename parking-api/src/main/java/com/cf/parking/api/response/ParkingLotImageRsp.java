@@ -9,13 +9,12 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * 停车场主对象
  * @author
- * @date 2023/09/05
+ * @date 2023/9/26
  */
 @Data
-@ApiModel(description = "停车场列表查询结果——不带图片信息")
-public class ParkingLotRsp {
+@ApiModel(description = "单个停车场查询结果——带图片信息")
+public class ParkingLotImageRsp {
 
     /** id */
     @ApiModelProperty(value = "id")
@@ -57,8 +56,7 @@ public class ParkingLotRsp {
     @ApiModelProperty(value = "备注")
     private String remark;
 
-    /**子记录*/
-    @ApiModelProperty(value = "子记录")
-    private List<ParkingLotRsp> children;
-
+    /** 停车场图片信息 */
+    @ApiModelProperty(value = "停车场图片信息")
+    private List<ParkingLotImageInfoRsp> files;
 }

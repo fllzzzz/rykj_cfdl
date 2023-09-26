@@ -1,24 +1,26 @@
-package com.cf.parking.facade.dto;
+package com.cf.parking.facade.bo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.experimental.Accessors;
 
 import java.util.Date;
 import java.util.List;
 
 /**
  * @author
- * @date 2023/9/11
+ * @date 2023/9/26
  */
 @Data
-@Accessors(chain = true)
-public class ParkingLotOptDTO {
-
+public class ParkingLotImageBO {
     /** id */
     private Long id;
 
     /** parentId */
     private Long parentId;
+
+    /** parentName */
+    private String parentName;
 
     /** 区域 */
     private String region;
@@ -41,6 +43,6 @@ public class ParkingLotOptDTO {
     /** 备注 */
     private String remark;
 
-    /** 上传的图片信息 */
-    private List<ParkingLotImageDTO> files;
+    /** 停车场图片信息 */
+    private List<ParkingLotImageInfoBO> files;
 }

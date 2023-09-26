@@ -1,6 +1,5 @@
 package com.cf.parking.facade.bo;
 
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.util.Date;
