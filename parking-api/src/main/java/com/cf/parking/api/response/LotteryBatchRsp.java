@@ -39,12 +39,12 @@ public class LotteryBatchRsp {
 
     /** 报名开始时间 */
     @ApiModelProperty(value = "报名开始时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date applyStartTime;
 
     /** 报名结束时间 */
     @ApiModelProperty(value = "报名结束时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date applyEndTime;
 
     /** 车位有效开始日期 */

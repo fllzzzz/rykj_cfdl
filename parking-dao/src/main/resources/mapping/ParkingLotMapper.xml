@@ -25,4 +25,109 @@
         <include refid="selectParkingLotVo" />
         where id = #{id}
     </select>
+
+    <insert id="insertWithImageInfo" parameterType="com.cf.parking.dao.po.ParkingLotPO">
+        insert into parking_lot
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="parentId != null">
+                parent_id,
+            </if>
+            <if test="region != null">
+                region,
+            </if>
+            <if test="regionCode != null">
+                region_code,
+            </if>
+            <if test="amount != null">
+                amount,
+            </if>
+            <if test="type != null">
+                type,
+            </if>
+            <if test="createTm != null">
+                create_tm,
+            </if>
+            <if test="updateTm != null">
+                update_tm,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+            <if test="imageInfo != null">
+                image_info,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id},
+            </if>
+            <if test="parentId != null">
+                #{parentId},
+            </if>
+            <if test="region != null">
+                #{region},
+            </if>
+            <if test="regionCode != null">
+                #{regionCode},
+            </if>
+            <if test="amount != null">
+                #{amount},
+            </if>
+            <if test="type != null">
+                #{type},
+            </if>
+            <if test="createTm != null">
+                #{createTm},
+            </if>
+            <if test="updateTm != null">
+                #{updateTm},
+            </if>
+            <if test="remark != null">
+                #{remark},
+            </if>
+            <if test="imageInfo != null">
+                #{imageInfo},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateWithImageInfo" parameterType="com.cf.parking.dao.po.ParkingLotPO">
+        update parking_lot
+        <set>
+            <if test="id != null">
+                id = #{id},
+            </if>
+            <if test="parentId != null">
+                parent_id = #{parentId},
+            </if>
+            <if test="region != null">
+                region = #{region},
+            </if>
+            <if test="regionCode != null">
+                region_code = #{regionCode},
+            </if>
+            <if test="amount != null">
+                amount = #{amount},
+            </if>
+            <if test="type != null">
+                type = #{type},
+            </if>
+            <if test="createTm != null">
+                create_tm = #{createTm},
+            </if>
+            <if test="updateTm != null">
+                update_tm = #{updateTm},
+            </if>
+            <if test="remark != null">
+                remark = #{remark},
+            </if>
+            <if test="imageInfo != null">
+                image_info = #{imageInfo},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
 </mapper>

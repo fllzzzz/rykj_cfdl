@@ -8,6 +8,7 @@ import com.cf.parking.dao.mapper.LotteryResultMapper;
 import com.cf.parking.dao.po.LotteryResultDetailPO;
 import com.cf.parking.dao.po.LotteryResultPO;
 import com.cf.parking.facade.bo.LotteryResultDetailBO;
+import com.cf.parking.services.enums.LotteryResultStateEnum;
 import com.cf.support.result.PageResponse;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
@@ -95,5 +96,16 @@ public class LotteryResultService extends ServiceImpl<LotteryResultMapper, Lotte
 	public Integer batchDeleteByLotteryBatchId(Long batchId) {
 		return mapper.delete(new LambdaQueryWrapper<LotteryResultPO>()
 				.eq(LotteryResultPO::getBatchId, batchId));
+	}
+
+	/**
+	 * 查询对应批次下已归档的摇号结果
+	 * @param batchId
+	 * @return
+	 */
+	public List<LotteryResultPO> selectArchivedResultListByBatchId(Long batchId) {
+		return mapper.selectList(new LambdaQueryWrapper<LotteryResultPO>()
+				.eq(LotteryResultPO::getBatchId,batchId)
+				.eq(LotteryResultPO::getState, LotteryResultStateEnum.HAVE_ARCHIVED.getState()));
 	}
 }

@@ -13,18 +13,14 @@ import com.cf.parking.dao.mapper.LotteryBatchMapper;
 import com.cf.parking.dao.po.*;
 import com.cf.parking.facade.bo.LotteryBatchBO;
 import com.cf.parking.facade.bo.LotteryResultDetailBO;
-import com.cf.parking.facade.dto.LinkMessageDTO;
+import com.cf.parking.facade.bo.LotteryResultExportBO;
 import com.cf.parking.facade.dto.LotteryBatchDTO;
 import com.cf.parking.facade.dto.LotteryBatchOptDTO;
 import com.cf.parking.facade.facade.DingTalkMessageFacade;
 import com.cf.parking.facade.facade.LotteryBatchFacade;
 import com.cf.parking.services.enums.LotteryBatchStateEnum;
 import com.cf.parking.services.enums.LotteryResultStateEnum;
-import com.cf.parking.services.service.LotteryBatchService;
-import com.cf.parking.services.service.LotteryDealService;
-import com.cf.parking.services.service.LotteryResultService;
-import com.cf.parking.services.service.ParkingLotService;
-import com.cf.parking.services.service.UserProfileService;
+import com.cf.parking.services.service.*;
 import com.cf.parking.services.utils.AssertUtil;
 import com.cf.parking.services.utils.PageUtils;
 import com.cf.support.bean.DingTalkBean;
@@ -74,12 +70,12 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
 
     @Resource
     private DingTalkBean dingTalkBean;
-
-    @Resource
-    private DingTalkMessageFacade dingTalkMessageFacade;
     
     @Resource
     private LotteryDealService lotteryDealService;
+
+    @Resource
+    private LotteryResultDetailService lotteryResultDetailService;
 
     @Resource
     private IdWorker idWorker;
@@ -294,7 +290,12 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
 
         //1.2下发通知
         String notifyMessage = String.format(message, DateUtil.format(lotteryBatchPO.getBatchNum(), "yyyy-MM-dd"));
-        dingTalkMessageFacade.asyncSendLink(new LinkMessageDTO().setUrl("eapp://pages/lottery/lottery").setOpenIdList(jobNumList).setMessage(notifyMessage),"摇号通知");
+        OapiMessageCorpconversationAsyncsendV2Request.Link link = new OapiMessageCorpconversationAsyncsendV2Request.Link();
+        link.setTitle("摇号通知");
+        link.setMessageUrl("eapp://pages/lottery/lottery");
+        link.setText(notifyMessage);
+        link.setPicUrl("http://rongcloud-web.qiniudn.com/docs_demo_rongcloud_logo.png");
+        dingTalkBean.sendLinkMessage(link, jobNumList);
 
         //2.修改批次状态为已通知
         lotteryBatchPO.setState(LotteryBatchStateEnum.HAVE_NOTIFIED.getState());
@@ -329,6 +330,45 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
 		long num = mapper.updateByState(id,LotteryBatchStateEnum.HAVE_END.getState(),LotteryBatchStateEnum.ALLOCATIONED.getState());
 		AssertUtil.checkTrue(num == 1, "状态已变更,请刷新重试");	
 		lotteryDealService.allocationPark(lotteryBatchPO,parking);
+    }
+
+    /**
+     * 查询摇号结果导出对象
+     * @param batchId
+     * @return
+     */
+    @Override
+    public List<LotteryResultExportBO> exportResult(Long batchId) {
+        List<LotteryResultExportBO> resultExportBOList = new ArrayList<>();
+
+        //1.查询摇号批次基础信息
+        LotteryBatchPO batchPO = mapper.selectById(batchId);
+
+        //2.查询状态为已归档的对应的摇号结果记录
+        List<LotteryResultPO> resultPOList = lotteryResultService.selectArchivedResultListByBatchId(batchId);
+        if (CollectionUtils.isNotEmpty(resultPOList)){
+
+            resultPOList.stream().forEach(resultPO->{
+                String roundName = lotteryRuleRoundFacade.getNameByRoundId(resultPO.getRoundId().toString());
+                List<LotteryResultDetailPO> resultDetailPOList = lotteryResultDetailService.queryDetailListByResultId(resultPO.getId());
+                if (CollectionUtils.isNotEmpty(resultDetailPOList)){
+                    List<LotteryResultExportBO> resultExportBOS = BeanConvertorUtils.copyList(resultDetailPOList, LotteryResultExportBO.class);
+                    resultExportBOS.forEach(exportBO -> {
+                        //1.设置停车场名称
+                        exportBO.setParkingLotName(parkingLotService.selectParkingLotByCode(exportBO.getParkingLotCode()).getRegion());
+                        //2.设置摇号轮数
+                        exportBO.setRoundName(roundName);
+                        //3.设置基础数据
+                        exportBO.setBatchNum(batchPO.getBatchNum());
+                        exportBO.setParkingAmount(batchPO.getParkingAmount());
+                        exportBO.setApplyTime(batchPO.getApplyStartTime() + "——" + batchPO.getApplyEndTime());
+                        exportBO.setValidDate(batchPO.getValidStartDate() + "——" + batchPO.getValidEndDate());
+                    });
+                    resultExportBOList.addAll(resultExportBOS);
+                }
+            });
+        }
+        return resultExportBOList;
     }
 
 

@@ -45,4 +45,9 @@ public class DepartmentPO  {
      * 部门状态，0为正常，1为失效
      */
     private Integer state;
+
+    /**
+     * 父级部门code
+     */
+    private String parentCode;
 }

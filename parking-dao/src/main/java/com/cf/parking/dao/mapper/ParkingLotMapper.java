@@ -19,4 +19,18 @@ public interface ParkingLotMapper extends BaseMapper<ParkingLotPO> {
      * @return
      */
     ParkingLotPO selectParkingLotPOWithImageInfoById(@Param("id") Long id);
+
+    /**
+     * 新增带图片信息的停车场信息
+     * @param po
+     * @return
+     */
+    int insertWithImageInfo(ParkingLotPO po);
+
+    /**
+     * 修改带图片信息的停车场信息
+     * @param po
+     * @return
+     */
+    int updateWithImageInfo(ParkingLotPO po);
 }

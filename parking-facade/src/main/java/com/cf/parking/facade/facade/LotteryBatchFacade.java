@@ -2,11 +2,13 @@ package com.cf.parking.facade.facade;
 
 import com.cf.parking.facade.bo.LotteryBatchBO;
 import com.cf.parking.facade.bo.LotteryResultDetailBO;
+import com.cf.parking.facade.bo.LotteryResultExportBO;
 import com.cf.parking.facade.dto.LotteryBatchDTO;
 import com.cf.parking.facade.dto.LotteryBatchOptDTO;
 import com.cf.support.result.PageResponse;
 
 import java.util.Date;
+import java.util.List;
 
 
 /**
@@ -82,4 +84,11 @@ public interface LotteryBatchFacade
 	 * @param parkingCode 停车场code
 	 */
 	void allocationPark(Long id, String parkingCode);
+
+    /**
+     * 查询摇号结果导出对象
+     * @param batchId
+     * @return
+     */
+    List<LotteryResultExportBO> exportResult(Long batchId);
 }

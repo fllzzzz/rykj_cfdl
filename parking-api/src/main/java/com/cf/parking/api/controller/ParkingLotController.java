@@ -184,7 +184,8 @@ public class ParkingLotController
     /**
      * 新增停车场
      */
-    @AdminOptLogTitle("新增停车场")
+
+//    @AdminOptLogTitle("新增停车场")
     @AdminUserAuthentication
     @ApiOperation(value = "新增停车场", notes = "点击新增按钮")
     @PostMapping("/add")
@@ -284,13 +285,12 @@ public class ParkingLotController
     /**
      * 根据id查询具体停车场信息——小程序端/PC端
      */
-    @UserAuthentication
     @ApiOperation(value = "根据id查询具体停车场信息——小程序端/PC端" , notes = "根据id查询具体停车场信息——小程序端/PC端")
     @PostMapping("/parkingLot/info")
-    public Result<ParkingLotImageRsp> getParkingLotInfoById(Long id)
+    public Result<ParkingLotImageRsp> getParkingLotInfoById(@RequestBody ParkingLotReq param)
     {
-        AssertUtil.checkNull(id,"请选择要查看的停车场！");
-        ParkingLotImageBO bo = parkingLotFacade.getParkingLotInfoById(id);
+        AssertUtil.checkNull(param.getId(),"请选择要查看的停车场！");
+        ParkingLotImageBO bo = parkingLotFacade.getParkingLotInfoById(param.getId());
         return Result.buildSuccessResult(BeanConvertorUtils.map(bo,ParkingLotImageRsp.class));
     }
 

@@ -28,8 +28,6 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,9 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.Base64;
 import java.util.List;
@@ -190,7 +186,6 @@ public class UserVerifyController {
     /**
      * 单张文件上传(转为base64返回给前端)
      */
-//    @UserAuthentication
     @ApiOperation(value = "单张文件上传——小程序", notes = "单张文件上传")
     @PostMapping("/imageUpload")
     public Result<String> imageUpload(MultipartFile image) throws IOException {
@@ -217,7 +212,6 @@ public class UserVerifyController {
         String base64ImgStr = null;
         try {
             base64ImgStr = getBase64ImgStr(compressedBytes);
-            base64ImgStr = Base64.getEncoder().encodeToString(compressedBytes);
         } catch (IOException e) {
             log.error("图片转base64失败：{}",e);
             return Result.buildErrorResult("图片转换失败，请重试！");
@@ -346,8 +340,8 @@ public class UserVerifyController {
     /**
      * 车辆审核信息批量导出
      */
-//    @UserAuthentication
-//    @AdminOptLogTitle("车辆审核信息批量导出")
+    @AdminUserAuthentication
+    @AdminOptLogTitle("车辆审核信息批量导出")
     @ApiOperation(value = "车辆审核信息批量导出", notes = "车辆审核信息批量导出")
     @PostMapping("/batchExport")
     public void batchExport(@RequestBody UserVerifyOptReq param, HttpServletResponse response)

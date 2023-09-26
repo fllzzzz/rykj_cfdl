@@ -1,16 +1,20 @@
 package com.cf.parking.api.controller;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 
 import com.alibaba.fastjson.JSON;
 import com.cf.parking.api.annotation.AdminOptLogTitle;
 import com.cf.parking.api.request.LotteryAllocationReq;
 import com.cf.parking.api.request.LotteryBatchOptReq;
 import com.cf.parking.api.request.LotteryBatchReq;
+import com.cf.parking.api.response.ExportUserVerifyRsp;
 import com.cf.parking.api.response.LotteryBatchRsp;
 import com.cf.parking.api.response.LotteryResultDetailPageRsp;
+import com.cf.parking.api.response.LotteryResultExportRsp;
 import com.cf.parking.facade.bo.LotteryBatchBO;
 import com.cf.parking.facade.bo.LotteryResultDetailBO;
+import com.cf.parking.facade.bo.LotteryResultExportBO;
 import com.cf.parking.facade.dto.LotteryBatchDTO;
 import com.cf.parking.facade.dto.LotteryBatchOptDTO;
 import com.cf.parking.facade.facade.LotteryBatchFacade;
@@ -20,6 +24,7 @@ import com.cf.support.exception.BusinessException;
 import com.cf.support.result.PageResponse;
 import com.cf.support.result.Result;
 import com.cf.support.utils.BeanConvertorUtils;
+import com.cf.support.utils.ExcelUtiles;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -225,5 +230,21 @@ public class LotteryBatchController
         }
         List<LotteryResultDetailPageRsp> lotteryBatchRsps = BeanConvertorUtils.copyList(result.getList(), LotteryResultDetailPageRsp.class);
         return Result.buildSuccessResult(new PageResponse(lotteryBatchRsps,result.getPageNo(),result.getTotal(),result.getPageSize()));
+    }
+
+
+    /**
+     * 结果导出
+     */
+    @AdminUserAuthentication
+    @ApiOperation(value = "结果导出", notes = "点击结果导出按钮")
+    @PostMapping("/exportResult")
+    public void  exportResult(@RequestBody LotteryBatchReq param, HttpServletResponse response)
+    {
+        log.info("结果导出入参：{}",JSON.toJSONString(param));
+        AssertUtil.checkNull(param.getId(),"请选择摇号批次！");
+        List<LotteryResultExportBO>  boList= lotteryBatchFacade.exportResult(param.getId());
+        List<LotteryResultExportRsp> lotteryResultExportRsps = BeanConvertorUtils.copyList(boList, LotteryResultExportRsp.class);
+        ExcelUtiles.exportExcel(lotteryResultExportRsps, "摇号结果", "摇号结果", ExportUserVerifyRsp.class, "摇号结果.xlsx", response);
     }
 }

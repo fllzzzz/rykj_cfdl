@@ -142,7 +142,7 @@ public class ParkingLotFacadeImpl implements ParkingLotFacade
 
         try{
             //3.新增
-            int result = mapper.insert(po);
+            int result = mapper.insertWithImageInfo(po);
             log.info("新增停车场成功  ——  {}",po);
             return result;
         } catch (DataIntegrityViolationException e){
@@ -166,7 +166,7 @@ public class ParkingLotFacadeImpl implements ParkingLotFacade
         po.setUpdateTm(new Date());
         setImageInfo(dto.getFiles(), po);
         try{
-            int result = mapper.updateById(po);
+            int result = mapper.updateWithImageInfo(po);
             log.info("修改停车场成功  ——  {}",po);
             return result;
         } catch (DataIntegrityViolationException e){
@@ -316,7 +316,9 @@ public class ParkingLotFacadeImpl implements ParkingLotFacade
         ParkingLotImageBO bo = new ParkingLotImageBO();
         BeanUtils.copyProperties(po, bo);
         //将字符串转为图片信息对象
-        bo.setFiles(JSON.parseObject(po.getImageInfo(), new TypeReference<List<ParkingLotImageInfoBO>>(){}));
+        List<ParkingLotImageInfoBO> parkingLotImageInfoBOS = JSON.parseObject(po.getImageInfo(), new TypeReference<List<ParkingLotImageInfoBO>>() {});
+        bo.setFiles(parkingLotImageInfoBOS);
+        bo.setParentName(mapper.selectById(po.getParentId()).getRegion());
         return bo;
     }
 
