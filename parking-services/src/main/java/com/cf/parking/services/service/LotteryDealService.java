@@ -380,6 +380,10 @@ public class LotteryDealService {
 		List<String> jobNumList = lotteryResultDetailService.querySpaceListByBatchId(batch.getId());
 		//过滤掉中签人员
 		applyList = applyList.stream().filter(apply -> !jobNumList.contains(apply.getJobNumber())).collect(Collectors.toList());
+		if(CollectionUtils.isEmpty(applyList)) {
+			log.info("批次：{}不存在未中签人员",batch.getId());
+			return;
+		}
 		jobNumList.clear();;
 		List<String> applyJobList = applyList.stream().map(apply -> apply.getJobNumber()).collect(Collectors.toList());
 		//查询未中签用户是否有车位
@@ -423,6 +427,10 @@ public class LotteryDealService {
 	private void generateSpaceList(LotteryBatchPO batch, ParkingLotPO parking, List<LotteryApplyRecordPO> applyList,
 			List<UserSpacePO> existSpaceList, List<UserSpacePO> alloSpaceList, List<UserVerifyPO> vefifyList,
 			List<UserSpacePO> existList, List<UserSpacePO> addList) {
+		log.info("分配车位入参：停车场：{}，批次：{}，未中签人员：{}，已存在车位：{}，已存在分配车位：{}，车牌信息：{}",JSON.toJSONString(parking),
+				JSON.toJSONString(batch),JSON.toJSONString(applyList),JSON.toJSONString(existSpaceList),JSON.toJSONString(alloSpaceList),
+				JSON.toJSONString(vefifyList)
+				);
 		//车位信息映射成Map形式  {jobNum:{plateNo:UserSpacePO}}
 		Map<String/**工号*/, Map<String/**车牌*/, UserSpacePO>> userSpaceMap = (Map<String, Map<String, UserSpacePO>>) existSpaceList.stream()
 			.collect(Collectors.toMap(UserSpacePO::getJobNumber, // 工号作为外层Map的键
@@ -476,6 +484,7 @@ public class LotteryDealService {
 				//筛选出车位有效期和当前批次一致的数据
 				canSkipList = plateMap.values().stream().filter(space -> DateUtil.beginOfDay(space.getEndDate()).compareTo(DateUtil.beginOfDay(batch.getValidEndDate())) == 0 ).collect(Collectors.toList());
 				if(!CollectionUtils.isEmpty(canSkipList)) { //不为空，则是第二种（有人给他转车位了）
+					log.info("用户：{}已有车位：{},无需分配公共车位",apply.getJobNumber(),JSON.toJSONString(canSkipList));
 					continue;
 				} else {
 					addSpaceList(addList,batch,apply,plateNoList,DateUtil.format(batch.getValidStartDate(), ParkingConstants.SHORT_DATE_FORMAT),parking.getRegionCode());
