@@ -13,8 +13,10 @@ import com.cf.parking.dao.mapper.LotteryBatchMapper;
 import com.cf.parking.dao.po.*;
 import com.cf.parking.facade.bo.LotteryBatchBO;
 import com.cf.parking.facade.bo.LotteryResultDetailBO;
+import com.cf.parking.facade.dto.LinkMessageDTO;
 import com.cf.parking.facade.dto.LotteryBatchDTO;
 import com.cf.parking.facade.dto.LotteryBatchOptDTO;
+import com.cf.parking.facade.facade.DingTalkMessageFacade;
 import com.cf.parking.facade.facade.LotteryBatchFacade;
 import com.cf.parking.services.enums.LotteryBatchStateEnum;
 import com.cf.parking.services.enums.LotteryResultStateEnum;
@@ -72,6 +74,9 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
 
     @Resource
     private DingTalkBean dingTalkBean;
+
+    @Resource
+    private DingTalkMessageFacade dingTalkMessageFacade;
     
     @Resource
     private LotteryDealService lotteryDealService;
@@ -287,15 +292,9 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
             throw new BusinessException("未找到公司员工，无法通知！");
         }
 
+        //1.2下发通知
         String notifyMessage = String.format(message, DateUtil.format(lotteryBatchPO.getBatchNum(), "yyyy-MM-dd"));
-
-
-        OapiMessageCorpconversationAsyncsendV2Request.Link link = new OapiMessageCorpconversationAsyncsendV2Request.Link();
-        link.setTitle("摇号批次通知");
-        link.setMessageUrl("eapp://pages/my/my?showTabBar=true");
-        link.setText(notifyMessage);
-        link.setPicUrl("http://rongcloud-web.qiniudn.com/docs_demo_rongcloud_logo.png");
-        dingTalkBean.sendLinkMessage(link, jobNumList);
+        dingTalkMessageFacade.asyncSendLink(new LinkMessageDTO().setUrl("eapp://pages/lottery/lottery").setOpenIdList(jobNumList).setMessage(notifyMessage),"摇号通知");
 
         //2.修改批次状态为已通知
         lotteryBatchPO.setState(LotteryBatchStateEnum.HAVE_NOTIFIED.getState());
