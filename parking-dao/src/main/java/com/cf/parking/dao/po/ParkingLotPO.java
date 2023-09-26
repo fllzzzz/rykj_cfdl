@@ -1,6 +1,7 @@
 package com.cf.parking.dao.po;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -47,7 +48,8 @@ public class ParkingLotPO
     /** 备注 */
     private String remark;
 
-    /** 备注 */
+    /** 图片信息，由于太大，为了接口响应速度这里在使用queryWrapper时不从数据库里查 */
+    @TableField(exist=false)
     private String imageInfo;
 
 }

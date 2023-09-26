@@ -2,8 +2,8 @@ package com.cf.parking.facade.facade;
 
 import com.cf.parking.facade.bo.ParkingLotAreaBO;
 import com.cf.parking.facade.bo.ParkingLotBO;
+import com.cf.parking.facade.bo.ParkingLotImageBO;
 import com.cf.parking.facade.bo.ParkingLotTreeBO;
-import com.cf.parking.facade.bo.SpaceNumBO;
 import com.cf.parking.facade.dto.ParkingLotAreaOptDTO;
 import com.cf.parking.facade.dto.ParkingLotDTO;
 import com.cf.parking.facade.dto.ParkingLotOptDTO;
@@ -76,9 +76,15 @@ public interface ParkingLotFacade
     List<ParkingLotTreeBO> getParkingLotTreeList();
 
     /**
-     * 查询停车场车位数量饼图
+     * 根据id查询停车场信息
      * @return
      */
-    List<SpaceNumBO> getParkingLotPieChart();
+    ParkingLotImageBO getParkingLotInfoById(Long id);
+
+    /**
+     * 查询所有非园区的停车场id-region列表
+     * @return
+     */
+    List<ParkingLotBO> getParkingLotIdRegionList();
 
 }

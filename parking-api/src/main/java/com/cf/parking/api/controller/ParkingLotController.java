@@ -10,8 +10,8 @@ import com.cf.parking.api.response.*;
 import com.cf.parking.dao.po.UserProfilePO;
 import com.cf.parking.facade.bo.ParkingLotAreaBO;
 import com.cf.parking.facade.bo.ParkingLotBO;
+import com.cf.parking.facade.bo.ParkingLotImageBO;
 import com.cf.parking.facade.bo.ParkingLotTreeBO;
-import com.cf.parking.facade.bo.SpaceNumBO;
 import com.cf.parking.facade.constant.ParkingSysCodeConstant;
 import com.cf.parking.facade.dto.*;
 import com.cf.parking.facade.facade.ParkingLotFacade;
@@ -269,15 +269,29 @@ public class ParkingLotController
 
 
     /**
-     * 查询停车场列表
+     * 查询所有非园区的停车场id-region列表
      */
     @UserAuthentication
-    @ApiOperation(value = "查询停车场车位数量饼图——小程序端", notes = "查询停车场车位数量饼图——小程序端")
-    @PostMapping("/parkingLot/pieChart")
-    public Result<List<SpaceNumRsp>> getParkingLotPieChart()
+    @ApiOperation(value = "查询所有非园区的停车场id-region列表——小程序端" , notes = "查询所有非园区的停车场id-region列表——小程序端/PC端")
+    @PostMapping("/parkingLot/idRegionList")
+    public Result<List<ParkingLotRsp>> getParkingLotIdRegionList()
     {
-        List<SpaceNumBO> spaceNumBOList = parkingLotFacade.getParkingLotPieChart();
-        return Result.buildSuccessResult(BeanConvertorUtils.copyList(spaceNumBOList,SpaceNumRsp.class));
+        List<ParkingLotBO> boList = parkingLotFacade.getParkingLotIdRegionList();
+        return Result.buildSuccessResult(BeanConvertorUtils.copyList(boList,ParkingLotRsp.class));
+    }
+
+
+    /**
+     * 根据id查询具体停车场信息——小程序端/PC端
+     */
+    @UserAuthentication
+    @ApiOperation(value = "根据id查询具体停车场信息——小程序端/PC端" , notes = "根据id查询具体停车场信息——小程序端/PC端")
+    @PostMapping("/parkingLot/info")
+    public Result<ParkingLotImageRsp> getParkingLotInfoById(Long id)
+    {
+        AssertUtil.checkNull(id,"请选择要查看的停车场！");
+        ParkingLotImageBO bo = parkingLotFacade.getParkingLotInfoById(id);
+        return Result.buildSuccessResult(BeanConvertorUtils.map(bo,ParkingLotImageRsp.class));
     }
 
 

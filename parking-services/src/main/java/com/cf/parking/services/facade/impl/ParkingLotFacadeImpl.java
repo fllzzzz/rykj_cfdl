@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cf.parking.dao.mapper.ParkingLotMapper;
 import com.cf.parking.dao.po.ParkingLotPO;
 import com.cf.parking.facade.bo.*;
-import com.cf.parking.facade.constant.FeignUrlConstant;
 import com.cf.parking.facade.dto.*;
 import com.cf.parking.facade.facade.ParkingLotFacade;
 import com.cf.parking.services.integration.GatewayHikvisionFeign;
@@ -178,7 +178,7 @@ public class ParkingLotFacadeImpl implements ParkingLotFacade
         }
     }
 
-    private void setImageInfo(List<ParkingLotImagesDTO> images, ParkingLotPO po) {
+    private void setImageInfo(List<ParkingLotImageDTO> images, ParkingLotPO po) {
         if (CollectionUtils.isNotEmpty(images)){
             String imageInfo = JSON.toJSONString(images);
             po.setImageInfo(imageInfo);
@@ -293,25 +293,33 @@ public class ParkingLotFacadeImpl implements ParkingLotFacade
     }
 
     /**
-     * 查询停车场车位数量饼图
+     * 查询所有非园区的停车场id-region列表
      * @return
      */
     @Override
-    public List<SpaceNumBO> getParkingLotPieChart() {
-        HikvisionResult<List<SpaceNumDTO>> hikvisionResult;
-        try{
-            hikvisionResult = gatewayHikvisionFeign.remainSpaceNum(FeignUrlConstant.SPACE_NUM_URL, new ParkSyscodeDTO());
-        }catch (Exception e){
-            log.info("调用海康接口停车场列表错误:{}", e);
-            throw new BusinessException("海康接口查询失败！");
-        }
-        log.info("所有停车场列表:{}", hikvisionResult);
-        List<SpaceNumDTO> data = hikvisionResult.getData();
-        if (CollectionUtils.isNotEmpty(data)){
-            return data.stream().map(spaceNumDTO -> new SpaceNumBO().setValue(Long.parseLong(spaceNumDTO.getLeftPlace())).setName(spaceNumDTO.getParkName())).collect(Collectors.toList());
-        }
-        return BeanConvertorUtils.copyList(data, SpaceNumBO.class);
+    public List<ParkingLotBO> getParkingLotIdRegionList() {
+        LambdaQueryWrapper<ParkingLotPO> queryWrapper = new LambdaQueryWrapper<ParkingLotPO>().select(ParkingLotPO::getId, ParkingLotPO::getRegion).ne(ParkingLotPO::getParentId,0);
+        List<ParkingLotPO> poList = mapper.selectList(queryWrapper);
+
+        return BeanConvertorUtils.copyList(poList,ParkingLotBO.class);
     }
+
+    /**
+     * 根据id查询停车场信息
+     * @return
+     */
+    @Override
+    public ParkingLotImageBO getParkingLotInfoById(Long id) {
+        //根据id查询包含图片信息的停车场对象信息
+        ParkingLotPO po = mapper.selectParkingLotPOWithImageInfoById(id);
+
+        ParkingLotImageBO bo = new ParkingLotImageBO();
+        BeanUtils.copyProperties(po, bo);
+        //将字符串转为图片信息对象
+        bo.setFiles(JSON.parseObject(po.getImageInfo(), new TypeReference<List<ParkingLotImageInfoBO>>(){}));
+        return bo;
+    }
+
 
     private List<ParkingLotTreeBO> getParkingLotTreeChildren(ParkingLotTreeBO treeBO) {
         List<ParkingLotPO> childPOList = mapper.selectList(new LambdaQueryWrapper<ParkingLotPO>().eq(ParkingLotPO::getParentId, treeBO.getId()));
