@@ -19,6 +19,7 @@ import com.cf.parking.facade.facade.LotteryBatchFacade;
 import com.cf.parking.services.enums.LotteryBatchStateEnum;
 import com.cf.parking.services.enums.LotteryResultStateEnum;
 import com.cf.parking.services.service.LotteryBatchService;
+import com.cf.parking.services.service.LotteryDealService;
 import com.cf.parking.services.service.LotteryResultService;
 import com.cf.parking.services.service.ParkingLotService;
 import com.cf.parking.services.service.UserProfileService;
@@ -70,6 +71,9 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
 
     @Resource
     private DingTalkBean dingTalkBean;
+    
+    @Resource
+    private LotteryDealService lotteryDealService;
 
     @Resource
     private IdWorker idWorker;
@@ -307,6 +311,20 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
             return validStartDate.compareTo(batchPO.getValidEndDate()) >= 1;
         }
         return true;
+    }
+
+
+    @Transactional(rollbackFor = Exception.class)
+	@Override
+	public void allocationPark(Long id, String parkingCode) {
+		LotteryBatchPO lotteryBatchPO = mapper.selectById(id);
+		AssertUtil.checkNull(lotteryBatchPO, "批次数据不存在");
+		AssertUtil.checkTrue(LotteryBatchStateEnum.HAVE_END.getState().equals(lotteryBatchPO.getState()), "当前状态不能进行分配");
+		ParkingLotPO parking = parkingLotService.selectParkingLotByCode(parkingCode);
+		AssertUtil.checkNull(parking, "停车场不存在");
+		long num = mapper.updateByState(id,LotteryBatchStateEnum.HAVE_END.getState(),LotteryBatchStateEnum.ALLOCATIONED.getState());
+		AssertUtil.checkTrue(num == 1, "状态已变更,请刷新重试");	
+		lotteryDealService.allocationPark(lotteryBatchPO,parking);
     }
 
 

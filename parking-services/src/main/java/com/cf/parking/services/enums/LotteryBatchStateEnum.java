@@ -8,7 +8,9 @@ package com.cf.parking.services.enums;
 public enum LotteryBatchStateEnum {
     NEED_NOTIFY("0","待通知"),
     HAVE_NOTIFIED("1","已通知"),
-    HAVE_END("2","已结束");
+    HAVE_END("2","已结束"),
+    ALLOCATIONED("3","已分配")
+    ;
 
 
     private String state;

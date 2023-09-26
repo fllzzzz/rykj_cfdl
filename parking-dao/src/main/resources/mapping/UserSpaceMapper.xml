@@ -27,7 +27,7 @@
     </delete>
     
     <select id="querySpaceGroupByExpireDate" resultMap="userSpaceMap">
-    	select job_number,parking_lot ,start_date,end_date from user_space where job_number = #{jobNum} and type = 1 GROUP BY parking_lot ,start_date,end_date
+    	select job_number,parking_lot ,start_date,end_date from user_space where job_number = #{jobNum} and type = #{type} GROUP BY parking_lot ,start_date,end_date
     </select>
     
 </mapper>

@@ -1,14 +1,16 @@
 package com.cf.parking.services.service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -55,6 +57,11 @@ public class LotteryDealService {
 	@Resource
 	private UserService userService;
 	
+	@Resource
+	private LotteryApplyRecordService lotteryApplyRecordService;
+	
+	@Resource
+	private UserVerifyService userVerifyService;
 	
 	
 	
@@ -129,6 +136,10 @@ public class LotteryDealService {
 	 * @param outSpaceList 转让人车位
 	 * @param verifyList 受让人车牌
 	 * @param inJobNum 受让人工号
+	 * 
+	 *  1.受让人无车位且无公共车位，插入带定时日期的数据；
+  		2.受让人仅有公共车位--->更改公共车位截止日期为今天，其余信息不改;插入带定时日期的数据，利用闸机车牌覆盖策略，覆盖掉公共车位
+  		3.受让人有车位，3.1判断两者日期不可重叠，3.2判断是否同一车库，是的话根据日期判断更改开始或结束日期，不为同一车库则插入带定时日期的数据
 	 */
 	@Transactional(rollbackFor = Exception.class)
 	public void transfer(List<UserSpacePO> outSpaceList, List<UserVerifyPO> verifyList, String inJobNum) {
@@ -146,16 +157,20 @@ public class LotteryDealService {
 		
 		String userName = verifyList.get(0).getUserName();
 		//用户已有车库、有效期
-		List<UserSpacePO> spaceList = userSpaceService.querySpaceGroupByExpireDate(inJobNum);
+		List<UserSpacePO> spaceList = userSpaceService.querySpaceGroupByExpireDate(inJobNum,UserSpaceTypeEnum.LOTTERY.getState());
 		log.info("受让人持有的车位：{}",spaceList);
 		//受让人拥有的车库
 		List<String> parkLotList = spaceList.stream().map(item -> item.getParkingLot()).collect(Collectors.toList());
 		
 		if (CollectionUtils.isEmpty(spaceList)) { //受让人无摇号车位
-			//这里没有去区分分配车位，原因是转让车位都是指定日期生效的，它生效之后，会把分配的车位覆盖掉
-			Date date = DateUtil.beginOfDay(new Date())  ;
+
+			Date minDate = DateUtil.beginOfDay(new Date());
+			Date maxDate = DateUtil.beginOfDay(new Date());
+			
 			for(UserSpacePO outSpace : outSpaceList ) {
-				
+				//取最小的日期
+				minDate = minDate.compareTo(outSpace.getStartDate()) > 0 ? outSpace.getStartDate() : minDate;
+				maxDate = maxDate.compareTo(outSpace.getEndDate()) > 0 ?  maxDate : outSpace.getEndDate();
 				transferList.add(initTransferInfo(outSpace,outUser.getUserId(), verifyList.get(0).getUserId(),verifyList.get(0).getUserName()));
 				verifyList.forEach(verify -> {
 						UserSpacePO po = new UserSpacePO()
@@ -171,38 +186,44 @@ public class LotteryDealService {
 								.setStartDate(outSpace.getStartDate())
 								.setEndDate(outSpace.getEndDate())
 								.setState(UserSpaceStateEnum.UNSYNC.getState())
+								.setType(UserSpaceTypeEnum.LOTTERY.getState())
 								.setBatchId(outSpace.getBatchId())
 								.setBatchNum(outSpace.getBatchNum())
 								.setRoundId(outSpace.getRoundId());
 						addList.add(po);
-						
 					});
 			}
+			
+			List<UserSpacePO> alloSpaceList = userSpaceService.querySpaceGroupByExpireDate(inJobNum,UserSpaceTypeEnum.SETTING.getState());
+			if (!CollectionUtils.isEmpty(alloSpaceList)) {
+				for (UserSpacePO space : alloSpaceList) {
+					if (maxDate.compareTo(space.getEndDate()) < 0) {//可能是月末转让，且第二个月受让者又没中，导致转让的有效期小于公共车位有效期
+						//更新起始日期为下有效期截止日期+1
+						Date startDate = DateUtils.addDays(maxDate, 1);
+						userSpaceService.updateStartDate(inJobNum,startDate, DateUtil.format(startDate, ParkingConstants.SHORT_DATE_FORMAT), UserSpaceTypeEnum.SETTING.getState());
+					}
+				}
+				
+			}
+			
 			
 		} else {
 		  /**
 			* 我们的日期都是整月出现的，且下一期的有效期开始时间大于上一期的结束时间，在批次设置里有校验
 			* 所以日期上会出现4种情况
 			* 1.转让车位的有效期是受让人持有车位有效期的子集，同一个车位不能再同一时间段又2个车位，所以不能转让
-			* 2.受让人持有车位的有效期是转让车位有效期的子集，不让转让
+			* 2.受让人持有车位的有效期是转让车位有效期的子集，不让转让 (1和2总结就是日期不能有交集)
 			* 3.转让车位的有效期的结束时间<持有车辆有效期的开始时间 ，同一个车库就合并车位有效期，否则就新增一条车位数据
 			* 4.持有车位的有效期的结束时间< 转让车辆有效期的开始时间，同一个车库就合并车位有效期，否则就新增一条车位数据
 			*/
 			outSpaceList.forEach(outSpace -> { //校验有没有第一种和第二种情况
 				spaceList.forEach(inSpace -> {
-					if (inSpace.getEndDate().compareTo(outSpace.getEndDate()) >= 0 && 
-							inSpace.getStartDate().compareTo(outSpace.getStartDate()) <= 0) {
-						//转让人的车位有效期是受让人车位有效期的子集
-						log.error("转让人车位={}的有效期属于受让人车位={}的一部分,无须进行转让");
-						throw new BusinessException("受让人持有该有效期内的车位，无法进行转让");
+					
+					if( !(inSpace.getStartDate().compareTo(outSpace.getEndDate()) > 0 ||
+							outSpace.getStartDate().compareTo(inSpace.getEndDate()) > 0	)) {
+						throw new BusinessException("受让人持有的车位有效期和转让人的车位有效期不能存在重叠，无法进行转让");
 					}
 					
-					if (inSpace.getEndDate().compareTo(outSpace.getEndDate()) <= 0 && 
-							inSpace.getStartDate().compareTo(outSpace.getStartDate()) >= 0) {
-						//转让人的车位有效期是受让人车位有效期的子集
-						log.error("转让人车位={}的有效期属于受让人车位={}的一部分,无须进行转让");
-						throw new BusinessException("受让人持有该有效期内的车位，无法进行转让");
-					}
 				});
 			});
 			
@@ -231,6 +252,7 @@ public class LotteryDealService {
 									.setScheduleDate(outSpace.getStartDate().compareTo(DateUtil.endOfDay(new Date())) > 0 ? DateUtil.format(outSpace.getStartDate(), ParkingConstants.SHORT_DATE_FORMAT)  :  DateUtil.format(DateUtil.beginOfDay( DateUtil.tomorrow()), ParkingConstants.SHORT_DATE_FORMAT))
 									.setStartDate(outSpace.getStartDate())
 									.setState(UserSpaceStateEnum.UNSYNC.getState())
+									.setType(UserSpaceTypeEnum.LOTTERY.getState())
 									.setBatchId(outSpace.getBatchId())
 									.setBatchNum(outSpace.getBatchNum())
 									.setRoundId(outSpace.getRoundId())
@@ -244,6 +266,7 @@ public class LotteryDealService {
 									.setScheduleDate(outSpace.getStartDate().compareTo(DateUtil.endOfDay(new Date())) > 0 ? DateUtil.format(outSpace.getStartDate(), ParkingConstants.SHORT_DATE_FORMAT)  :  DateUtil.format(DateUtil.beginOfDay( DateUtil.tomorrow()), ParkingConstants.SHORT_DATE_FORMAT))
 									.setEndDate(outSpace.getEndDate())
 									.setState(UserSpaceStateEnum.UNSYNC.getState())
+									.setType(UserSpaceTypeEnum.LOTTERY.getState())
 									.setBatchId(outSpace.getBatchId())
 									.setBatchNum(outSpace.getBatchNum())
 									.setRoundId(outSpace.getRoundId())
@@ -268,6 +291,7 @@ public class LotteryDealService {
 								.setStartDate(outSpace.getStartDate())
 								.setEndDate(outSpace.getEndDate())
 								.setState(UserSpaceStateEnum.UNSYNC.getState())
+								.setType(UserSpaceTypeEnum.LOTTERY.getState())
 								.setBatchId(outSpace.getBatchId())
 								.setBatchNum(outSpace.getBatchNum())
 								.setRoundId(outSpace.getRoundId())
@@ -291,6 +315,7 @@ public class LotteryDealService {
 								.setScheduleDate(outSpace.getStartDate().compareTo(DateUtil.endOfDay(new Date())) > 0 ? DateUtil.format(outSpace.getStartDate(), ParkingConstants.SHORT_DATE_FORMAT)  :  DateUtil.format(DateUtil.beginOfDay( DateUtil.tomorrow()), ParkingConstants.SHORT_DATE_FORMAT))
 								.setStartDate(outSpace.getStartDate())
 								.setEndDate(outSpace.getEndDate())
+								.setType(UserSpaceTypeEnum.LOTTERY.getState())
 								.setState(UserSpaceStateEnum.UNSYNC.getState())
 								.setBatchId(outSpace.getBatchId())
 								.setBatchNum(outSpace.getBatchNum())
@@ -341,6 +366,207 @@ public class LotteryDealService {
 				.setUserId(userId)
 				.setValidEndDate(outSpace.getEndDate())
 				.setValidStartDate(outSpace.getStartDate())				;
+	}
+
+	/**
+	 * 根据批次给未中签的人员分配停车场
+	 * @param batch 批次数据
+	 * @param parking 停车场数据
+	 */
+	public void allocationPark(LotteryBatchPO batch, ParkingLotPO parking) {
+		//获取到报名人员
+		List<LotteryApplyRecordPO> applyList = lotteryApplyRecordService.queryLotteryApplyList(batch.getId() ,null);
+		//获取中签人员
+		List<String> jobNumList = lotteryResultDetailService.querySpaceListByBatchId(batch.getId());
+		//过滤掉中签人员
+		applyList = applyList.stream().filter(apply -> !jobNumList.contains(apply.getJobNumber())).collect(Collectors.toList());
+		jobNumList.clear();;
+		List<String> applyJobList = applyList.stream().map(apply -> apply.getJobNumber()).collect(Collectors.toList());
+		//查询未中签用户是否有车位
+		List<UserSpacePO> existSpaceList = userSpaceService.querySpaceListByJobNum(applyJobList, UserSpaceTypeEnum.LOTTERY.getState());
+		List<UserSpacePO> alloSpaceList = userSpaceService.querySpaceListByJobNum(applyJobList, UserSpaceTypeEnum.SETTING.getState());
+		//查询用户
+		List<UserPO> userList = userService.getUserByOpenIdList(applyJobList);
+		List<Long> userIdList = userList.stream().map(user -> user.getUserId()).collect(Collectors.toList());
+		//车牌列表
+		List<UserVerifyPO> vefifyList = userVerifyService.queryVerifyListByUserIdList(userIdList);
+		userIdList.clear();
+		userList.clear();
+		applyJobList.clear();
+		
+		List<UserSpacePO> existList = new ArrayList<>();
+		List<UserSpacePO> addList = new ArrayList<>();
+		
+		generateSpaceList(batch,parking,applyList,existSpaceList,alloSpaceList,vefifyList,existList,addList);
+		
+		if (!CollectionUtils.isEmpty(addList)) {
+			userSpaceService.saveBatch(addList);
+		}
+		
+		if (!CollectionUtils.isEmpty(existList)) {
+			userSpaceService.updateBatchById(existList);
+		}
+		
+	}
+
+	/**
+	 * 生成车位信息数据
+	 * @param batch			  批次数据
+	 * @param parking 
+	 * @param applyList 	  报名数据
+	 * @param existSpaceList  摇号车位
+	 * @param alloSpaceList   分配车位
+	 * @param vefifyList 	  车牌信息
+	 * @param addList 	 待保存的车位
+	 * @param existList  待更新的车位
+	 */
+	private void generateSpaceList(LotteryBatchPO batch, ParkingLotPO parking, List<LotteryApplyRecordPO> applyList,
+			List<UserSpacePO> existSpaceList, List<UserSpacePO> alloSpaceList, List<UserVerifyPO> vefifyList,
+			List<UserSpacePO> existList, List<UserSpacePO> addList) {
+		//车位信息映射成Map形式  {jobNum:{plateNo:UserSpacePO}}
+		Map<String/**工号*/, Map<String/**车牌*/, UserSpacePO>> userSpaceMap = (Map<String, Map<String, UserSpacePO>>) existSpaceList.stream()
+			.collect(Collectors.toMap(UserSpacePO::getJobNumber, // 工号作为外层Map的键
+				   userSpacePO -> {
+				            Map<String, UserSpacePO> innerMap = new HashMap<>();
+				            innerMap.put(userSpacePO.getPlateNo(), userSpacePO); // 使用车牌作为内层Map的键
+				            return innerMap;
+				       },
+				       (existingMap, newMap) -> {
+				            existingMap.putAll(newMap); // 合并现有Map和新Map中的元素
+				            return existingMap;
+				       }));
+		existSpaceList.clear();
+		
+		Map<String/**工号*/, Map<String/**车牌*/, UserSpacePO>> alloSpaceMap = (Map<String, Map<String, UserSpacePO>>) alloSpaceList.stream()
+				.collect(Collectors.toMap(UserSpacePO::getJobNumber, // 工号作为外层Map的键
+					   userSpacePO -> {
+					            Map<String, UserSpacePO> innerMap = new HashMap<>();
+					            innerMap.put(userSpacePO.getPlateNo(), userSpacePO); // 使用车牌作为内层Map的键
+					            return innerMap;
+					       },
+					       (existingMap, newMap) -> {
+					            existingMap.putAll(newMap); // 合并现有Map和新Map中的元素
+					            return existingMap;
+					       }));
+		alloSpaceList.clear();
+		//车牌信息映射成用户id--车牌集合形式
+		Map<Long,List<String>> verifyMap = vefifyList.stream().collect(Collectors.groupingBy(UserVerifyPO::getUserId ,Collectors.mapping(UserVerifyPO::getPlateNo, Collectors.toList())));
+		vefifyList.clear();
+		
+		//临时存放车牌数据
+		List<String> plateNoList = new ArrayList<>();
+		//存放车牌---车位对应信息
+		Map<String, UserSpacePO> plateMap = new HashMap<>();
+		//存放有效期和批次有效期一致的车位数据
+		List<UserSpacePO> canSkipList = new ArrayList<>();
+		//存放临时车位信息
+		UserSpacePO tempSpace = null;
+		for(LotteryApplyRecordPO apply : applyList){
+			
+			plateNoList = verifyMap.get(apply.getUserId());
+			if (CollectionUtils.isEmpty(plateNoList)) {
+				log.error("工号为：{}的用户无车牌",apply.getJobNumber());
+				continue;
+			}
+			
+			if (userSpaceMap.containsKey(apply.getJobNumber())) {
+				//存在车位
+				//两种情况，1.上一次的车位还未过期，这时的车位应该加上定时日期。2.有人给他转车位了，这时应该跳过。
+				plateMap = userSpaceMap.get(apply.getJobNumber());
+				//筛选出车位有效期和当前批次一致的数据
+				canSkipList = plateMap.values().stream().filter(space -> DateUtil.beginOfDay(space.getEndDate()).compareTo(DateUtil.beginOfDay(batch.getValidEndDate())) == 0 ).collect(Collectors.toList());
+				if(!CollectionUtils.isEmpty(canSkipList)) { //不为空，则是第二种（有人给他转车位了）
+					continue;
+				} else {
+					addSpaceList(addList,batch,apply,plateNoList,DateUtil.format(batch.getValidStartDate(), ParkingConstants.SHORT_DATE_FORMAT),parking.getRegionCode());
+				}
+			} else if (alloSpaceMap.containsKey(apply.getJobNumber())){//存在公共车位 
+				plateMap = alloSpaceMap.get(apply.getJobNumber());
+				for(String plateNo : plateNoList) {
+					tempSpace = plateMap.get(plateNo);//获取车牌对应的车库
+					updateSpaceList(addList,existList,batch,apply,tempSpace,plateNo,parking.getRegionCode());
+				}
+			} else {
+				addSpaceList(addList,batch,apply,plateNoList,null,parking.getRegionCode());
+			}
+			
+		}
+	}
+
+	/**
+	 * tempSpace存在时，判断车库和入参parkCode是否一致，一致时放到修改列表，不一致放到新增列表
+	 * tempSpace不存在，放到新增列表
+	 * @param addList 待保存的车位集合
+	 * @param existList 待修改的车位集合
+	 * @param batch 分配的批次
+	 * @param apply 报名信息
+	 * @param tempSpace 已有的分配车位
+	 * @param plateNo 车牌好
+	 * @param parkCode 车库编码
+	 */
+	private void updateSpaceList(List<UserSpacePO> addList, List<UserSpacePO> existList, LotteryBatchPO batch,
+			LotteryApplyRecordPO apply, UserSpacePO tempSpace, String plateNo, String parkCode) {
+		if(tempSpace != null && tempSpace.getParkingLot().equals(parkCode)) { //存在车位且车库一致，更新
+			tempSpace.setEndDate(batch.getValidEndDate())
+					.setScheduleDate("")
+					.setState(UserSpaceStateEnum.UNSYNC.getState())
+					.setUpdateTm(new Date())
+					.setBatchId(batch.getId())
+					.setType(UserSpaceTypeEnum.SETTING.getState());
+			existList.add(tempSpace);
+			return ;
+		}
+		
+		UserSpacePO space = new UserSpacePO()
+				.setBatchId(batch.getId())
+				.setType(UserSpaceTypeEnum.SETTING.getState())
+				.setBatchNum(batch.getBatchNum())
+				.setCreateTm(new Date())
+				.setEndDate(batch.getValidEndDate())
+				.setJobNumber(apply.getJobNumber())
+				.setName(apply.getUserName())
+				.setParkingLot(parkCode)
+				.setPlateNo(plateNo)
+				//走到这里，代表这个人是有车位的，只是没有这个车牌,或者是这个车牌有车库只是车库不一致。没有这个车牌就不需要定时新增，车库不一致需要定时新增
+				.setScheduleDate(tempSpace == null ? null : DateUtil.format(batch.getValidStartDate(), ParkingConstants.SHORT_DATE_FORMAT))
+				.setStartDate(batch.getValidStartDate())
+				.setState(UserSpaceStateEnum.UNSYNC.getState())
+				.setUpdateTm(new Date())
+				.setUserSpaceId(idWorker.nextId())
+				;
+		addList.add(space);
+		
+	}
+
+	/**
+	 * 往待保存集合addList中添加数据
+	 * @param addList
+	 * @param batch
+	 * @param apply 
+	 * @param plateNoList
+	 */
+	private void addSpaceList(List<UserSpacePO> addList, LotteryBatchPO batch, LotteryApplyRecordPO apply, List<String> plateNoList,String scheduleDate,String parkCode) {
+		plateNoList.forEach(plate -> {
+			UserSpacePO space = new UserSpacePO()
+					.setBatchId(batch.getId())
+					.setType(UserSpaceTypeEnum.SETTING.getState())
+					.setBatchNum(batch.getBatchNum())
+					.setCreateTm(new Date())
+					.setEndDate(batch.getValidEndDate())
+					.setJobNumber(apply.getJobNumber())
+					.setName(apply.getUserName())
+					.setParkingLot(parkCode)
+					.setPlateNo(plate)
+					.setScheduleDate(scheduleDate)
+					.setStartDate(batch.getValidStartDate())
+					.setState(UserSpaceStateEnum.UNSYNC.getState())
+					.setUpdateTm(new Date())
+					.setUserSpaceId(idWorker.nextId())
+					;
+			addList.add(space);
+		});
+		
+		
 	}
 			
 	

@@ -6,6 +6,7 @@ import com.cf.parking.dao.po.UserSpacePO;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * @author lpy
@@ -24,7 +25,7 @@ public interface UserSpaceMapper extends BaseMapper<UserSpacePO> {
 	 * @param outJobNum
 	 * @return
 	 */
-	List<UserSpacePO> querySpaceGroupByExpireDate(String jobNum);
+	List<UserSpacePO> querySpaceGroupByExpireDate(@Param("jobNum") String jobNum,@Param("type")Integer type);
 
 }
 
