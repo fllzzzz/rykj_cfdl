@@ -18,6 +18,7 @@ import com.cf.support.bean.IdWorker;
 import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -54,6 +55,7 @@ public class LotteryRuleAssignFacadeImpl implements LotteryRuleAssignFacade
 
         Page<LotteryRuleAssignPO> poPage = mapper.selectPage(page, new LambdaQueryWrapper<LotteryRuleAssignPO>()
                 .eq(StringUtils.isNotBlank(dto.getType()), LotteryRuleAssignPO::getType, dto.getType())
+                .eq(ObjectUtils.isNotEmpty(dto.getRoundId()),LotteryRuleAssignPO::getRoundId,dto.getRoundId())
                 .like(StringUtils.isNotBlank(dto.getName()), LotteryRuleAssignPO::getName, dto.getName())
                 .eq(StringUtils.isNotBlank(dto.getParkingLotCode()), LotteryRuleAssignPO::getParkingLotCode, dto.getParkingLotCode())
                 .eq(StringUtils.isNotBlank(dto.getState()), LotteryRuleAssignPO::getState, dto.getState())
@@ -62,7 +64,7 @@ public class LotteryRuleAssignFacadeImpl implements LotteryRuleAssignFacade
         List<LotteryRuleAssignBO> boList = BeanConvertorUtils.copyList(poPage.getRecords(), LotteryRuleAssignBO.class);
 
         //根据停车场code查询停车场名称返回前端
-        boList.stream().forEach(this::setParkingLotName);
+        boList.forEach(this::setParkingLotName);
         return PageUtils.toResponseList(page,boList);
     }
 

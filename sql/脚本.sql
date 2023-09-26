@@ -28,6 +28,7 @@ create table parking_lot(
   amount        int(0)              default 0          comment '车位数量',
   type          char(1)             default 0         comment '类型(0：可摇号，1：不可摇号)',
   remark      varchar(128)          default ''         comment '备注',
+  image_info      longtext                            comment '图片信息',
   create_tm     timestamp(3)                          comment '创建时间',
   update_tm     timestamp(3)                          comment '更新时间',
   primary key (id) USING BTREE,

@@ -1,5 +1,7 @@
 package com.cf.parking.services.facade.impl;
 
+import cn.afterturn.easypoi.excel.ExcelExportUtil;
+import cn.afterturn.easypoi.excel.entity.enmus.ExcelType;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -13,6 +15,7 @@ import com.cf.parking.facade.dto.UserVerifyDTO;
 import com.cf.parking.facade.dto.UserVerifyOptDTO;
 import com.cf.parking.facade.facade.UserVerifyFacade;
 import com.cf.parking.services.constant.ParkingConstants;
+import com.cf.parking.services.enums.PictureInfoEnum;
 import com.cf.parking.services.enums.UserVerifyStateEnum;
 import com.cf.parking.services.service.UserProfileService;
 import com.cf.parking.services.utils.PageUtils;
@@ -20,16 +23,27 @@ import com.cf.support.bean.IdWorker;
 import com.cf.support.exception.BusinessException;
 import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
+import com.cf.support.utils.ExcelUtiles;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.util.Base64;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -51,18 +65,27 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
     @Resource
     private UserProfileService userProfileService;
 
+    private static HashMap<Integer,String> stateMap = new HashMap<>();
+
+    static {
+        stateMap.put(UserVerifyStateEnum.UNAUDIT.getState(),UserVerifyStateEnum.UNAUDIT.getRemark());
+        stateMap.put(UserVerifyStateEnum.FAILED.getState(),UserVerifyStateEnum.FAILED.getRemark());
+        stateMap.put(UserVerifyStateEnum.SUCCESS.getState(),UserVerifyStateEnum.SUCCESS.getRemark());
+    }
+
     /**
      * 查询车辆审核列表
      * @param dto
      * @return
      */
     @Override
-    public PageResponse<UserVerifyBO> getUserVerifyList(UserVerifyDTO dto) {
+    public PageResponse<UserVerifyBO> getPageUserVerifyList(UserVerifyDTO dto) {
         Page<UserVerifyPO> page = PageUtils.toPage(dto);
 
         LambdaQueryWrapper<UserVerifyPO> queryWrapper = new LambdaQueryWrapper<UserVerifyPO>()
                 .eq(!ObjectUtils.isEmpty(dto.getState()), UserVerifyPO::getState, dto.getState())
                 .like(StringUtils.isNotBlank(dto.getUserName()), UserVerifyPO::getUserName, dto.getUserName())
+                .like(StringUtils.isNotBlank(dto.getPlatNo()), UserVerifyPO::getPlateNo, dto.getPlatNo())
                 .le( !ObjectUtils.isEmpty(dto.getEndDate()) , UserVerifyPO::getCreateTm, DateUtil.format(dto.getEndDate(), "yyyy-MM-dd 23:59:59") )
                 .ge(!ObjectUtils.isEmpty(dto.getStartDate()), UserVerifyPO::getCreateTm, dto.getStartDate())
                 .orderByDesc(UserVerifyPO::getCreateTm);
@@ -114,7 +137,7 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
         if (null != userInfoPO){
             userVerifyPO.setUserName(userInfoPO.getName());
         }
-        userVerifyPO.setState(Integer.parseInt(UserVerifyStateEnum.UNAUDIT.getState()));
+        userVerifyPO.setState(UserVerifyStateEnum.UNAUDIT.getState());
         userVerifyPO.setCreateTm(new Date());
         userVerifyPO.setUpdateTm(new Date());
         try{
@@ -169,7 +192,7 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
         List<UserVerifyPO> poList = mapper.selectBatchIds(dto.getIds());
         List<Long> userIds = poList.stream().filter(po->!ObjectUtils.isEmpty(po.getUserId())).map(UserVerifyPO::getUserId).collect(Collectors.toList());
         //2.2批量更新
-        if (CollectionUtils.isNotEmpty(userIds) && UserVerifyStateEnum.SUCCESS.getState().equals(dto.getState().toString())){
+        if (CollectionUtils.isNotEmpty(userIds) && UserVerifyStateEnum.SUCCESS.getState().equals(dto.getState())){
             //为停车场信息为空的用户默认停车场
             List<UserProfilePO> userProfilePOList = userProfileService.selectList(userIds);
             List<Long> changeUserIds = userProfilePOList.stream().filter(po -> StringUtils.isBlank(po.getParkingLotRegion())).map(UserProfilePO::getUserId).collect(Collectors.toList());
@@ -208,7 +231,7 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
 
         //2.修改
         BeanUtils.copyProperties(dto,userVerifyPO);
-        userVerifyPO.setState(Integer.parseInt(UserVerifyStateEnum.UNAUDIT.getState()));
+        userVerifyPO.setState(UserVerifyStateEnum.UNAUDIT.getState());
         userVerifyPO.setReason("");
         userVerifyPO.setUpdateTm(new Date());
         try{
@@ -242,5 +265,96 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
         UserVerifyPO po = mapper.selectById(id);
         return BeanConvertorUtils.map(po, UserVerifyBO.class);
     }
+
+    /**
+     *车辆审核信息批量导出
+     * @param boList
+     * @return
+     */
+    @Override
+    public void batchExport(List<UserVerifyBO> boList, HttpServletResponse response) {
+
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet();
+
+        //由于要将base64转为图片，无法复用excelExport方法，这里一行行进行添加
+        //1.设置title
+        Row titleRow = sheet.createRow(0);
+        setTitle(titleRow);
+
+        //2.对于每一行，设置内容和图片
+        for (int i = 0; i < boList.size(); i++) {
+            //2.1设置内容
+            UserVerifyBO bo = boList.get(i);
+            Row dataRow = sheet.createRow(i + 1);
+            dataRow.createCell(0).setCellValue(DateFormatUtils.format(bo.getCreateTm(),"yyyy-MM-dd"));
+            dataRow.createCell(1).setCellValue(bo.getUserName());
+            dataRow.createCell(2).setCellValue(bo.getPlateNo());
+            dataRow.createCell(6).setCellValue(stateMap.get(bo.getState()));
+            dataRow.createCell(7).setCellValue(bo.getReason());
+
+            //2.2设置图片
+            importPic2Excel(workbook, sheet, i+1,3, bo.getVehicleImg());
+            importPic2Excel(workbook, sheet, i+1,4, bo.getDrivingPermitImg());
+            importPic2Excel(workbook, sheet, i+1,5, bo.getDrivingLicenseImg());
+        }
+
+        try {
+            response.setCharacterEncoding("UTF-8");
+            response.setHeader("content-Type", "application/vnd.ms-excel");
+            response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode("车辆审核信息批量导出.xlsx", "UTF-8"));
+            workbook.write(response.getOutputStream());
+            workbook.close();
+        } catch (Exception e) {
+            log.error("车辆审核信息批量导出失败：{}",e);
+        }
+    }
+
+    /**
+     * 根据条件查询所有符合条件的记录
+     * @param dto
+     * @return
+     */
+    @Override
+    public List<UserVerifyBO> getAllUserVerifyList(UserVerifyDTO dto) {
+        LambdaQueryWrapper<UserVerifyPO> queryWrapper = new LambdaQueryWrapper<UserVerifyPO>()
+                .eq(!ObjectUtils.isEmpty(dto.getState()), UserVerifyPO::getState, dto.getState())
+                .eq(!ObjectUtils.isEmpty(dto.getUserName()),UserVerifyPO::getUserName,dto.getUserName())
+                .eq(!ObjectUtils.isEmpty(dto.getPlatNo()),UserVerifyPO::getPlateNo,dto.getPlatNo())
+                .le( !ObjectUtils.isEmpty(dto.getEndDate()) , UserVerifyPO::getCreateTm, DateUtil.format(dto.getEndDate(), "yyyy-MM-dd 23:59:59") )
+                .ge(!ObjectUtils.isEmpty(dto.getStartDate()), UserVerifyPO::getCreateTm, dto.getStartDate())
+                .orderByDesc(UserVerifyPO::getCreateTm);
+        List<UserVerifyPO> poList = mapper.selectList(queryWrapper);
+        return BeanConvertorUtils.copyList(poList,UserVerifyBO.class);
+    }
+
+    private void setTitle(Row titleRow) {
+        titleRow.createCell(0).setCellValue("申请日期");
+        titleRow.createCell(1).setCellValue("申请人");
+        titleRow.createCell(2).setCellValue("车牌号");
+        titleRow.createCell(3).setCellValue("车辆照片");
+        titleRow.createCell(4).setCellValue("行驶证照片");
+        titleRow.createCell(5).setCellValue("驾驶证照片");
+        titleRow.createCell(6).setCellValue("状态");
+        titleRow.createCell(7).setCellValue("审核意见");
+    }
+
+    private void importPic2Excel(Workbook workbook, Sheet sheet, int row,int col, String img) {
+        String base64Str = img.replaceFirst(PictureInfoEnum.BASE64_JPG_PRE.getInfo(),"");
+        byte[] vehicleImageData = Base64.getDecoder().decode(base64Str);
+        //添加图片获取索引
+        int pictureIdx = workbook.addPicture(vehicleImageData, Workbook.PICTURE_TYPE_JPEG);
+        //获取辅助类对象
+        CreationHelper helper = workbook.getCreationHelper();
+        //创建Drawing并插入图片
+        Drawing drawing = sheet.createDrawingPatriarch();
+        ClientAnchor anchor = helper.createClientAnchor();
+        anchor.setCol1(col);
+        anchor.setRow1(row);
+        Picture pict = drawing.createPicture(anchor, pictureIdx);
+        //设置图片大小
+        pict.resize(1);
+    }
+
 
 }

@@ -47,4 +47,7 @@ public class ParkingLotPO
     /** 备注 */
     private String remark;
 
+    /** 备注 */
+    private String imageInfo;
+
 }

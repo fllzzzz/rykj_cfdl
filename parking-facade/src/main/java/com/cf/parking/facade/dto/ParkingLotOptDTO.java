@@ -1,10 +1,10 @@
 package com.cf.parking.facade.dto;
 
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author
@@ -40,4 +40,7 @@ public class ParkingLotOptDTO {
 
     /** 备注 */
     private String remark;
+
+    /** 上传的图片信息 */
+    private List<ParkingLotImagesDTO> files;
 }

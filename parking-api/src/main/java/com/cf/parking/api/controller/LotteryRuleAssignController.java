@@ -142,7 +142,7 @@ public class LotteryRuleAssignController
         LotteryRuleAssignOptDTO dto = new LotteryRuleAssignOptDTO();
         BeanUtils.copyProperties(param, dto);
 
-        //3.新增处理
+        //3.修改处理
         Integer result = lotteryRuleAssignFacade.update(dto);
         return result > 0 ? Result.buildSuccessResult() : Result.buildErrorResult("修改失败，请重试！");
 
