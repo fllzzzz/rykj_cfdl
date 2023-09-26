@@ -50,4 +50,9 @@ public class UserService extends ServiceImpl<UserPOMapper, UserPO>
     public List<UserPO> getUserByUserIdList(Collection<Long> userIdList) {
         return list(new LambdaQueryWrapper<UserPO>().in( UserPO::getUserId, userIdList));
     }
+    
+    
+    public List<UserPO> getUserByOpenIdList(Collection<String> openIdList) {
+        return list(new LambdaQueryWrapper<UserPO>().in( UserPO::getOpenId, openIdList));
+    }
 }

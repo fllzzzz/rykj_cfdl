@@ -74,4 +74,12 @@ public interface LotteryBatchFacade
      * @return
      */
     boolean judgeValidStartDateUsable(Date validStartDate);
+
+
+	/**
+	 * 分配停车场
+	 * @param id 批次ID
+	 * @param parkingCode 停车场code
+	 */
+	void allocationPark(Long id, String parkingCode);
 }

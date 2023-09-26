@@ -22,5 +22,8 @@
         select id, batch_num, parking_amount, round_id, apply_start_time, apply_end_time, valid_start_date, valid_end_date, state, remark, create_tm, update_tm from lottery_batch
     </sql>
 
+	<update id="updateByState">
+		update lottery_batch set state = #{newState} where id = #{id} and state=#{oldState}
+	</update>
 
 </mapper>

@@ -4,6 +4,7 @@ import javax.annotation.Resource;
 
 import com.alibaba.fastjson.JSON;
 import com.cf.parking.api.annotation.AdminOptLogTitle;
+import com.cf.parking.api.request.LotteryAllocationReq;
 import com.cf.parking.api.request.LotteryBatchOptReq;
 import com.cf.parking.api.request.LotteryBatchReq;
 import com.cf.parking.api.response.LotteryBatchRsp;
@@ -179,6 +180,28 @@ public class LotteryBatchController
 
         Integer result = lotteryBatchFacade.notifyAllUserByBatchId(param.getId());
         return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult("通知失败，请重试！");
+    }
+
+    
+    /**
+     * 给本批次未中签人员分配停车场
+     * (修改前要判断是否已通知)
+     */
+    @AdminOptLogTitle("给本批次未中签人员分配停车场")
+    @AdminUserAuthentication
+    @ApiOperation(value = "未中签人员分配停车场", notes = "未中签人员分配停车场")
+    @PostMapping("/allocationPark")
+    public Result allocationPark(@RequestBody LotteryAllocationReq param)
+    {
+    	log.info("未中签人员分配停车场入参：{}",JSON.toJSONString(param));
+    	
+        //1.参数校验
+    	AssertUtil.checkNull(param, "参数不能为空");
+    	AssertUtil.checkNull(param.getId(), "批次ID不能为空");
+    	AssertUtil.checkNull(param.getParkingCode(), "停车场不能为空");
+
+        lotteryBatchFacade.allocationPark(param.getId(),param.getParkingCode());
+        return Result.buildSuccessResult() ;
     }
 
 

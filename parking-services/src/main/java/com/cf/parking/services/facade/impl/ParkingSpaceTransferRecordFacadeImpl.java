@@ -8,6 +8,7 @@ import javax.annotation.Resource;
 import com.cf.parking.dao.mapper.ParkingSpaceTransferRecordMapper;
 import com.cf.parking.dao.po.*;
 import com.cf.parking.facade.facade.ParkingSpaceTransferRecordFacade;
+import com.cf.parking.services.enums.UserSpaceTypeEnum;
 import com.cf.parking.services.service.*;
 import com.cf.parking.services.utils.AssertUtil;
 import cn.hutool.core.date.DateUtil;
@@ -66,7 +67,7 @@ public class ParkingSpaceTransferRecordFacadeImpl implements ParkingSpaceTransfe
 	@Override
 	public void transfer(String outJobNum, String inJobNum) {
 		log.info("转让开始，转让人：{},受让人：{}",outJobNum,inJobNum);;
-		List<UserSpacePO> spaceList = userSpaceService.querySpaceGroupByExpireDate(outJobNum);
+		List<UserSpacePO> spaceList = userSpaceService.querySpaceGroupByExpireDate(outJobNum,UserSpaceTypeEnum.LOTTERY.getState());
 
 		AssertUtil.checkTrue(!CollectionUtils.isEmpty(spaceList), "您无车位，无法进行转赠");
 		//移除当天到期的车位信息

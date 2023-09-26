@@ -233,6 +233,7 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 
 	/**
 	 * 把中签结果和已有车位结合起来生产新车位信息数据
+	 * 确认的时候，已有的共有车位本来就快要到期了，新车位直接加定时日期就行
 	 * @param lottery 
 	 * @param batch
 	 * @param detailList
@@ -472,8 +473,8 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 	 * @param jobNum 工号
 	 * @return
 	 */
-	public List<UserSpacePO> querySpaceGroupByExpireDate(String jobNum) {
-		return userSpaceMapper.querySpaceGroupByExpireDate(jobNum);
+	public List<UserSpacePO> querySpaceGroupByExpireDate(String jobNum,Integer type) {
+		return userSpaceMapper.querySpaceGroupByExpireDate(jobNum,type);
 	}
 
 
@@ -573,6 +574,24 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 				.eq(UserSpacePO::getRoundId, roundId)
 				.eq(UserSpacePO::getBatchId, batchId)
 				.eq(UserSpacePO::getState, state));
+	}
+
+
+	/**
+	 * 更新工号为jobNum 的type类型的起始日期和定时日期
+	 * @param jobNum
+	 * @param addDays
+	 * @param type
+	 */
+	public void updateStartDate(String jobNum, Date startDate,String scheduledate, Integer type) {
+		UserSpacePO space = new UserSpacePO().setStartDate(startDate)
+				.setScheduleDate(scheduledate)
+				.setState(UserSpaceStateEnum.UNSYNC.getState());
+		userSpaceMapper.update(space, new LambdaUpdateWrapper<UserSpacePO>()
+					.eq(UserSpacePO::getJobNumber, jobNum)
+					.eq(UserSpacePO::getType, type)
+					.ge(UserSpacePO::getEndDate, scheduledate)
+				);
 	}
 }
 
