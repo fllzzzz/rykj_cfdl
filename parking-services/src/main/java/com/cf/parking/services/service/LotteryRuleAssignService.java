@@ -106,6 +106,7 @@ public class LotteryRuleAssignService extends ServiceImpl<LotteryRuleAssignMappe
 	 */
 	public List<String> queryRuleAssignList(Long batchId, Long roundId) {
 		List<LotteryResultPO> resultList = lotteryResultService.selectResultListByBatchId(batchId);
+		//过滤出状态不为待摇号且轮次不等于roundId的数据
 		resultList = resultList.stream().filter(result -> !LotteryResultStateEnum.UNLOTTERY.getState().equals(result.getState()) && result.getRoundId() != roundId  ).collect(Collectors.toList());
 		if (CollectionUtils.isEmpty(resultList)) {
 			return Collections.emptyList();
@@ -114,7 +115,7 @@ public class LotteryRuleAssignService extends ServiceImpl<LotteryRuleAssignMappe
 		List<LotteryRuleAssignPO> ruleList = ruleAssignMapper.selectList(new LambdaQueryWrapper<LotteryRuleAssignPO>()
 				.in(LotteryRuleAssignPO::getRoundId, roundIdList)
 			);
-		return null;
+		return getJobNumFromRuleList(ruleList);
 	}
 	
 	/**
@@ -133,11 +134,12 @@ public class LotteryRuleAssignService extends ServiceImpl<LotteryRuleAssignMappe
 				
 		ruleList.forEach(rule -> {
 			if (RuleAssignTypeEnum.EMPLOYEE.getState().equals(rule.getType())) {
-				ruleJobList.add(rule.getCode());
+				ruleJobList.addAll(JSON.parseArray(rule.getCode(), String.class));
 			} else if (RuleAssignTypeEnum.DEPARMENT.getState().equals(rule.getType())) {
-				deptCodeList.add(rule.getCode());
+				deptCodeList.addAll(JSON.parseArray(rule.getCode(), String.class));
 			}
 		});
+		ruleList.clear();
 		//获取部门下的人员
 		ruleJobList.addAll(employeeService.queryEmployeeListByDept(deptCodeList));
 		deptCodeList.clear();
