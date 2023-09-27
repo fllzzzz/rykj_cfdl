@@ -7,9 +7,11 @@
         <result property="id"    column="id"    />
         <result property="type"    column="type"    />
         <result property="roundId"    column="round_id"    />
+        <result property="roundName"    column="round_name"    />
         <result property="code"    column="code"    />
         <result property="name"    column="name"    />
         <result property="parkingLotCode"    column="parking_lot_code"    />
+        <result property="parkingLotRegion"    column="parking_lot_region"    />
         <result property="state"    column="state"    />
         <result property="remark"    column="remark"    />
         <result property="createTm"    column="create_tm"    />
@@ -17,7 +19,7 @@
     </resultMap>
 
     <sql id="selectLotteryRuleAssignVo">
-        select id, type, code, name, parking_lot_code, state, remark,round_id, create_tm, update_tm from lottery_rule_assign
+        select id, type, code, name, parking_lot_code,parking_lot_region, state, remark,round_id,round_name, create_tm, update_tm from lottery_rule_assign
     </sql>
 
 </mapper>

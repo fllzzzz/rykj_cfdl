@@ -1,6 +1,7 @@
 package com.cf.parking.api.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.cf.parking.api.request.BlackListBatchAddReq;
 import com.cf.parking.facade.bo.ParkBaseDetailRespBO;
 import com.cf.parking.facade.bo.ParkBaseRespBO;
@@ -27,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -260,6 +262,23 @@ public class TestController {
 		ParkBaseRespBO<ParkBaseDetailRespBO> result = parkInvokeService.deleteCarInfo(dto);
 		log.info("删除车位:{}",JSON.toJSONString(result));
 		return Result.buildSuccessResult(result);
+	}
+
+	@PostMapping("/tett")
+	@ApiOperation(value = "测试json", notes = "测试json")
+	public Result tett() {
+		List<String> list = new ArrayList<>();
+		list.add("11112223654");
+		list.add("786246264");
+		list.add("575754241");
+		list.add("758787878");
+
+		log.info("删除车位:{}",JSON.toJSONString(list));
+
+		String json = "[\"11112223654\",\"786246264\",\"575754241\",\"758787878\"]";
+		List<String> list1 = JSON.parseObject(json, new TypeReference<List<String>>() {
+		});
+		return Result.buildSuccessResult(list1);
 	}
 	
 }

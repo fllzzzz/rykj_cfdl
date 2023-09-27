@@ -35,6 +35,9 @@ public class LotteryRuleAssignPO
     /** 停车场编号 */
     private String parkingLotCode;
 
+    /** 停车场名称 */
+    private String parkingLotRegion;
+
     /** 状态(0：停用，1：启用) */
     private String state;
 
@@ -51,4 +54,9 @@ public class LotteryRuleAssignPO
      * 轮次id
      */
     private Long roundId;
+
+    /**
+     * 轮次名称
+     */
+    private String roundName;
 }

@@ -1,6 +1,7 @@
 package com.cf.parking.facade.facade;
 
 import com.cf.parking.facade.bo.LotteryRuleAssignBO;
+import com.cf.parking.facade.bo.LotteryRuleAssignExportBO;
 import com.cf.parking.facade.dto.LotteryRuleAssignDTO;
 import com.cf.parking.facade.dto.LotteryRuleAssignOptDTO;
 import com.cf.support.result.PageResponse;
@@ -44,4 +45,18 @@ public interface LotteryRuleAssignFacade
      * @return
      */
     Integer deleteById(Long id);
+
+    /**
+     * 根据roundId查询停车场区域名称
+     * @param roundId
+     * @return
+     */
+    String getParkingLotRegionByRoundId(Long roundId);
+
+    /**
+     * 人员导出
+     * @param assignId
+     * @return
+     */
+    List<LotteryRuleAssignExportBO> exportEmployee(Long assignId);
 }

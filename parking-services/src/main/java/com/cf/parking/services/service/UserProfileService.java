@@ -16,6 +16,7 @@ import com.cf.support.exception.BusinessException;
 import com.cf.support.utils.BeanConvertorUtils;
 import com.cf.parking.facade.bo.AdminScoreRecordBO;
 import com.cf.parking.facade.dto.AdminScoresPageDTO;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -203,7 +204,7 @@ public class UserProfileService extends ServiceImpl<UserProfilePOMapper, UserPro
      */
     public UserProfilePO selectUserProfileByNameAndJobNumber(String name, String jobNumber) {
         return userProfilePOMapper.selectOne(new LambdaQueryWrapper<UserProfilePO>()
-                .eq(UserProfilePO::getName,name)
+                .eq(ObjectUtils.isNotEmpty(name),UserProfilePO::getName,name)
                 .eq(UserProfilePO::getJobNumber,jobNumber));
     }
 

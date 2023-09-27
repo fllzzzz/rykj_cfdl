@@ -24,13 +24,17 @@ public class LotteryRuleAssignRsp {
     @ApiModelProperty(value = "摇号规则-分配轮次id")
     private Long roundId;
 
+    /** 摇号规则-分配轮次id */
+    @ApiModelProperty(value = "摇号规则-分配轮次id")
+    private String roundName;
+
     /** 分配类型（1：按部门分配；2：按人员分配） */
     @ApiModelProperty(value = "分配类型（1：按部门分配；2：按人员分配）")
     private String type;
 
-    /** 部门编码/人员工号 */
-    @ApiModelProperty(value = "部门编码/人员工号")
-    private String code;
+    /** 部门编码/人员工号列表 */
+    @ApiModelProperty(value = "部门编码/人员工号列表")
+    private List<String> codeArr;
 
     /** 名称（部门或者人员名称） */
     @ApiModelProperty(value = "名称（部门或者人员名称）")
@@ -38,7 +42,7 @@ public class LotteryRuleAssignRsp {
 
     /** 停车场，多个间逗号间隔 */
     @ApiModelProperty(value = "停车场名称")
-    private String parkingLotName;
+    private String parkingLotRegion;
 
     /** 停车场编号，多个间逗号间隔 */
     @ApiModelProperty(value = "停车场编号")

@@ -8,7 +8,6 @@ import com.cf.parking.api.annotation.AdminOptLogTitle;
 import com.cf.parking.api.request.LotteryAllocationReq;
 import com.cf.parking.api.request.LotteryBatchOptReq;
 import com.cf.parking.api.request.LotteryBatchReq;
-import com.cf.parking.api.response.ExportUserVerifyRsp;
 import com.cf.parking.api.response.LotteryBatchRsp;
 import com.cf.parking.api.response.LotteryResultDetailPageRsp;
 import com.cf.parking.api.response.LotteryResultExportRsp;
@@ -245,6 +244,6 @@ public class LotteryBatchController
         AssertUtil.checkNull(param.getId(),"请选择摇号批次！");
         List<LotteryResultExportBO>  boList= lotteryBatchFacade.exportResult(param.getId());
         List<LotteryResultExportRsp> lotteryResultExportRsps = BeanConvertorUtils.copyList(boList, LotteryResultExportRsp.class);
-        ExcelUtiles.exportExcel(lotteryResultExportRsps, "摇号结果", "摇号结果", ExportUserVerifyRsp.class, "摇号结果.xlsx", response);
+        ExcelUtiles.exportExcel(lotteryResultExportRsps, "摇号结果", "摇号结果", LotteryResultExportRsp.class, "摇号结果.xlsx", response);
     }
 }

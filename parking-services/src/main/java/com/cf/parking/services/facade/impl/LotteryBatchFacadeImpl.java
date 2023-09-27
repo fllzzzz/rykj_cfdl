@@ -32,6 +32,7 @@ import com.dingtalk.api.request.OapiMessageCorpconversationAsyncsendV2Request;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -359,10 +360,10 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
                         //2.设置摇号轮数
                         exportBO.setRoundName(roundName);
                         //3.设置基础数据
-                        exportBO.setBatchNum(batchPO.getBatchNum());
+                        exportBO.setBatchNum(DateFormatUtils.format(batchPO.getBatchNum(),"yyyy-MM-dd"));
                         exportBO.setParkingAmount(batchPO.getParkingAmount());
-                        exportBO.setApplyTime(batchPO.getApplyStartTime() + "——" + batchPO.getApplyEndTime());
-                        exportBO.setValidDate(batchPO.getValidStartDate() + "——" + batchPO.getValidEndDate());
+                        exportBO.setApplyTime(DateFormatUtils.format(batchPO.getApplyStartTime(),"yyyy-MM-dd") + "——" + DateFormatUtils.format(batchPO.getApplyEndTime(),"yyyy-MM-dd"));
+                        exportBO.setValidDate(DateFormatUtils.format(batchPO.getValidStartDate(),"yyyy-MM-dd") + "——" + DateFormatUtils.format(batchPO.getValidEndDate(),"yyyy-MM-dd"));
                     });
                     resultExportBOList.addAll(resultExportBOS);
                 }

@@ -6,7 +6,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import java.util.Date;
 
 /**
  * @author
@@ -18,9 +17,8 @@ public class LotteryResultExportRsp {
 
     /** 期号 */
     @ApiModelProperty(value = "期号")
-    @Excel(name = "订单id", orderNum = "1")
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date batchNum;
+    @Excel(name = "期号", orderNum = "1")
+    private String batchNum;
 
     /** 车位数量 */
     @ApiModelProperty(value = "车位数量")

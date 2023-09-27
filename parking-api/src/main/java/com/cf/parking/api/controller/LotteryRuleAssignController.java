@@ -1,14 +1,20 @@
 package com.cf.parking.api.controller;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 
+import com.alibaba.fastjson.JSON;
 import com.cf.parking.api.annotation.AdminOptLogTitle;
+import com.cf.parking.api.request.LotteryBatchReq;
 import com.cf.parking.api.request.LotteryRuleAssignOptReq;
 import com.cf.parking.api.request.LotteryRuleAssignReq;
 import com.cf.parking.api.response.*;
 import com.cf.parking.dao.po.DepartmentPO;
 import com.cf.parking.dao.po.UserProfilePO;
+import com.cf.parking.facade.bo.DepartmentTreeBO;
+import com.cf.parking.facade.bo.LotteryResultExportBO;
 import com.cf.parking.facade.bo.LotteryRuleAssignBO;
+import com.cf.parking.facade.bo.LotteryRuleAssignExportBO;
 import com.cf.parking.facade.dto.LotteryRuleAssignDTO;
 import com.cf.parking.facade.dto.LotteryRuleAssignOptDTO;
 import com.cf.parking.facade.facade.LotteryRuleAssignFacade;
@@ -16,10 +22,10 @@ import com.cf.parking.services.service.DepartmentService;
 import com.cf.parking.services.service.UserProfileService;
 import com.cf.parking.services.utils.AssertUtil;
 import com.cf.support.authertication.AdminUserAuthentication;
-import com.cf.support.authertication.UserAuthentication;
 import com.cf.support.result.PageResponse;
 import com.cf.support.result.Result;
 import com.cf.support.utils.BeanConvertorUtils;
+import com.cf.support.utils.ExcelUtiles;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -74,18 +80,14 @@ public class LotteryRuleAssignController
 
 
     /**
-     * 部门列表
+     * 部门树状结构
      */
-    @ApiOperation(value = "部门列表", notes = "停车场分配模块中需要使用到部门列表")
-    @PostMapping("/departmentList")
-    public Result<List<DepartmentBaseRsp>> departmentList()
+    @ApiOperation(value = "部门树状结构", notes = "停车场分配模块中需要使用到部门树状结构")
+    @PostMapping("/departmentTree")
+    public Result<List<DepartmentTreeRsp>> departmentTree()
     {
-        List<DepartmentPO> poList = departmentService.queryUsingDepartmentList();
-        List<DepartmentBaseRsp> rspList = new ArrayList<>();
-        if (!CollectionUtils.isEmpty(poList)){
-            rspList = poList.stream().map(x -> new DepartmentBaseRsp().setCode(x.getDeptCode()).setName(x.getDepartmentName())).collect(Collectors.toList());
-        }
-        return Result.buildSuccessResult(rspList);
+        List<DepartmentTreeBO> boList = departmentService.departmentTree();
+        return Result.buildSuccessResult(BeanConvertorUtils.copyList(boList,DepartmentTreeRsp.class));
     }
 
 
@@ -136,6 +138,7 @@ public class LotteryRuleAssignController
     @PostMapping("/update")
     public Result update(@RequestBody LotteryRuleAssignOptReq param) {
         //1.参数校验
+        AssertUtil.checkNull(param.getId(), "请选择分配规则记录！");
         paramVerify(param);
 
         //2.参数转换
@@ -149,9 +152,9 @@ public class LotteryRuleAssignController
     }
 
     private void paramVerify(@RequestBody LotteryRuleAssignOptReq param) {
+        AssertUtil.checkNull(param.getRoundId(), "请选择轮数！");
         AssertUtil.checkNull(param.getType(), "请选择分配类型！");
-        AssertUtil.checkNull(param.getName(), "请选择名称！");
-        AssertUtil.checkNull(param.getParkingLotCode(), "请选择停车场！");
+        AssertUtil.checkNull(param.getCodeArr(), "请选择名称！");
     }
 
     /**
@@ -166,5 +169,34 @@ public class LotteryRuleAssignController
         AssertUtil.checkNull(param.getId(),"请选择要删除的分配记录！");
         Integer result = lotteryRuleAssignFacade.deleteById(param.getId());
         return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult("删除失败，请重试！");
+    }
+
+
+    /**
+     * 根据roundId查询停车场名称
+     */
+    @AdminUserAuthentication
+    @ApiOperation(value = "根据roundId查询停车场名称", notes = "根据roundId查询停车场名称")
+    @PostMapping("/regionByRoundId")
+    public Result<String> parkingLotRegionByRoundId(@RequestBody LotteryRuleAssignReq param)
+    {
+        AssertUtil.checkNull(param.getRoundId(),"请选择摇号轮数！");
+        String region = lotteryRuleAssignFacade.getParkingLotRegionByRoundId(param.getRoundId());
+        return Result.buildSuccessResult(region);
+    }
+
+    /**
+     * 人员导出
+     */
+    @AdminUserAuthentication
+    @ApiOperation(value = "人员导出", notes = "人员导出")
+    @PostMapping("/exportEmployee")
+    public void  exportEmployee(@RequestBody LotteryRuleAssignReq param, HttpServletResponse response)
+    {
+        log.info("人员导出：{}", JSON.toJSONString(param));
+        AssertUtil.checkNull(param.getId(),"请选择要导出的记录！");
+        List<LotteryRuleAssignExportBO>  boList= lotteryRuleAssignFacade.exportEmployee(param.getId());
+        List<LotteryRuleAssignExportRsp> exportRsps = BeanConvertorUtils.copyList(boList, LotteryRuleAssignExportRsp.class);
+        ExcelUtiles.exportExcel(exportRsps, "分配人员名单", "分配人员名单", LotteryRuleAssignExportRsp.class, "分配人员名单.xlsx", response);
     }
 }

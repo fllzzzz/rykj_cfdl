@@ -1,10 +1,8 @@
 package com.cf.parking.facade.bo;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import java.util.Date;
 
 /**
  * 摇号结果导出bo对象
@@ -17,8 +15,7 @@ public class LotteryResultExportBO {
 
 
     /** 期号 */
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date batchNum;
+    private String batchNum;
 
     /** 车位数量 */
     private Long parkingAmount;

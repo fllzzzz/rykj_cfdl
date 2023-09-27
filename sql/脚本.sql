@@ -51,7 +51,7 @@ create table lottery_rule_round(
 
 
 
-drop table if exists lottery_rule_assign_type;
+drop table if exists lottery_rule_assign;
 create table lottery_rule_assign(
   id           bigint(0)            not null           comment 'id',
   type         varchar(32)          default ''         comment '分配类型（1：按部门分配；2：按人员分配）',
@@ -182,3 +182,10 @@ alter table lottery_batch add unique index batch_num_idx (batch_num);
 alter table lottery_rule_assign add column round_id bigint comment '轮次id';
 alter table lottery_rule_assign add index round_idx(round_id);
 alter table user_space add column  type char(1) default '0' comment '类型，1摇号，2默认';
+
+--20230927
+alter table lottery_rule_assign add column round_name varchar(32) default ''  comment '轮数名称';
+alter table lottery_rule_assign add column  parking_lot_region  varchar(64) default '' comment '停车场区域';
+alter table lottery_rule_assign MODIFY column parking_lot_code  varchar(64) default '' comment '停车场编号';
+alter table lottery_rule_assign MODIFY COLUMN code VARCHAR(2048) default '' comment '部门编码/人员工号（可多选）';
+alter table lottery_rule_assign MODIFY COLUMN name VARCHAR(2048) default '' comment '名称（部门或者人员名称）';
