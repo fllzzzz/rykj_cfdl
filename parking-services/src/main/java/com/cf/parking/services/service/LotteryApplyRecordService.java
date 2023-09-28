@@ -45,11 +45,11 @@ public class LotteryApplyRecordService extends ServiceImpl<LotteryApplyRecordMap
 	 * @param openIdList 工号
 	 * @param result 结果
 	 */
-	public void updateResultByJobNum(List<String> openIdList, String result) {
+	public void updateResultByJobNum(List<String> openIdList, String parkCode) {
 		if (CollectionUtils.isEmpty(openIdList)) {
 			return;
 		}
-		LotteryApplyRecordPO record = new LotteryApplyRecordPO().setResult(result);
+		LotteryApplyRecordPO record = new LotteryApplyRecordPO().setResult("2").setParkingLotCode(parkCode);
 		applyRecordMapper.update(record, new LambdaUpdateWrapper<LotteryApplyRecordPO>().in(LotteryApplyRecordPO::getJobNumber, openIdList));
 	}
 

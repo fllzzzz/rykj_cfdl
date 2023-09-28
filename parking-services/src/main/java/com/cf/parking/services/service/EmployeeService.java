@@ -72,5 +72,10 @@ public class EmployeeService extends ServiceImpl<EmployeePOMapper, EmployeePO> i
 	}
 
 
+	public EmployeePO queryEmployeeByOpenId(String openId) {
+		return employeePOMapper.selectOne(new LambdaQueryWrapper<EmployeePO>()
+					.eq(EmployeePO::getEmplNo, openId)
+				);
+	}
 	
 }
