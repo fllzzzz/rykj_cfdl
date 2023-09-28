@@ -304,9 +304,19 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
             response.setHeader("content-Type", "application/vnd.ms-excel");
             response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode("车辆审核信息批量导出.xlsx", "UTF-8"));
             workbook.write(response.getOutputStream());
-            workbook.close();
+            response.getOutputStream().flush();
         } catch (Exception e) {
             log.error("车辆审核信息批量导出失败：{}",e);
+        } finally {
+        	if (workbook != null) {
+        		try {
+					workbook.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+        	}
+        	
         }
     }
 
