@@ -91,4 +91,7 @@ public interface LotteryBatchFacade
      * @return
      */
     List<LotteryResultExportBO> exportResult(Long batchId);
+
+
+    LotteryBatchBO getLatestBatchInfo();
 }

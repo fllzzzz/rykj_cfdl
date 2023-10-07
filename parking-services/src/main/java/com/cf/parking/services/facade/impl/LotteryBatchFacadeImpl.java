@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -16,7 +15,6 @@ import com.cf.parking.facade.bo.LotteryResultDetailBO;
 import com.cf.parking.facade.bo.LotteryResultExportBO;
 import com.cf.parking.facade.dto.LotteryBatchDTO;
 import com.cf.parking.facade.dto.LotteryBatchOptDTO;
-import com.cf.parking.facade.facade.DingTalkMessageFacade;
 import com.cf.parking.facade.facade.LotteryBatchFacade;
 import com.cf.parking.services.enums.LotteryBatchStateEnum;
 import com.cf.parking.services.enums.LotteryResultStateEnum;
@@ -371,6 +369,18 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
         }
         return resultExportBOList;
     }
+
+
+	@Override
+	public LotteryBatchBO getLatestBatchInfo() {
+		LotteryBatchPO batch = lotteryBatchService.getNotifiedLatestBatchInfo();
+		if (batch == null) {
+			return null;
+		}
+		LotteryBatchBO bo = new LotteryBatchBO();
+		BeanUtils.copyProperties(batch, bo);;
+		return bo;
+	}
 
 
 }

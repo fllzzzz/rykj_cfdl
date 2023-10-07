@@ -17,6 +17,7 @@ import com.cf.parking.facade.bo.LotteryResultExportBO;
 import com.cf.parking.facade.dto.LotteryBatchDTO;
 import com.cf.parking.facade.dto.LotteryBatchOptDTO;
 import com.cf.parking.facade.facade.LotteryBatchFacade;
+import com.cf.parking.services.constant.ParkingConstants;
 import com.cf.parking.services.utils.AssertUtil;
 import com.cf.support.authertication.AdminUserAuthentication;
 import com.cf.support.exception.BusinessException;
@@ -24,6 +25,8 @@ import com.cf.support.result.PageResponse;
 import com.cf.support.result.Result;
 import com.cf.support.utils.BeanConvertorUtils;
 import com.cf.support.utils.ExcelUtiles;
+
+import cn.hutool.core.date.DateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -83,6 +86,18 @@ public class LotteryBatchController
         List<LotteryBatchRsp> lotteryBatchRsps = BeanConvertorUtils.copyList(result.getList(), LotteryBatchRsp.class);
         Result<PageResponse<LotteryBatchRsp>> resultRsp = Result.buildSuccessResult(new PageResponse(lotteryBatchRsps,result.getPageNo(),result.getTotal(),result.getPageSize()));
         return resultRsp;
+    }
+    
+    
+    /**
+     * 新增/修改摇号批次时，查询最新一期摇号批次信息（期号最大的、状态为已通知或已结束的）
+     */
+    @AdminUserAuthentication
+    @ApiOperation(value = "获取最新一期且状态不为待通知的批次结束日期", notes = "获取最新一期且状态不为待通知的批次结束日期")
+    @PostMapping("/latest/date")
+    public Result getLatestDate() {
+    	LotteryBatchBO batch = lotteryBatchFacade.getLatestBatchInfo();
+    	return  Result.buildSuccessResult(batch == null ? null : DateUtil.format(batch.getValidEndDate(), ParkingConstants.SHORT_DATE_FORMAT));
     }
 
     /**
