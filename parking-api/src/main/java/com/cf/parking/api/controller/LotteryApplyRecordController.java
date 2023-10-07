@@ -57,9 +57,8 @@ public class LotteryApplyRecordController
 
     //————————————————小程序端————————————————————
     /**
-     * 打开页面，摇号信息展示
+     * 打开页面，摇号信息展示,通知直接跳转，有权限过滤的话打不开
      */
-    @UserAuthentication
     @ApiOperation(value = "摇号信息展示————小程序", notes = "打开申请页面，摇号信息展示")
     @PostMapping("/info")
     public Result<LotteryApplyRsp>  info()
