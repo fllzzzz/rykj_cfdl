@@ -19,6 +19,7 @@ import com.cf.parking.dao.po.LotteryApplyRecordPO;
 import com.cf.parking.dao.po.LotteryResultPO;
 import com.cf.parking.dao.po.LotteryRuleAssignPO;
 import com.cf.parking.dao.po.ParkingLotPO;
+import com.cf.parking.services.enums.EnableStateEnum;
 import com.cf.parking.services.enums.LotteryResultStateEnum;
 import com.cf.parking.services.enums.RuleAssignTypeEnum;
 
@@ -64,6 +65,7 @@ public class LotteryRuleAssignService extends ServiceImpl<LotteryRuleAssignMappe
 	public List<LotteryRuleAssignPO> queryRuleListByRoundId(Long roundId){
 		return ruleAssignMapper.selectList(new LambdaQueryWrapper<LotteryRuleAssignPO>()
 					.eq(LotteryRuleAssignPO::getRoundId, roundId)
+					.eq(LotteryRuleAssignPO::getState, EnableStateEnum.ENABLE.getState())
 				);
 	}
 	
@@ -119,6 +121,7 @@ public class LotteryRuleAssignService extends ServiceImpl<LotteryRuleAssignMappe
 		List<Long> roundIdList = resultList.stream().map(result -> result.getRoundId()).collect(Collectors.toList());
 		List<LotteryRuleAssignPO> ruleList = ruleAssignMapper.selectList(new LambdaQueryWrapper<LotteryRuleAssignPO>()
 				.in(LotteryRuleAssignPO::getRoundId, roundIdList)
+				.eq(LotteryRuleAssignPO::getState, EnableStateEnum.ENABLE.getState())
 			);
 		log.info("本轮前{}已设置的部门人员规则{}",roundId,JSON.toJSONString(ruleList));
 		return getJobNumFromRuleList(ruleList);
