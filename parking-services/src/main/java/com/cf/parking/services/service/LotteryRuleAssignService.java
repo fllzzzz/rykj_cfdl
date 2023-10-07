@@ -84,15 +84,18 @@ public class LotteryRuleAssignService extends ServiceImpl<LotteryRuleAssignMappe
 		
 		//获取部门人员/配置
 		List<LotteryRuleAssignPO> ruleList = queryRuleListByRoundId(roundId);
+		log.info("根据轮次:{}查询部门人员配：{}",roundId,JSON.toJSONString(ruleList));
 		if (CollectionUtils.isEmpty(ruleList)) {//没有设置就直接返回报名人员
 			return applyList;
 		}
 		
 		List<String> ruleJobList = getJobNumFromRuleList(ruleList);
+		log.info("本轮：{}配置参加摇号人员：{}",roundId,JSON.toJSONString(ruleJobList));
 		//取两个集合的交集做摇号人员
 		applyList = applyList.stream().filter(apply -> ruleJobList.contains(apply.getJobNumber())).collect(Collectors.toList()); 
 		//获取前几轮已配置摇号人员工号
 		List<String> excludeList = queryRuleAssignList(batchId,roundId);
+		log.info("本轮：{}根据配置排除摇号人员：{}",roundId,JSON.toJSONString(ruleJobList));
 		applyList = applyList.stream().filter(apply -> !excludeList.contains(apply.getJobNumber())).collect(Collectors.toList()); 
 		return applyList;
 	}
@@ -106,8 +109,10 @@ public class LotteryRuleAssignService extends ServiceImpl<LotteryRuleAssignMappe
 	 */
 	public List<String> queryRuleAssignList(Long batchId, Long roundId) {
 		List<LotteryResultPO> resultList = lotteryResultService.selectResultListByBatchId(batchId);
+		log.info("根据批次:{}查询轮次列表:{}",batchId,JSON.toJSONString(resultList));
 		//过滤出状态不为待摇号且轮次不等于roundId的数据
-		resultList = resultList.stream().filter(result -> !LotteryResultStateEnum.UNLOTTERY.getState().equals(result.getState()) && result.getRoundId() != roundId  ).collect(Collectors.toList());
+		resultList = resultList.stream().filter(result -> !LotteryResultStateEnum.UNLOTTERY.getState().equals(result.getState()) && result.getRoundId().compareTo(roundId) != 0   ).collect(Collectors.toList());
+		log.info("过滤出状态不为待摇号且轮次不等于{}的数据",roundId,JSON.toJSONString(resultList));
 		if (CollectionUtils.isEmpty(resultList)) {
 			return Collections.emptyList();
 		}
@@ -115,6 +120,7 @@ public class LotteryRuleAssignService extends ServiceImpl<LotteryRuleAssignMappe
 		List<LotteryRuleAssignPO> ruleList = ruleAssignMapper.selectList(new LambdaQueryWrapper<LotteryRuleAssignPO>()
 				.in(LotteryRuleAssignPO::getRoundId, roundIdList)
 			);
+		log.info("本轮前{}已设置的部门人员规则{}",roundId,JSON.toJSONString(ruleList));
 		return getJobNumFromRuleList(ruleList);
 	}
 	
@@ -143,6 +149,7 @@ public class LotteryRuleAssignService extends ServiceImpl<LotteryRuleAssignMappe
 		//获取部门下的人员
 		ruleJobList.addAll(employeeService.queryEmployeeListByDept(deptCodeList));
 		deptCodeList.clear();
+		log.info("根据部门人员规则{}获取对应的人员工号：{}",JSON.toJSONString(ruleJobList),JSON.toJSONString(ruleJobList));
 		return ruleJobList;
 	}
 
