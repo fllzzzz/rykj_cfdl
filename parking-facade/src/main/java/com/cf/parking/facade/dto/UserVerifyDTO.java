@@ -25,7 +25,7 @@ public class UserVerifyDTO extends PageRequest {
     private Long id;
 
     /** 车牌号 */
-    private String platNo;
+    private String plateNo;
 
     /** userId */
     private Long userId;

@@ -44,4 +44,7 @@ public class LotteryResultExportBO {
     /** 用户姓名 */
     private String userName;
 
+    /** 用户工号 */
+    private String userJobNumber;
+
 }

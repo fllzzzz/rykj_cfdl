@@ -25,7 +25,7 @@ public class UserVerifyReq extends PageRequest {
 
     /** 车牌号 */
     @ApiModelProperty(value = "车牌号，小程序端使用")
-    private String platNo;
+    private String plateNo;
 
     /** 申请人 */
     @ApiModelProperty(value = "申请人")

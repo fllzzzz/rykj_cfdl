@@ -169,7 +169,7 @@ public class UserVerifyController {
         Long userId = user.getUserId();
 
         //2.参数校验
-        AssertUtil.checkNull(param.getPlatNo(),"请选择车牌号！");
+        AssertUtil.checkNull(param.getPlateNo(),"请选择车牌号！");
 
         //3.参数转换
         UserVerifyDTO dto = new UserVerifyDTO();
@@ -341,7 +341,6 @@ public class UserVerifyController {
      * 车辆审核信息批量导出
      */
     @AdminUserAuthentication
-    @AdminOptLogTitle("车辆审核信息批量导出")
     @ApiOperation(value = "车辆审核信息批量导出", notes = "车辆审核信息批量导出")
     @PostMapping("/batchExport")
     public void batchExport(@RequestBody UserVerifyOptReq param, HttpServletResponse response)
