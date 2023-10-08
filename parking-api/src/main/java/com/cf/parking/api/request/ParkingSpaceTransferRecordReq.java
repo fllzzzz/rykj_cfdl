@@ -30,6 +30,17 @@ public class ParkingSpaceTransferRecordReq extends PageRequest {
     private Date validEndDate;
 
     /** userId */
+    @ApiModelProperty(value = "用户id，不需要传入")
     private Long userId;
+
+    //PC端查询条件
+    /**停车场 */
+    @ApiModelProperty(value = "转赠车位")
+    private String parkingLotCode;
+
+    /**停车场 */
+    @ApiModelProperty(value = "用户信息（姓名/工号）")
+    private String userInfo;
+
 
 }

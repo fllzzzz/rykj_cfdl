@@ -252,7 +252,7 @@ public class UserVerifyController {
         //2.1是否为黑名单判断
         LotteryBlackListPO lotteryBlackListPO = lotteryBlackListService.queryBlackUserInfo(userId);
         if (null != lotteryBlackListPO){
-            return Result.buildErrorResult("您已被加入黑名单，请联系管理员解除！");
+            return Result.buildErrorResult("暂无权限，请联系管理员！");
         }
 
         //2.2判断车辆数量是否大于2
@@ -311,7 +311,7 @@ public class UserVerifyController {
         //2.1是否为黑名单判断
         LotteryBlackListPO lotteryBlackListPO = lotteryBlackListService.queryBlackUserInfo(userId);
         if (null != lotteryBlackListPO){
-            return Result.buildErrorResult("您已被加入黑名单，请联系管理员解除！");
+            return Result.buildErrorResult("暂无权限，请联系管理员！");
         }
 
         //3.参数校验

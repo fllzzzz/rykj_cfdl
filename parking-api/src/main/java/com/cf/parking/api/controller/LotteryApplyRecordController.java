@@ -11,6 +11,7 @@ import com.cf.parking.facade.bo.LotteryApplyBO;
 import com.cf.parking.facade.bo.LotteryApplyRecordBO;
 import com.cf.parking.facade.dto.LotteryApplyRecordDTO;
 import com.cf.parking.facade.facade.LotteryApplyRecordFacade;
+import com.cf.parking.services.service.LotteryBlackListService;
 import com.cf.parking.services.utils.AssertUtil;
 import com.cf.support.authertication.UserAuthentication;
 import com.cf.support.authertication.UserAuthenticationServer;
@@ -45,6 +46,9 @@ public class LotteryApplyRecordController
 {
     @Resource
     private LotteryApplyRecordFacade lotteryApplyRecordFacade;
+
+    @Resource
+    private LotteryBlackListService lotteryBlackListService;
 
     @Resource
     private UserAuthenticationServer userAuthenticationServer;
@@ -88,7 +92,13 @@ public class LotteryApplyRecordController
 
         AssertUtil.checkNull(param.getBatchId(),"请选择摇号报名批次！");
 
-        //2.申请摇号
+        //2.是否在摇号黑名单内
+        if (!ObjectUtils.isEmpty(lotteryBlackListService.queryBlackUserInfo(userId))){
+            return Result.buildErrorResult("暂无权限，请联系管理员！");
+        }
+
+
+        //3.申请摇号
         Integer result = lotteryApplyRecordFacade.apply(userId,param.getBatchId());
         return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult("申请失败，请重试！");
     }

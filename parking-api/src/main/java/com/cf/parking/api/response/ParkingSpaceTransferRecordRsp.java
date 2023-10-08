@@ -48,9 +48,23 @@ public class ParkingSpaceTransferRecordRsp {
 
     /** 创建时间 */
     @JsonFormat(pattern = "yyyy-MM-dd")
+    @ApiModelProperty(value = "转赠日期")
     private Date createTm;
 
     /** 更新时间 */
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date updateTm;
+
+    //PC端展示属性
+    /** 申请人姓名 */
+    @ApiModelProperty(value = "申请人姓名")
+    private String userName;
+
+    /** 申请人工号 */
+    @ApiModelProperty(value = "申请人工号")
+    private String userJobNumber;
+
+    /** 赠予人工号 */
+    @ApiModelProperty(value = "赠予人工号")
+    private String acceptUserJobNumber;
 }

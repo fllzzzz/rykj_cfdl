@@ -10,6 +10,7 @@ import com.cf.parking.api.response.ParkingSpaceTransferRecordRsp;
 import com.cf.parking.facade.bo.ParkingSpaceTransferRecordBO;
 import com.cf.parking.facade.dto.ParkingSpaceTransferRecordDTO;
 import com.cf.parking.facade.facade.ParkingSpaceTransferRecordFacade;
+import com.cf.support.authertication.AdminUserAuthentication;
 import com.cf.support.authertication.UserAuthentication;
 import com.cf.parking.services.utils.AssertUtil;
 import com.cf.parking.services.utils.PageUtils;
@@ -54,6 +55,30 @@ public class ParkingSpaceTransferRecordController
     private UserSessionDTO getUser() {
         return userAuthenticationServer.getCurrentUser();
     }
+
+
+    //————————————————PC端————————————————————
+
+    /**
+     * 查询车位转赠记录列表
+     */
+    @AdminUserAuthentication
+    @ApiOperation(value = "查询车位转赠记录列表————PC端", notes = "根据条件分页查询")
+    @PostMapping("/pcList")
+    public Result<PageResponse<ParkingSpaceTransferRecordRsp>> pcList(@RequestBody ParkingSpaceTransferRecordReq param)
+    {
+        log.info("转赠记录查询参数：{}",JSON.toJSONString(param));
+        //1.参数转换
+        ParkingSpaceTransferRecordDTO dto = new ParkingSpaceTransferRecordDTO();
+        BeanUtils.copyProperties(param,dto);
+
+        //3.列表查询
+        PageResponse<ParkingSpaceTransferRecordBO> result = parkingSpaceTransferRecordFacade.getParkingSpaceTransferRecordList(dto);
+        List<ParkingSpaceTransferRecordRsp> transferRecordRsps = BeanConvertorUtils.copyList(result.getList(), ParkingSpaceTransferRecordRsp.class);
+        return PageUtils.pageResult(result,transferRecordRsps);
+    }
+
+
 
     //————————————————小程序端————————————————————
 

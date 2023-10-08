@@ -193,3 +193,12 @@ alter table lottery_rule_assign MODIFY COLUMN name VARCHAR(2048) default '' comm
 --20231008
 alter table lottery_apply_record MODIFY column result varchar(16) default '' comment '摇号结果(-1：未开号；0：未中；1：摇中)';
 alter table user_space add column  state char(1) default '0' comment '状态（0：未同步；1：同步成功；2：同步失败）';
+
+drop table if exists lottery_rule_description;
+create table lottery_rule_description(
+  id           bigint(0)            not null           comment 'id',
+  description   varchar(1024)       default ''         comment '规则描述',
+  create_tm     timestamp(3)                          comment '创建时间',
+  update_tm     timestamp(3)                          comment '更新时间',
+  primary key (id) USING BTREE
+)engine=innodb  comment ='摇号规则描述表（只有一条记录）' ROW_FORMAT = Dynamic;

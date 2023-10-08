@@ -24,6 +24,7 @@ import com.cf.support.utils.BeanConvertorUtils;
 import com.esotericsoftware.minlog.Log;
 
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -119,7 +120,9 @@ public class ParkingSpaceTransferRecordFacadeImpl implements ParkingSpaceTransfe
                 .eq(ObjectUtils.isNotEmpty(dto.getUserId()), ParkingSpaceTransferRecordPO::getUserId, dto.getUserId())
                 .le(ObjectUtils.isNotEmpty(dto.getValidEndDate()), ParkingSpaceTransferRecordPO::getCreateTm, dto.getValidEndDate())
                 .ge(ObjectUtils.isNotEmpty(dto.getValidStartDate()), ParkingSpaceTransferRecordPO::getCreateTm, dto.getValidStartDate())
-                .orderByDesc(ParkingSpaceTransferRecordPO::getCreateTm));
+				.eq(StringUtils.isNotBlank(dto.getParkingLotCode()),ParkingSpaceTransferRecordPO::getParkingLotCode,dto.getParkingLotCode())
+				.orderByDesc(ParkingSpaceTransferRecordPO::getCreateTm));
+
 
         List<ParkingSpaceTransferRecordBO> boList = BeanConvertorUtils.copyList(poPage.getRecords(), ParkingSpaceTransferRecordBO.class);
 		boList.forEach(this::setParkingLotRegionByCode);
