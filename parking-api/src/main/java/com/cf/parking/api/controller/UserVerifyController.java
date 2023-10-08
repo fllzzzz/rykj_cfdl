@@ -1,5 +1,6 @@
 package com.cf.parking.api.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.cf.parking.api.annotation.AdminOptLogTitle;
 import com.cf.parking.api.request.UserVerifyOptReq;
 import com.cf.parking.api.request.UserVerifyReq;
@@ -93,6 +94,7 @@ public class UserVerifyController {
     @PostMapping("/infoById")
     public Result<UserVerifyRsp> getInfoById(@RequestBody UserVerifyReq param)
     {
+    	log.info("获取个人车辆审核详细信息——小程序:{}", JSON.toJSONString(param));
         //1.参数校验
         AssertUtil.checkNull(param.getId(),"请选择要审核的记录！");
 
@@ -111,6 +113,7 @@ public class UserVerifyController {
     @PostMapping("/audit")
     public Result audit(@RequestBody UserVerifyOptReq param)
     {
+    	log.info("审核车辆:{}", JSON.toJSONString(param));
         UserVerifyOptDTO dto = new UserVerifyOptDTO();
         BeanUtils.copyProperties(param,dto);
         Integer result = userVerifyFacade.audit(dto);
@@ -126,6 +129,7 @@ public class UserVerifyController {
     @PostMapping("/batchAudit")
     public Result batchAudit(@RequestBody UserVerifyOptReq param)
     {
+    	log.info("批量审核车辆:{}", JSON.toJSONString(param));
         List<Long> ids = param.getIds();
         AssertUtil.checkNull(ids,"请选择要审核的记录！");
 
@@ -151,7 +155,7 @@ public class UserVerifyController {
         //1.获取当前登录用户的信息
         UserSessionDTO user = getUserSessionDTO();
         Long userId = user.getUserId();
-
+        
         List<String> platNoList = userVerifyFacade.getPlatNoListByUserId(userId);
         return Result.buildSuccessResult(platNoList);
     }
@@ -164,6 +168,7 @@ public class UserVerifyController {
     @PostMapping("/info")
     public Result<UserVerifyRsp> getInfo(@RequestBody UserVerifyReq param)
     {
+    	log.info("获取个人车辆审核详细信息——小程序:{}", JSON.toJSONString(param));
         //1.获取当前登录用户的信息
         UserSessionDTO user = getUserSessionDTO();
         Long userId = user.getUserId();
@@ -238,6 +243,7 @@ public class UserVerifyController {
     @PostMapping("/add")
     public Result add(@RequestBody UserVerifyOptReq param)
     {
+    	log.info("小程序用户新增车辆信息:{}", JSON.toJSONString(param));
         //1.获取当前登录用户的信息
         UserSessionDTO user = getUserSessionDTO();
         Long userId = user.getUserId();
@@ -297,6 +303,7 @@ public class UserVerifyController {
     @PostMapping("/update")
     public Result update(@RequestBody UserVerifyOptReq param)
     {
+    	log.info("小程序用户修改车辆信息:{}", JSON.toJSONString(param));
         //1.获取当前登录用户的信息
         UserSessionDTO user = getUserSessionDTO();
         Long userId = user.getUserId();
@@ -332,6 +339,7 @@ public class UserVerifyController {
     @PostMapping("/delete")
     public Result<String> delete(@RequestBody UserVerifyReq param)
     {
+    	log.info("小程序用户删除车辆信息:{}", JSON.toJSONString(param));
         AssertUtil.checkNull(param.getId(),"请选择要删除的记录！");
         Integer result = userVerifyFacade.deleteById(param.getId());
         return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult("删除失败，请重试！");
@@ -346,6 +354,7 @@ public class UserVerifyController {
     @PostMapping("/batchExport")
     public void batchExport(@RequestBody UserVerifyOptReq param, HttpServletResponse response)
     {
+    	log.info("车辆审核信息批量导出:{}", JSON.toJSONString(param));
         //1.参数转换
         UserVerifyDTO dto = new UserVerifyDTO();
         BeanUtils.copyProperties(param,dto);
