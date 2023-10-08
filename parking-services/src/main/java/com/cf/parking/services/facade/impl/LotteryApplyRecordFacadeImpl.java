@@ -75,15 +75,10 @@ public class LotteryApplyRecordFacadeImpl implements LotteryApplyRecordFacade
     public PageResponse<LotteryApplyRecordBO> getApplyRecordList(LotteryApplyRecordDTO dto) {
         Page<LotteryApplyRecordPO> page = PageUtils.toPage(dto);
 
-        List<String> list = new ArrayList<>();
-        list.add("");
-        list.add("0");
-        list.add("-1");
 
         LambdaQueryWrapper<LotteryApplyRecordPO> queryWrapper = new LambdaQueryWrapper<LotteryApplyRecordPO>()
                 .eq(ObjectUtils.isNotEmpty(dto.getUserId()), LotteryApplyRecordPO::getUserId, dto.getUserId())
-                .eq("0".equals(dto.getResult()), LotteryApplyRecordPO::getResult, dto.getResult())
-                .notIn("1".equals(dto.getResult()), LotteryApplyRecordPO::getResult,list)
+                .eq(ObjectUtils.isNotEmpty(dto.getResult()), LotteryApplyRecordPO::getResult, dto.getResult())
                 .eq(LotteryApplyRecordPO::getUserId, getUser().getUserId())
                 .le(ObjectUtils.isNotEmpty(dto.getEndDate()), LotteryApplyRecordPO::getBatchNum, dto.getEndDate())
                 .ge(ObjectUtils.isNotEmpty(dto.getStartDate()), LotteryApplyRecordPO::getBatchNum, dto.getStartDate())

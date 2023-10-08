@@ -189,3 +189,6 @@ alter table lottery_rule_assign add column  parking_lot_region  varchar(64) defa
 alter table lottery_rule_assign MODIFY column parking_lot_code  varchar(64) default '' comment '停车场编号';
 alter table lottery_rule_assign MODIFY COLUMN code VARCHAR(2048) default '' comment '部门编码/人员工号（可多选）';
 alter table lottery_rule_assign MODIFY COLUMN name VARCHAR(2048) default '' comment '名称（部门或者人员名称）';
+
+--20231008
+alter table lottery_apply_record MODIFY column result varchar(16) default '' comment '摇号结果(-1：未开号；0：未中；1：摇中)';
