@@ -83,6 +83,8 @@ public class ParkInvokeService {
 			}
 			return ParkBaseRespBO.fail();
 			
+		} catch(BusinessException e) {
+			return ParkBaseRespBO.fail(e.getMsg());
 		} catch (Exception e) {
 			log.info("调用添加车辆接口入参：{},e={}",JSON.toJSONString(info),e);
 			return ParkBaseRespBO.fail();
