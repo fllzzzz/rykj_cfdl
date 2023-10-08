@@ -362,6 +362,9 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
                         exportBO.setParkingAmount(batchPO.getParkingAmount());
                         exportBO.setApplyTime(DateFormatUtils.format(batchPO.getApplyStartTime(),"yyyy-MM-dd") + "——" + DateFormatUtils.format(batchPO.getApplyEndTime(),"yyyy-MM-dd"));
                         exportBO.setValidDate(DateFormatUtils.format(batchPO.getValidStartDate(),"yyyy-MM-dd") + "——" + DateFormatUtils.format(batchPO.getValidEndDate(),"yyyy-MM-dd"));
+                        if (StringUtils.isNotBlank(exportBO.getUserJobNumber())){
+                            exportBO.setUserName(exportBO.getUserName() + "(" + exportBO.getUserJobNumber() + ")");
+                        }
                     });
                     resultExportBOList.addAll(resultExportBOS);
                 }

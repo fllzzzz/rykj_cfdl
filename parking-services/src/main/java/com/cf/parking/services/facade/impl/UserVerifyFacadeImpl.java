@@ -85,7 +85,7 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
         LambdaQueryWrapper<UserVerifyPO> queryWrapper = new LambdaQueryWrapper<UserVerifyPO>()
                 .eq(!ObjectUtils.isEmpty(dto.getState()), UserVerifyPO::getState, dto.getState())
                 .like(StringUtils.isNotBlank(dto.getUserName()), UserVerifyPO::getUserName, dto.getUserName())
-                .like(StringUtils.isNotBlank(dto.getPlatNo()), UserVerifyPO::getPlateNo, dto.getPlatNo())
+                .like(StringUtils.isNotBlank(dto.getPlateNo()), UserVerifyPO::getPlateNo, dto.getPlateNo())
                 .le( !ObjectUtils.isEmpty(dto.getEndDate()) , UserVerifyPO::getCreateTm, DateUtil.format(dto.getEndDate(), "yyyy-MM-dd 23:59:59") )
                 .ge(!ObjectUtils.isEmpty(dto.getStartDate()), UserVerifyPO::getCreateTm, dto.getStartDate())
                 .orderByDesc(UserVerifyPO::getCreateTm);
@@ -109,7 +109,7 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
     public UserVerifyBO getUserVerify(UserVerifyDTO dto) {
         UserVerifyPO userVerifyPO = mapper.selectOne(new LambdaQueryWrapper<UserVerifyPO>()
                                                         .eq(UserVerifyPO::getUserId,dto.getUserId())
-                                                        .eq(UserVerifyPO::getPlateNo,dto.getPlatNo()));
+                                                        .eq(UserVerifyPO::getPlateNo,dto.getPlateNo()));
 
         return BeanConvertorUtils.map(userVerifyPO, UserVerifyBO.class);
     }
@@ -294,9 +294,16 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
             dataRow.createCell(7).setCellValue(bo.getReason());
 
             //2.2设置图片
-            importPic2Excel(workbook, sheet, i+1,3, bo.getVehicleImg());
-            importPic2Excel(workbook, sheet, i+1,4, bo.getDrivingPermitImg());
-            importPic2Excel(workbook, sheet, i+1,5, bo.getDrivingLicenseImg());
+            if (StringUtils.isNotBlank(bo.getVehicleImg())){
+                importPic2Excel(workbook, sheet, i+1,3, bo.getVehicleImg());
+            }
+            if (StringUtils.isNotBlank(bo.getDrivingPermitImg())){
+                importPic2Excel(workbook, sheet, i+1,4, bo.getDrivingPermitImg());
+            }
+            if (StringUtils.isNotBlank(bo.getDrivingLicenseImg())){
+                importPic2Excel(workbook, sheet, i+1,5, bo.getDrivingLicenseImg());
+            }
+
         }
 
         try {
@@ -330,7 +337,7 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
         LambdaQueryWrapper<UserVerifyPO> queryWrapper = new LambdaQueryWrapper<UserVerifyPO>()
                 .eq(!ObjectUtils.isEmpty(dto.getState()), UserVerifyPO::getState, dto.getState())
                 .eq(!ObjectUtils.isEmpty(dto.getUserName()),UserVerifyPO::getUserName,dto.getUserName())
-                .eq(!ObjectUtils.isEmpty(dto.getPlatNo()),UserVerifyPO::getPlateNo,dto.getPlatNo())
+                .like(!ObjectUtils.isEmpty(dto.getPlateNo()),UserVerifyPO::getPlateNo,dto.getPlateNo())
                 .le( !ObjectUtils.isEmpty(dto.getEndDate()) , UserVerifyPO::getCreateTm, DateUtil.format(dto.getEndDate(), "yyyy-MM-dd 23:59:59") )
                 .ge(!ObjectUtils.isEmpty(dto.getStartDate()), UserVerifyPO::getCreateTm, dto.getStartDate())
                 .orderByDesc(UserVerifyPO::getCreateTm);
