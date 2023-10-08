@@ -49,7 +49,7 @@ public class LotteryApplyRecordService extends ServiceImpl<LotteryApplyRecordMap
 		if (CollectionUtils.isEmpty(openIdList)) {
 			return;
 		}
-		LotteryApplyRecordPO record = new LotteryApplyRecordPO().setResult("2").setParkingLotCode(parkCode);
+		LotteryApplyRecordPO record = new LotteryApplyRecordPO().setResult("1").setParkingLotCode(parkCode);
 		applyRecordMapper.update(record, new LambdaUpdateWrapper<LotteryApplyRecordPO>().in(LotteryApplyRecordPO::getJobNumber, openIdList));
 	}
 
