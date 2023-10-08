@@ -2,6 +2,8 @@ package com.cf.parking.dao.po;
 
 import java.util.Date;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 import lombok.Data;
@@ -12,6 +14,8 @@ import lombok.experimental.Accessors;
 @TableName("employee")
 @Accessors(chain = true)
 public class EmployeePO {
+	
+	@TableId(value = "empl_no", type = IdType.INPUT)
     private String emplNo;
 
     private String name;
