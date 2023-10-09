@@ -2,7 +2,6 @@ package com.cf.parking.facade.dto;
 
 import com.cf.support.result.PageRequest;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -26,4 +25,12 @@ public class ParkingSpaceTransferRecordDTO extends PageRequest {
 
     /** userId */
     private Long userId;
+
+    //PC端查询条件
+    /**停车场 */
+    private String parkingLotCode;
+
+    /**停车场 */
+    private String userInfo;
+
 }
