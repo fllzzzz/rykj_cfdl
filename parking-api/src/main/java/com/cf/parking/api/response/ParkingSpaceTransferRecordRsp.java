@@ -13,7 +13,7 @@ import java.util.Date;
  * @date 2023/09/05
  */
 @Data
-@ApiModel(description = "停车场查询结果")
+@ApiModel(description = "车位转赠记录查询结果")
 public class ParkingSpaceTransferRecordRsp {
 
     /** id */
