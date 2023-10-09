@@ -13,7 +13,6 @@ import com.cf.parking.services.service.*;
 import com.cf.parking.services.utils.AssertUtil;
 import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
-
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cf.parking.facade.bo.ParkingSpaceTransferRecordBO;
@@ -21,8 +20,6 @@ import com.cf.parking.facade.dto.ParkingSpaceTransferRecordDTO;
 import com.cf.parking.services.utils.PageUtils;
 import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
-import com.esotericsoftware.minlog.Log;
-
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
