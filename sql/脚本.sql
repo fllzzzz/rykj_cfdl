@@ -194,6 +194,23 @@ alter table lottery_rule_assign MODIFY COLUMN name VARCHAR(2048) default '' comm
 alter table lottery_apply_record MODIFY column result varchar(16) default '' comment '摇号结果(-1：未开号；0：未中；1：摇中)';
 alter table user_space add column  state char(1) default '0' comment '状态（0：未同步；1：同步成功；2：同步失败）';
 
+drop table if exists parking_space_change_record;
+CREATE TABLE `parking_space_change_record` (
+  `id` bigint NOT NULL COMMENT 'id',
+  `parking_code` varchar(32) DEFAULT '0' COMMENT '申请人停车场编号',
+  `user_id` bigint DEFAULT '0' COMMENT '申请人userId',
+	`user_name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT '' COMMENT '申请人姓名',
+  `accept_user_id` bigint DEFAULT '0' COMMENT '交换人userId',
+  `accept_user_name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT '' COMMENT '交换人姓名',
+ `accept_parking_code` varchar(32) DEFAULT '0' COMMENT '交换人停车场编号', 
+ `valid_start_date` date DEFAULT NULL COMMENT '转赠有效开始日期',
+  `valid_end_date` date DEFAULT NULL COMMENT '转赠有效截止日期',
+	state char(1) default '0' comment '状态（0：申请，1：已同意，2：已拒绝，3：已撤销）',
+  `create_tm` timestamp(3) NULL DEFAULT NULL COMMENT '创建时间',
+  `update_tm` timestamp(3) NULL DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC COMMENT='车位互换记录表';
+
 drop table if exists lottery_rule_description;
 create table lottery_rule_description(
   id           bigint(0)            not null           comment 'id',

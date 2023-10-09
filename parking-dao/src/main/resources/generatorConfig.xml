@@ -15,7 +15,7 @@
 
         </commentGenerator>
         <jdbcConnection driverClass="com.mysql.cj.jdbc.Driver"
-                        connectionURL="jdbc:mysql://101.34.3.87:3306/cfdl-parking" userId="rykjdev" password="Rykjdev@202302">
+                        connectionURL="jdbc:mysql://192.168.1.194:3306/parking" userId="root" password="admin123">
         </jdbcConnection>
         <!-- 数据库类型与java类型转换 -->
         <javaTypeResolver>
@@ -37,7 +37,7 @@
         </javaClientGenerator>
         <!-- 生成对应表及类名 -->
 
-        <table tableName="department" domainObjectName="DepartmentPO"
+        <table tableName="admin_user" domainObjectName="adminUserPO"
                enableCountByExample="false"
                enableUpdateByExample="false"
                enableDeleteByExample="false"
