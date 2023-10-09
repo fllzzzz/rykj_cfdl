@@ -15,9 +15,47 @@
         <result property="updateTm"    column="update_tm"    />
     </resultMap>
 
+    <!--联合查询-->
+    <resultMap type="com.cf.parking.dao.dto.ParkingSpaceTransferRecordRspDTO" id="ParkingSpaceTransferRecordDTOResult">
+        <result property="id"    column="id"    />
+        <result property="parkingLotCode"    column="parking_lot_code"    />
+        <result property="parkingLotRegion"    column="parking_lot_region"    />
+        <result property="acceptUserName"    column="accept_user_name"    />
+        <result property="validStartDate"    column="valid_start_date"    />
+        <result property="validEndDate"    column="valid_end_date"    />
+        <result property="createTm"    column="create_tm"    />
+        <result property="updateTm"    column="update_tm"    />
+        <result property="userName"    column="user_name"    />
+        <result property="userJobNumber"    column="user_job_number"    />
+        <result property="acceptUserJobNumber"    column="accept_user_job_number"    />
+    </resultMap>
+
     <sql id="selectParkingSpaceTransferRecordVo">
         select id, parking_lot_code, user_id, accept_user_id, accept_user_name, valid_start_date, valid_end_date, create_tm, update_tm from parking_space_transfer_record
     </sql>
 
-
+    <select id="selectParkingSpaceTransferRecordPage" resultMap="ParkingSpaceTransferRecordDTOResult">
+        select tr.id,tr.parking_lot_code,pl.region as parking_lot_region,upac.name as accept_user_name,tr.valid_start_date,tr.valid_end_date,tr.create_tm,tr.update_tm,up.name as user_name,up.job_number as user_job_number,upac.job_number as accept_user_job_number
+        from parking_space_transfer_record tr
+        left join parking_lot pl on tr.parking_lot_code = pl.region_code
+        left join user_profile up on tr.user_id = up.user_id
+        left join user_profile upac on tr.accept_user_id = upac.user_id
+        <where>
+            <if test="queryPO.userId != null">
+                and tr.user_id = #{queryPO.userId}
+            </if>
+            <if test="queryPO.validStartDate != null  ">
+                and  date_format(tr.create_tm,'%Y-%m-%d') &gt;= #{queryPO.validEndDate}
+            </if>
+            <if test="queryPO.validEndDate != null  ">
+                and  date_format(tr.create_tm,'%Y-%m-%d') &lt;= #{queryPO.validEndDate}
+            </if>
+            <if test="queryPO.parkingLotCode != null and queryPO.parkingLotCode != '' ">
+                and tr.parking_lot_code = #{queryPO.parkingLotCode}
+            </if>
+            <if test="userInfo != null and userInfo != '' ">
+                and (up.name like concat('%',#{userInfo},'%') or up.job_number like concat('%',#{userInfo},'%') or upac.name like concat('%',#{userInfo},'%') or upac.job_number like concat('%',#{userInfo},'%') )
+            </if>
+        </where>
+    </select>
 </mapper>

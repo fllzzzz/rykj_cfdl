@@ -10,6 +10,7 @@ import com.cf.parking.dao.mapper.UserProfilePOMapper;
 import com.cf.parking.dao.po.UserInfoPO;
 import com.cf.parking.dao.po.UserPO;
 import com.cf.parking.dao.po.UserProfilePO;
+import com.cf.parking.facade.bo.UserProfileBO;
 import com.cf.parking.facade.enums.BizResultCodeEnum;
 import com.cf.parking.services.constant.ParkingConstants;
 import com.cf.support.exception.BusinessException;
@@ -243,4 +244,14 @@ public class UserProfileService extends ServiceImpl<UserProfilePOMapper, UserPro
 		}
 		userProfilePOMapper.batchSetParkingLotByJobNum(applyIdList,parkingLot);
 	}
+
+    /**
+     * 根据userId查询用户详情
+     * @param userId
+     * @return
+     */
+    public UserProfileBO selectUserProfileByUserId(Long userId) {
+        UserProfilePO userProfilePO = userProfilePOMapper.selectById(userId);
+        return BeanConvertorUtils.map(userProfilePO,UserProfileBO.class);
+    }
 }

@@ -28,10 +28,6 @@ public class ParkingSpaceTransferRecordRsp {
     @ApiModelProperty(value = "转赠停车场名称")
     private String parkingLotRegion;
 
-    /** 申请人userId */
-    @ApiModelProperty(value = "申请人userId")
-    private Long userId;
-
     /** 赠予人姓名 */
     @ApiModelProperty(value = "赠予人姓名")
     private String acceptUserName;

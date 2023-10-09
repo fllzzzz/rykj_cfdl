@@ -4,10 +4,11 @@ import com.alibaba.fastjson.JSON;
 import com.cf.parking.api.annotation.AdminOptLogTitle;
 import com.cf.parking.api.request.UserVerifyOptReq;
 import com.cf.parking.api.request.UserVerifyReq;
-import com.cf.parking.api.response.ExportAdminOrderRecordRsp;
 import com.cf.parking.api.response.ExportUserVerifyRsp;
+import com.cf.parking.api.response.UserProfileRsp;
 import com.cf.parking.api.response.UserVerifyRsp;
 import com.cf.parking.dao.po.LotteryBlackListPO;
+import com.cf.parking.facade.bo.UserProfileBO;
 import com.cf.parking.facade.bo.UserVerifyBO;
 import com.cf.parking.facade.dto.UserVerifyDTO;
 import com.cf.parking.facade.dto.UserVerifyOptDTO;
@@ -140,6 +141,31 @@ public class UserVerifyController {
         return Result.buildSuccessResult() ;
     }
 
+    /**
+     * 车辆审核信息批量导出
+     */
+    @AdminUserAuthentication
+    @ApiOperation(value = "车辆审核信息批量导出", notes = "车辆审核信息批量导出")
+    @PostMapping("/batchExport")
+    public void batchExport(@RequestBody UserVerifyOptReq param, HttpServletResponse response)
+    {
+        log.info("车辆审核信息批量导出:{}", JSON.toJSONString(param));
+        //1.参数转换
+        UserVerifyDTO dto = new UserVerifyDTO();
+        BeanUtils.copyProperties(param,dto);
+
+        //2.查询符合条件的要导出的记录
+        List<UserVerifyBO> boList = userVerifyFacade.getAllUserVerifyList(dto);
+        List<ExportUserVerifyRsp> exportUserVerifyRsps = BeanConvertorUtils.copyList(boList, ExportUserVerifyRsp.class);
+
+        //3.对记录内的base64字符串转换成图片并进行导出
+        if (CollectionUtils.isEmpty(exportUserVerifyRsps)){
+            ExcelUtiles.exportExcel(exportUserVerifyRsps, "车辆审核记录", "车辆审核记录", ExportUserVerifyRsp.class, "车辆审核记录.xlsx", response);
+        }else {
+            userVerifyFacade.batchExport(boList,response);
+        }
+    }
+
 
 
     //————————————————小程序端————————————————————
@@ -264,6 +290,11 @@ public class UserVerifyController {
 
         //3.参数校验
         paramVerify(param);
+        //3.2判断车牌号是否重复
+        if (userVerifyFacade.judgePlateNoRepeat(param.getPlateNo())){
+            return Result.buildErrorResult("车牌号已存在，请联系管理员！");
+        }
+
 
         //4.参数转换
         UserVerifyOptDTO  dto = BeanConvertorUtils.map(param, UserVerifyOptDTO.class);
@@ -345,31 +376,26 @@ public class UserVerifyController {
         return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult("删除失败，请重试！");
     }
 
+
     /**
-     * 车辆审核信息批量导出
+     * 小程序端根据车牌号查询车主信息
      */
-    @AdminUserAuthentication
-    @ApiOperation(value = "车辆审核信息批量导出", notes = "车辆审核信息批量导出")
-    @PostMapping("/batchExport")
-    public void batchExport(@RequestBody UserVerifyOptReq param, HttpServletResponse response)
+    @UserAuthentication
+    @ApiOperation(value = "根据车牌号查询车主信息——小程序端")
+    @PostMapping("/infoByPlateNo")
+    public Result<UserProfileRsp> getInfoByPlateNo(@RequestBody UserVerifyReq param)
     {
-    	log.info("车辆审核信息批量导出:{}", JSON.toJSONString(param));
-        //1.参数转换
-        UserVerifyDTO dto = new UserVerifyDTO();
-        BeanUtils.copyProperties(param,dto);
+        log.info("根据车牌号查询车主详细信息——小程序:{}", JSON.toJSONString(param));
 
-        //2.查询符合条件的要导出的记录
-        List<UserVerifyBO> boList = userVerifyFacade.getAllUserVerifyList(dto);
-        List<ExportUserVerifyRsp> exportUserVerifyRsps = BeanConvertorUtils.copyList(boList, ExportUserVerifyRsp.class);
+        //1.参数校验
+        AssertUtil.checkNull(param.getPlateNo(),"请选择车牌号！");
 
-        //3.对记录内的base64字符串转换成图片并进行导出
-        if (CollectionUtils.isEmpty(exportUserVerifyRsps)){
-            ExcelUtiles.exportExcel(exportUserVerifyRsps, "车辆审核记录", "车辆审核记录", ExportUserVerifyRsp.class, "车辆审核记录.xlsx", response);
-        }else {
-            userVerifyFacade.batchExport(boList,response);
+        //2.查询
+        UserProfileBO bo = userVerifyFacade.getInfoByPlateNo(param.getPlateNo());
+        if (null == bo){
+            return Result.buildErrorResult("车主信息未录入摇号系统，请联系管理员查询！");
         }
+        return Result.buildSuccessResult(BeanConvertorUtils.map(bo,UserProfileRsp.class));
     }
-
-
 
 }

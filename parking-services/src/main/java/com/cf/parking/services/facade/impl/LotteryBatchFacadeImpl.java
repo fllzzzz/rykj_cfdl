@@ -13,6 +13,7 @@ import com.cf.parking.dao.po.*;
 import com.cf.parking.facade.bo.LotteryBatchBO;
 import com.cf.parking.facade.bo.LotteryResultDetailBO;
 import com.cf.parking.facade.bo.LotteryResultExportBO;
+import com.cf.parking.facade.constant.ParkingSysCodeConstant;
 import com.cf.parking.facade.dto.LotteryBatchDTO;
 import com.cf.parking.facade.dto.LotteryBatchOptDTO;
 import com.cf.parking.facade.facade.LotteryBatchFacade;
@@ -354,7 +355,7 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
                     List<LotteryResultExportBO> resultExportBOS = BeanConvertorUtils.copyList(resultDetailPOList, LotteryResultExportBO.class);
                     resultExportBOS.forEach(exportBO -> {
                         //1.设置停车场名称
-                        exportBO.setParkingLotName(parkingLotService.selectParkingLotByCode(exportBO.getParkingLotCode()).getRegion());
+                        exportBO.setParkingLotName(ParkingSysCodeConstant.codeRegionMap.getOrDefault(exportBO.getParkingLotCode(),""));
                         //2.设置摇号轮数
                         exportBO.setRoundName(roundName);
                         //3.设置基础数据
