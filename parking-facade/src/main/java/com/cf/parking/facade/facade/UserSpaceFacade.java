@@ -1,5 +1,6 @@
 package com.cf.parking.facade.facade;
 
+import com.cf.parking.facade.bo.ParkingSpaceGroupBO;
 import com.cf.parking.facade.bo.UserSpaceBO;
 import com.cf.parking.facade.dto.UserSpacePageDTO;
 import com.cf.support.result.PageResponse;
@@ -34,4 +35,12 @@ public interface UserSpaceFacade {
      * @throws InterruptedException
      */
     void syncUserSpaceData() throws InterruptedException;
+
+	/**
+	 * 根据车库/有效期进行分组
+	 * @param jobNumber 工号
+	 * @param type 类型 
+	 * @return
+	 */
+	List<ParkingSpaceGroupBO> getUserSpaceGroupByParkingLot(String jobNumber, Integer type);
 }

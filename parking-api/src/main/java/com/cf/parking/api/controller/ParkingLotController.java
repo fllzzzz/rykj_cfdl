@@ -20,9 +20,7 @@ import com.cf.parking.services.utils.AssertUtil;
 import com.cf.parking.services.utils.PageUtils;
 import com.cf.support.authertication.AdminUserAuthentication;
 import com.cf.support.authertication.UserAuthentication;
-import com.cf.support.authertication.UserAuthenticationServer;
 import com.cf.support.authertication.token.dto.UserSessionDTO;
-import com.cf.support.exception.BusinessException;
 import com.cf.support.result.PageResponse;
 import com.cf.support.result.Result;
 import com.cf.support.utils.BeanConvertorUtils;
@@ -32,12 +30,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -52,7 +48,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RestController
 @RequestMapping("/parking/lot")
-public class ParkingLotController
+public class ParkingLotController  extends BaseController
 {
     @Resource
     private ParkingLotFacade parkingLotFacade;
@@ -60,12 +56,6 @@ public class ParkingLotController
     @Resource
     private UserProfileService userProfileService;
 
-    @Resource
-    private UserAuthenticationServer userAuthenticationServer;
-
-    private UserSessionDTO getUser() {
-        return userAuthenticationServer.getCurrentUser();
-    }
 
     //————————————————PC端————————————————————
 
@@ -257,10 +247,7 @@ public class ParkingLotController
     public Result<String> getParkingLotInfo()
     {
         //1.获取当前登录用户的信息
-        UserSessionDTO user = getUser();
-        if (ObjectUtils.isEmpty(user)){
-            throw new BusinessException("请先登录！");
-        }
+        UserSessionDTO user = getUserSessionDTO();
         Long userId = user.getUserId();
 
         //2.查询
@@ -292,6 +279,15 @@ public class ParkingLotController
         AssertUtil.checkNull(param.getId(),"请选择要查看的停车场！");
         ParkingLotImageBO bo = parkingLotFacade.getParkingLotInfoById(param.getId());
         return Result.buildSuccessResult(BeanConvertorUtils.map(bo,ParkingLotImageRsp.class));
+    }
+
+    
+    @ApiOperation(value = "获取所有非园区的停车场" , notes = "获取所有非园区的停车场")
+    @PostMapping("/parkingLot/all")
+    public Result<List<ParkingLotImageRsp>> getAllParkingLot()
+    {
+        List<ParkingLotImageBO> bo = parkingLotFacade.getAllParkingLot();
+        return Result.buildSuccessResult(BeanConvertorUtils.copyList(bo,ParkingLotImageRsp.class));
     }
 
 

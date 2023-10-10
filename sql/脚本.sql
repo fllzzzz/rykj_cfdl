@@ -194,6 +194,7 @@ alter table lottery_rule_assign MODIFY COLUMN name VARCHAR(2048) default '' comm
 alter table lottery_apply_record MODIFY column result varchar(16) default '' comment '摇号结果(-1：未开号；0：未中；1：摇中)';
 alter table user_space add column  state char(1) default '0' comment '状态（0：未同步；1：同步成功；2：同步失败）';
 
+--20231009
 drop table if exists parking_space_change_record;
 CREATE TABLE `parking_space_change_record` (
   `id` bigint NOT NULL COMMENT 'id',
@@ -219,3 +220,8 @@ create table lottery_rule_description(
   update_tm     timestamp(3)                          comment '更新时间',
   primary key (id) USING BTREE
 )engine=innodb  comment ='摇号规则描述表（只有一条记录）' ROW_FORMAT = Dynamic;
+
+ALTER table parking_space_change_record add index user_id_idx(user_id);
+ALTER table parking_space_change_record add index acc_user_id_idx(accept_user_id);
+
+alter table parking_lot modify column   `remark` varchar(4000) DEFAULT '' COMMENT '备注';

@@ -14,9 +14,7 @@ import com.cf.parking.facade.facade.LotteryApplyRecordFacade;
 import com.cf.parking.services.service.LotteryBlackListService;
 import com.cf.parking.services.utils.AssertUtil;
 import com.cf.support.authertication.UserAuthentication;
-import com.cf.support.authertication.UserAuthenticationServer;
 import com.cf.support.authertication.token.dto.UserSessionDTO;
-import com.cf.support.exception.BusinessException;
 import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
 import io.swagger.annotations.Api;
@@ -42,7 +40,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/lottery/applyRecord")
-public class LotteryApplyRecordController
+public class LotteryApplyRecordController extends BaseController
 {
     @Resource
     private LotteryApplyRecordFacade lotteryApplyRecordFacade;
@@ -50,12 +48,7 @@ public class LotteryApplyRecordController
     @Resource
     private LotteryBlackListService lotteryBlackListService;
 
-    @Resource
-    private UserAuthenticationServer userAuthenticationServer;
-
-    private UserSessionDTO getUser() {
-        return userAuthenticationServer.getCurrentUser();
-    }
+   
 
 
 
@@ -101,14 +94,6 @@ public class LotteryApplyRecordController
         //3.申请摇号
         Integer result = lotteryApplyRecordFacade.apply(userId,param.getBatchId());
         return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult("申请失败，请重试！");
-    }
-
-    private UserSessionDTO getUserSessionDTO() {
-        UserSessionDTO user = getUser();
-        if (ObjectUtils.isEmpty(user)){
-            throw new BusinessException("请先登录！");
-        }
-        return user;
     }
 
 
