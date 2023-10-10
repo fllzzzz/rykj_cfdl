@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cf.parking.dao.mapper.UserSpaceMapper;
 import com.cf.parking.dao.po.UserSpacePO;
+import com.cf.parking.facade.bo.ParkingSpaceGroupBO;
 import com.cf.parking.facade.bo.UserSpaceBO;
 import com.cf.parking.facade.constant.FeignUrlConstant;
 import com.cf.parking.facade.dto.HikvisionResult;
@@ -124,6 +125,14 @@ public class UserSpaceFacadeImpl implements UserSpaceFacade {
 			Thread.sleep(3000);
 		}
 		userSpaceService.mergeParkingLots(resultList);
+	}
+
+	@Override
+	public List<ParkingSpaceGroupBO> getUserSpaceGroupByParkingLot(String jobNumber, Integer type) {
+		List<UserSpacePO> list = userSpaceService.querySpaceGroupByExpireDate(jobNumber, type);
+		log.info("查询用户：{}类型为{}的车库信息：{}",jobNumber,type,JSON.toJSONString(list));
+		return BeanConvertorUtils.copyList(list, ParkingSpaceGroupBO.class);
+		
 	}
 
 

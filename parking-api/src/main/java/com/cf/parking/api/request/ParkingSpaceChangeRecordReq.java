@@ -28,5 +28,8 @@ public class ParkingSpaceChangeRecordReq extends PageRequest {
 	
 	@ApiModelProperty(value = "申请人名称")
     private String userName;
+	
+	@ApiModelProperty(value = "状态")
+	private String state;
 
 }

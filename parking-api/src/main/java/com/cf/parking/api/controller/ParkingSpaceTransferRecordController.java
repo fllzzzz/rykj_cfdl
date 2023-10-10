@@ -113,6 +113,7 @@ public class ParkingSpaceTransferRecordController
         if (ObjectUtils.isEmpty(user)){
             throw new BusinessException("请先登录！");
         }
+        log.info("登陆用户：{}",JSON.toJSONString(user));
         return user;
     }
 
