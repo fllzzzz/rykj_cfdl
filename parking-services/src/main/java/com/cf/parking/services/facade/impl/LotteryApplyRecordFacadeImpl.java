@@ -1,10 +1,8 @@
 package com.cf.parking.services.facade.impl;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cf.parking.dao.mapper.LotteryApplyRecordMapper;
@@ -16,8 +14,6 @@ import com.cf.parking.facade.facade.LotteryApplyRecordFacade;
 import com.cf.parking.services.enums.LotteryApplyRecordStateEnum;
 import com.cf.parking.services.service.*;
 import com.cf.parking.services.utils.PageUtils;
-import com.cf.support.authertication.UserAuthenticationServer;
-import com.cf.support.authertication.token.dto.UserSessionDTO;
 import com.cf.support.bean.IdWorker;
 import com.cf.support.exception.BusinessException;
 import com.cf.support.result.PageResponse;
@@ -59,12 +55,7 @@ public class LotteryApplyRecordFacadeImpl implements LotteryApplyRecordFacade
     @Resource
     private UserProfileService userProfileService;
 
-    @Resource
-    private UserAuthenticationServer userAuthenticationServer;
 
-    private UserSessionDTO getUser() {
-        return userAuthenticationServer.getCurrentUser();
-    }
 
     /**
      * 查询摇号申请记录列表
@@ -78,7 +69,6 @@ public class LotteryApplyRecordFacadeImpl implements LotteryApplyRecordFacade
         LambdaQueryWrapper<LotteryApplyRecordPO> queryWrapper = new LambdaQueryWrapper<LotteryApplyRecordPO>()
                 .eq(ObjectUtils.isNotEmpty(dto.getUserId()), LotteryApplyRecordPO::getUserId, dto.getUserId())
                 .eq(ObjectUtils.isNotEmpty(dto.getResult()), LotteryApplyRecordPO::getResult, dto.getResult())
-                .eq(LotteryApplyRecordPO::getUserId, getUser().getUserId())
                 .le(ObjectUtils.isNotEmpty(dto.getEndDate()), LotteryApplyRecordPO::getBatchNum, dto.getEndDate())
                 .ge(ObjectUtils.isNotEmpty(dto.getStartDate()), LotteryApplyRecordPO::getBatchNum, dto.getStartDate())
                 .orderByDesc(LotteryApplyRecordPO::getUpdateTm);
