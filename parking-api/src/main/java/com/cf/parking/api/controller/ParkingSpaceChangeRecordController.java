@@ -58,7 +58,7 @@ public class ParkingSpaceChangeRecordController  extends BaseController
     //————————————————PC端————————————————————
     
     /**
-     * 查询车位转赠记录列表
+     * 查询车位互换记录列表
      */
     @SuppressWarnings("unchecked")
 	@AdminUserAuthentication
@@ -66,7 +66,7 @@ public class ParkingSpaceChangeRecordController  extends BaseController
     @PostMapping("/list")
     public Result<PageResponse<ParkingSpaceChangeRecordRsp>> pcList(@RequestBody ParkingSpaceChangeRecordReq param)
     {
-    	
+
         log.info("互换记录查询参数：{}",JSON.toJSONString(param));
         //2.参数转换
         ParkingSpaceChangeRecordDTO dto = new ParkingSpaceChangeRecordDTO();
@@ -82,7 +82,7 @@ public class ParkingSpaceChangeRecordController  extends BaseController
     //————————————————小程序端————————————————————
 
     /**
-     * 查询车位转赠记录列表
+     * 查询车位互换记录列表
      */
     @SuppressWarnings("unchecked")
 	@UserAuthentication

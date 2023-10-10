@@ -119,11 +119,6 @@ public class LotteryBatchService extends ServiceImpl<LotteryBatchMapper, Lottery
      */
     public boolean judgeWhetherInApplyTime(Date applyStartTime, Date applyEndTime) {
         Date now = new Date();
-		Calendar endTime = Calendar.getInstance();
-		endTime.setTime(applyEndTime);
-		endTime.set(Calendar.HOUR_OF_DAY, 23);
-		endTime.set(Calendar.MINUTE, 59);
-		endTime.set(Calendar.SECOND, 59);
-		return now.before(endTime.getTime()) && now.after(applyStartTime);
+		return now.before(DateUtil.endOfDay(applyEndTime)) && now.after(applyStartTime);
     }
 }

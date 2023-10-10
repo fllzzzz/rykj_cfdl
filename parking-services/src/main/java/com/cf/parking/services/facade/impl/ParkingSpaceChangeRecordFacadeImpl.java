@@ -1,9 +1,6 @@
 package com.cf.parking.services.facade.impl;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
@@ -93,16 +90,17 @@ public class ParkingSpaceChangeRecordFacadeImpl implements ParkingSpaceChangeRec
 	public PageResponse<ParkingSpaceChangeRecordBO> getParkingSpaceChangeRecordList(ParkingSpaceChangeRecordDTO dto) {
 		log.info("查询互换记录params:{}",JSON.toJSONString(dto));
 		Page<ParkingSpaceChangeRecordPO> page = PageUtils.toPage(dto);
-		
-        Page<ParkingSpaceChangeRecordPO> poPage = changeRecordPOMapper.selectPage(page, 
+
+		Page<ParkingSpaceChangeRecordPO> poPage = changeRecordPOMapper.selectPage(page,
         		new LambdaQueryWrapper<ParkingSpaceChangeRecordPO>()
         		.eq(ObjectUtils.isNotEmpty(dto.getState()), ParkingSpaceChangeRecordPO::getState, dto.getState())
-                .like(ObjectUtils.isNotEmpty(dto.getAcceptUserName()), ParkingSpaceChangeRecordPO::getAcceptUserName, dto.getAcceptUserName())
-                .like(ObjectUtils.isNotEmpty(dto.getUserName()), ParkingSpaceChangeRecordPO::getUserName, dto.getUserName())
-                .and(ObjectUtils.isNotEmpty(dto.getUserId()), 
-                		i -> i.eq(ObjectUtils.isNotEmpty(dto.getUserId()), ParkingSpaceChangeRecordPO::getAcceptUserId, dto.getUserId())
-                			.or()
-                			.eq(ObjectUtils.isNotEmpty(dto.getUserId()), ParkingSpaceChangeRecordPO::getUserId, dto.getUserId()))
+				.eq(StringUtils.isNotBlank(dto.getParkingLotCode()),ParkingSpaceChangeRecordPO::getParkingCode,dto.getParkingLotCode())
+				.ge(ObjectUtils.isNotEmpty(dto.getApplyStartDate()),ParkingSpaceChangeRecordPO::getCreateTm,dto.getApplyStartDate())
+				.le(ObjectUtils.isNotEmpty(dto.getApplyEndDate()),ParkingSpaceChangeRecordPO::getCreateTm,null == dto.getApplyEndDate() ? null : DateUtil.endOfDay(dto.getApplyEndDate()))
+				.and(ObjectUtils.isNotEmpty(dto.getUserName()),
+						i -> i.like(ObjectUtils.isNotEmpty(dto.getUserName()),ParkingSpaceChangeRecordPO::getUserName,dto.getUserName())
+								.or()
+								.like(ObjectUtils.isNotEmpty(dto.getUserName()),ParkingSpaceChangeRecordPO::getAcceptUserName,dto.getUserName()))
                 .orderByDesc(ParkingSpaceChangeRecordPO::getCreateTm));
 
         List<ParkingSpaceChangeRecordBO> boList = BeanConvertorUtils.copyList(poPage.getRecords(), ParkingSpaceChangeRecordBO.class);
@@ -111,7 +109,7 @@ public class ParkingSpaceChangeRecordFacadeImpl implements ParkingSpaceChangeRec
 		return PageUtils.toResponseList(page,boList);
 	}
 
-	
+
 	private void setParkingLotRegionByCode(ParkingSpaceChangeRecordBO bo, Map<String, String> parkingMap) {
 		ParkingLotPO parkingLotPO = null;
 		String parkingName = parkingMap.get(bo.getParkingCode());

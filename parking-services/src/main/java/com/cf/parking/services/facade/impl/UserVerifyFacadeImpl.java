@@ -87,7 +87,7 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
                 .eq(!ObjectUtils.isEmpty(dto.getState()), UserVerifyPO::getState, dto.getState())
                 .like(StringUtils.isNotBlank(dto.getUserName()), UserVerifyPO::getUserName, dto.getUserName())
                 .like(StringUtils.isNotBlank(dto.getPlateNo()), UserVerifyPO::getPlateNo, dto.getPlateNo())
-                .le( !ObjectUtils.isEmpty(dto.getEndDate()) , UserVerifyPO::getCreateTm, DateUtil.format(dto.getEndDate(), "yyyy-MM-dd 23:59:59") )
+                .le( !ObjectUtils.isEmpty(dto.getEndDate()) , UserVerifyPO::getCreateTm,null == dto.getEndDate() ? null : DateUtil.endOfDay(dto.getEndDate()) ) //不判断的话DateUtil.endOfDay会空指针异常
                 .ge(!ObjectUtils.isEmpty(dto.getStartDate()), UserVerifyPO::getCreateTm, dto.getStartDate())
                 .orderByDesc(UserVerifyPO::getCreateTm);
 
@@ -339,7 +339,7 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
                 .eq(!ObjectUtils.isEmpty(dto.getState()), UserVerifyPO::getState, dto.getState())
                 .eq(!ObjectUtils.isEmpty(dto.getUserName()),UserVerifyPO::getUserName,dto.getUserName())
                 .like(!ObjectUtils.isEmpty(dto.getPlateNo()),UserVerifyPO::getPlateNo,dto.getPlateNo())
-                .le( !ObjectUtils.isEmpty(dto.getEndDate()) , UserVerifyPO::getCreateTm, DateUtil.format(dto.getEndDate(), "yyyy-MM-dd 23:59:59") )
+                .le( !ObjectUtils.isEmpty(dto.getEndDate()) , UserVerifyPO::getCreateTm,null == dto.getEndDate() ? null : DateUtil.endOfDay(dto.getEndDate()) )
                 .ge(!ObjectUtils.isEmpty(dto.getStartDate()), UserVerifyPO::getCreateTm, dto.getStartDate())
                 .orderByDesc(UserVerifyPO::getCreateTm);
         List<UserVerifyPO> poList = mapper.selectList(queryWrapper);
