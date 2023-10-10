@@ -46,4 +46,9 @@ public class LotteryApplyBO {
 
     /** 是否已申请状态，true：已申请；false：未申请 */
     private Boolean applyState;
+    
+    /**
+     * 期号
+     */
+    private Date batchNum;
 }

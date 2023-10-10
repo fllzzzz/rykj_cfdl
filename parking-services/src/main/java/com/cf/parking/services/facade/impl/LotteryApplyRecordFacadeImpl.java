@@ -129,6 +129,7 @@ public class LotteryApplyRecordFacadeImpl implements LotteryApplyRecordFacade
         applyBO.setApplyEndTime(lotteryBatchPO.getApplyEndTime());
         applyBO.setValidStartDate(lotteryBatchPO.getValidStartDate());
         applyBO.setValidEndDate(lotteryBatchPO.getValidEndDate());
+        applyBO.setBatchNum(lotteryBatchPO.getBatchNum());
         //2.判断当前时间是否处于报名时间内
         boolean InTime = lotteryBatchService.judgeWhetherInApplyTime(lotteryBatchPO.getApplyStartTime(),lotteryBatchPO.getApplyEndTime());
         applyBO.setTimeState(InTime);

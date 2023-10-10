@@ -55,5 +55,10 @@ public class LotteryApplyRsp {
     @ApiModelProperty(value = "是否已申请状态，true：已申请；false：未申请")
     private Boolean applyState;
 
+    /**
+     * 期号
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private Date batchNum;
 
 }
