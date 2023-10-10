@@ -1,5 +1,6 @@
 package com.cf.parking.facade.facade;
 
+import com.cf.parking.facade.bo.UserProfileBO;
 import com.cf.parking.facade.bo.UserVerifyBO;
 import com.cf.parking.facade.dto.UserVerifyDTO;
 import com.cf.parking.facade.dto.UserVerifyOptDTO;
@@ -93,4 +94,18 @@ public interface UserVerifyFacade {
      * @return
      */
     List<UserVerifyBO> getAllUserVerifyList(UserVerifyDTO dto);
+
+    /**
+     * 根据车牌号查询车主信息
+     * @param plateNo
+     * @return
+     */
+    UserProfileBO getInfoByPlateNo(String plateNo);
+
+    /**
+     * 判断车牌号是否重复
+     * @param plateNo
+     * @return
+     */
+    Boolean judgePlateNoRepeat(String plateNo);
 }

@@ -1,25 +1,24 @@
-package com.cf.parking.facade.bo;
+package com.cf.parking.dao.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.util.Date;
 
 /**
- * 车位转赠记录
+ * PC端车位转赠记录返回对象
  * @author
- * @date 2023/9/5
+ * @date 2023/10/9
  */
 @Data
-public class ParkingSpaceTransferRecordBO {
+public class ParkingSpaceTransferRecordRspDTO {
     /** id */
     private Long id;
 
-    /** 转赠停车场编号*/
+    /** 转赠停车场编号 */
     private String parkingLotCode;
 
-    /** 转赠停车场区域 */
+    /** 转赠停车场名称 */
     private String parkingLotRegion;
 
     /** 赠予人姓名 */
@@ -40,7 +39,6 @@ public class ParkingSpaceTransferRecordBO {
     /** 更新时间 */
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date updateTm;
-
 
     //PC端展示属性
     /** 申请人姓名 */

@@ -1,5 +1,6 @@
 package com.cf.parking.services.service;
 
+import cn.hutool.core.date.DateField;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.cf.parking.services.enums.LotteryBatchStateEnum;
 import com.cf.parking.services.utils.AssertUtil;
@@ -8,6 +9,7 @@ import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +23,8 @@ import com.cf.parking.dao.po.LotteryRuleRoundPO;
 import com.cf.parking.dao.po.ParkingLotPO;
 import com.cf.parking.facade.dto.LotteryBatchOptDTO;
 import com.cf.parking.facade.facade.LotteryBatchFacade;
+
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import javax.annotation.Resource;
@@ -108,12 +112,18 @@ public class LotteryBatchService extends ServiceImpl<LotteryBatchMapper, Lottery
 
     /**
      * 判断当前时间是否处于报名时间内
+	 * 注：申请截止日期在数据库内存的是00:00:00，但实际在截止日期当天23:59:59仍应可以报名
      * @param applyStartTime
      * @param applyEndTime
      * @return
      */
     public boolean judgeWhetherInApplyTime(Date applyStartTime, Date applyEndTime) {
         Date now = new Date();
-        return now.before(applyEndTime) && now.after(applyStartTime);
+		Calendar endTime = Calendar.getInstance();
+		endTime.setTime(applyEndTime);
+		endTime.set(Calendar.HOUR_OF_DAY, 23);
+		endTime.set(Calendar.MINUTE, 59);
+		endTime.set(Calendar.SECOND, 59);
+		return now.before(endTime.getTime()) && now.after(applyStartTime);
     }
 }

@@ -75,7 +75,6 @@ public class LotteryApplyRecordFacadeImpl implements LotteryApplyRecordFacade
     public PageResponse<LotteryApplyRecordBO> getApplyRecordList(LotteryApplyRecordDTO dto) {
         Page<LotteryApplyRecordPO> page = PageUtils.toPage(dto);
 
-
         LambdaQueryWrapper<LotteryApplyRecordPO> queryWrapper = new LambdaQueryWrapper<LotteryApplyRecordPO>()
                 .eq(ObjectUtils.isNotEmpty(dto.getUserId()), LotteryApplyRecordPO::getUserId, dto.getUserId())
                 .eq(ObjectUtils.isNotEmpty(dto.getResult()), LotteryApplyRecordPO::getResult, dto.getResult())
@@ -85,9 +84,26 @@ public class LotteryApplyRecordFacadeImpl implements LotteryApplyRecordFacade
                 .orderByDesc(LotteryApplyRecordPO::getUpdateTm);
 
         Page<LotteryApplyRecordPO> lotteryApplyRecordPOPage = mapper.selectPage(page, queryWrapper);
-        List<LotteryApplyRecordBO> lotteryApplyRecordBOList = BeanConvertorUtils.copyList(lotteryApplyRecordPOPage.getRecords(), LotteryApplyRecordBO.class);
+        List<LotteryApplyRecordPO> records = lotteryApplyRecordPOPage.getRecords();
+        records.forEach(this::applyResultSet);
+
+        List<LotteryApplyRecordBO> lotteryApplyRecordBOList = BeanConvertorUtils.copyList(records, LotteryApplyRecordBO.class);
 
         return PageUtils.toResponseList(page,lotteryApplyRecordBOList);
+    }
+
+    //摇号申请记录中的摇号结果设置
+    private void applyResultSet(LotteryApplyRecordPO x) {
+        if (x.getResult().equals(LotteryApplyRecordStateEnum.NOTOPEN.getState())){
+            x.setResult(LotteryApplyRecordStateEnum.NOTOPEN.getRemark());
+        }
+        if (x.getResult().equals(LotteryApplyRecordStateEnum.NOTGET.getState())){
+            x.setResult(LotteryApplyRecordStateEnum.NOTGET.getRemark());
+        }
+        if (x.getResult().equals(LotteryApplyRecordStateEnum.GET.getState())){
+            //摇号结果模块设置的是停车场名称，这里直接返回此字段即可
+            x.setResult(x.getParkingLotCode());
+        }
     }
 
     /**
@@ -120,6 +136,7 @@ public class LotteryApplyRecordFacadeImpl implements LotteryApplyRecordFacade
             //报名时间内————>查看是否已申请
             LotteryApplyRecordPO recordPO = mapper.selectOne(new LambdaQueryWrapper<LotteryApplyRecordPO>()
                     .eq(LotteryApplyRecordPO::getBatchNum, lotteryBatchPO.getBatchNum())
+                    .eq(LotteryApplyRecordPO::getUserId,userId)
                     .eq(LotteryApplyRecordPO::getApplyState, LotteryApplyRecordStateEnum.HAVE_APPLIED.getState()));
 
             applyBO.setApplyState(null != recordPO);

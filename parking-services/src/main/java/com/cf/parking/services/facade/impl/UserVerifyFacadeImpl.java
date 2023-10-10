@@ -10,6 +10,7 @@ import com.cf.parking.dao.mapper.UserVerifyMapper;
 import com.cf.parking.dao.po.UserInfoPO;
 import com.cf.parking.dao.po.UserProfilePO;
 import com.cf.parking.dao.po.UserVerifyPO;
+import com.cf.parking.facade.bo.UserProfileBO;
 import com.cf.parking.facade.bo.UserVerifyBO;
 import com.cf.parking.facade.dto.UserVerifyDTO;
 import com.cf.parking.facade.dto.UserVerifyOptDTO;
@@ -373,5 +374,37 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
         pict.resize(1);
     }
 
+
+    /**
+     * 根据车牌号查询车主信息
+     * @param plateNo
+     * @return
+     */
+    @Override
+    public UserProfileBO getInfoByPlateNo(String plateNo) {
+        //1.查询传入的车牌号是否有用户
+        UserVerifyPO po = mapper.selectOne(new LambdaQueryWrapper<UserVerifyPO>().eq(UserVerifyPO::getPlateNo, plateNo));
+        if (null == po){
+            return null;
+        }
+
+        //2.查询用户详细信息
+        UserProfileBO bo = userProfileService.selectUserProfileByUserId(po.getUserId());
+        if (null != bo){
+            bo.setPlateNo(plateNo);
+        }
+        return bo;
+    }
+
+    /**
+     * 判断车牌号是否重复
+     * @param plateNo
+     * @return
+     */
+    @Override
+    public Boolean judgePlateNoRepeat(String plateNo) {
+        List<UserVerifyPO> poList = mapper.selectList(new LambdaQueryWrapper<UserVerifyPO>().eq(UserVerifyPO::getPlateNo, plateNo));
+        return CollectionUtils.isNotEmpty(poList);
+    }
 
 }

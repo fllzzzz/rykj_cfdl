@@ -62,7 +62,7 @@ public class ParkingSpaceTransferRecordController
     /**
      * 查询车位转赠记录列表
      */
-    @AdminUserAuthentication
+//    @AdminUserAuthentication
     @ApiOperation(value = "查询车位转赠记录列表————PC端", notes = "根据条件分页查询")
     @PostMapping("/pcList")
     public Result<PageResponse<ParkingSpaceTransferRecordRsp>> pcList(@RequestBody ParkingSpaceTransferRecordReq param)

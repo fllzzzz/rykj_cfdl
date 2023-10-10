@@ -7,8 +7,15 @@ package com.cf.parking.services.enums;
  */
 public enum LotteryApplyRecordStateEnum {
 
+    //申请状态
     CANCEL("0","取消申请"),
-    HAVE_APPLIED("1","已申请");
+    HAVE_APPLIED("1","已申请"),
+
+
+    //摇号结果
+    NOTOPEN("-1","未开号"),
+    NOTGET("0","未中"),
+    GET("1","摇中");
 
     private String state;
 

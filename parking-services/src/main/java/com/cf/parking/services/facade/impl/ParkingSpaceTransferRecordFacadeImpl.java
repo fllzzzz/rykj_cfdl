@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import javax.annotation.Resource;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cf.parking.dao.mapper.ParkingSpaceTransferRecordMapper;
 import com.cf.parking.dao.po.*;
 import com.cf.parking.facade.facade.ParkingSpaceTransferRecordFacade;
@@ -22,6 +24,7 @@ import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -112,17 +115,14 @@ public class ParkingSpaceTransferRecordFacadeImpl implements ParkingSpaceTransfe
     @Override
     public PageResponse<ParkingSpaceTransferRecordBO> getParkingSpaceTransferRecordList(ParkingSpaceTransferRecordDTO dto) {
         Page<ParkingSpaceTransferRecordPO> page = PageUtils.toPage(dto);
+		ParkingSpaceTransferRecordPO queryPO = new ParkingSpaceTransferRecordPO();
+		BeanUtils.copyProperties(dto,queryPO);
 
-        Page<ParkingSpaceTransferRecordPO> poPage = parkingSpaceTransferRecordMapper.selectPage(page, new LambdaQueryWrapper<ParkingSpaceTransferRecordPO>()
-                .eq(ObjectUtils.isNotEmpty(dto.getUserId()), ParkingSpaceTransferRecordPO::getUserId, dto.getUserId())
-                .le(ObjectUtils.isNotEmpty(dto.getValidEndDate()), ParkingSpaceTransferRecordPO::getCreateTm, dto.getValidEndDate())
-                .ge(ObjectUtils.isNotEmpty(dto.getValidStartDate()), ParkingSpaceTransferRecordPO::getCreateTm, dto.getValidStartDate())
-				.eq(StringUtils.isNotBlank(dto.getParkingLotCode()),ParkingSpaceTransferRecordPO::getParkingLotCode,dto.getParkingLotCode())
-				.orderByDesc(ParkingSpaceTransferRecordPO::getCreateTm));
-
-
-        List<ParkingSpaceTransferRecordBO> boList = BeanConvertorUtils.copyList(poPage.getRecords(), ParkingSpaceTransferRecordBO.class);
-		boList.forEach(this::setParkingLotRegionByCode);
+		IPage selectPage = parkingSpaceTransferRecordMapper.selectParkingSpaceTransferRecordPage(page,queryPO,dto.getUserInfo());
+		if (selectPage.getTotal() == 0){
+			return PageUtils.emptyResponseList(selectPage);
+		}
+		List<ParkingSpaceTransferRecordBO> boList = BeanConvertorUtils.copyList(selectPage.getRecords(), ParkingSpaceTransferRecordBO.class);
 		return PageUtils.toResponseList(page,boList);
     }
 
