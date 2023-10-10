@@ -3,8 +3,8 @@ package com.cf.parking.services.facade.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cf.parking.dao.mapper.LotteryRuleRoundMapper;
@@ -21,6 +21,7 @@ import com.cf.support.bean.IdWorker;
 import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -56,21 +57,19 @@ public class LotteryRuleRoundFacadeImpl implements LotteryRuleRoundFacade
             return name;
         }
 
-        roundId = roundId.replace("[","").replace("]","");
-        if (roundId.contains(",")){
-            String[] splitIds = roundId.split(",");
-            List<String> nameList = new ArrayList<>();
-            for (String splitId : splitIds) {
-                LotteryRuleRoundPO roundPO = mapper.selectById(Long.parseLong(splitId));
-                if (null != roundPO  && StringUtils.isNotBlank(roundPO.getName())){
-                    nameList.add(roundPO.getName());
-                }
-            }
-            name = nameList.stream().collect(Collectors.joining(","));
-        }else {
-            LotteryRuleRoundPO roundPO = mapper.selectById(Long.parseLong(roundId));
-            name = (null != roundPO && StringUtils.isNotBlank(roundPO.getName())) ?  roundPO.getName() :  null;
+        List<Long> roundIdList = JSON.parseArray(roundId, Long.class);
+        if (CollectionUtils.isEmpty(roundIdList)){
+            return name;
         }
+
+        List<String> nameList = new ArrayList<>();
+        for (Long id : roundIdList) {
+            LotteryRuleRoundPO roundPO = mapper.selectById(id);
+            if (null != roundPO  && StringUtils.isNotBlank(roundPO.getName())){
+                nameList.add(roundPO.getName());
+            }
+        }
+        name = String.join(",", nameList);
         return name;
     }
 
@@ -80,14 +79,8 @@ public class LotteryRuleRoundFacadeImpl implements LotteryRuleRoundFacade
         if (StringUtils.isBlank(roundId)){
             return null;
         }
-        roundId = roundId.replace("[","").replace("]","");
-        String[] split = roundId.split(",");
-        Long[] roundIdArr = new Long[split.length];
-        for (int i = 0; i < split.length; i++) {
-            roundIdArr[i] = Long.parseLong(split[i]);
-        }
-        return roundIdArr;
-
+        List<Long> roundIdList = JSON.parseArray(roundId, Long.class);
+        return roundIdList.toArray(new Long[0]);
     }
 
     /**

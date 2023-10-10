@@ -8,6 +8,7 @@ import com.cf.parking.dao.mapper.LotteryResultMapper;
 import com.cf.parking.dao.po.LotteryResultDetailPO;
 import com.cf.parking.dao.po.LotteryResultPO;
 import com.cf.parking.facade.bo.LotteryResultDetailBO;
+import com.cf.parking.facade.constant.ParkingSysCodeConstant;
 import com.cf.parking.services.enums.LotteryResultStateEnum;
 import com.cf.support.result.PageResponse;
 import org.springframework.stereotype.Service;
@@ -52,7 +53,7 @@ public class LotteryResultService extends ServiceImpl<LotteryResultMapper, Lotte
         //2.根据结果id查询对应的结果详情
         PageResponse<LotteryResultDetailBO> result =  lotteryResultDetailService.selectDetailListByResultId(page,po.getId());
 		result.getList().forEach(bo -> {
-			bo.setParkingLotName(parkingLotService.selectParkingLotByCode(bo.getParkingLotCode()).getRegion());
+			bo.setParkingLotName(ParkingSysCodeConstant.codeRegionMap.getOrDefault(bo.getParkingLotCode(),""));
 		});
 		return result;
     }

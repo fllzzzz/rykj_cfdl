@@ -5,6 +5,7 @@ import cn.hutool.core.date.DateUtil;
 import com.cf.parking.facade.bo.LotteryResultDetailBO;
 import com.cf.parking.facade.bo.ParkBaseDetailRespBO;
 import com.cf.parking.facade.bo.ParkBaseRespBO;
+import com.cf.parking.facade.constant.ParkingSysCodeConstant;
 import com.cf.parking.services.utils.PageUtils;
 import lombok.extern.slf4j.Slf4j;
 import com.alibaba.fastjson.JSON;
@@ -510,7 +511,7 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 	private LotteryResultDetailBO getLotteryResultDetailBOByUserSpacePO(UserSpacePO po) {
 		LotteryResultDetailBO detailBO = new LotteryResultDetailBO();
 		detailBO.setId(po.getUserSpaceId());
-		detailBO.setParkingLotName(parkingLotService.selectParkingLotByCode(po.getParkingLot()).getRegion());
+		detailBO.setParkingLotName(ParkingSysCodeConstant.codeRegionMap.getOrDefault(po.getParkingLot(),""));
 		detailBO.setUserName(po.getName());
 		detailBO.setUserJobNumber(po.getJobNumber());
 		detailBO.setState(po.getState());

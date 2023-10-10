@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import cn.hutool.core.date.DateUtil;
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cf.parking.dao.mapper.LotteryBatchMapper;
@@ -131,8 +132,7 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
         //2.1轮数设置（将数组转为字符串）
         AssertUtil.checkNull(dto.getRoundIdArr(),"请选择摇号轮数");
         Long[] roundIdArr = dto.getRoundIdArr();
-        String roundId = Arrays.toString(roundIdArr).replaceAll("\\s+","");
-        po.setRoundId(roundId);
+        po.setRoundId(JSON.toJSONString(roundIdArr));
 
         try{
             //1.插入摇号批次记录

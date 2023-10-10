@@ -45,10 +45,10 @@
                 and tr.user_id = #{queryPO.userId}
             </if>
             <if test="queryPO.validStartDate != null  ">
-                and  date_format(tr.create_tm,'%Y-%m-%d') &gt;= #{queryPO.validEndDate}
+                and  date_format(tr.create_tm,'%Y%m%d') &gt;= date_format(#{queryPO.validStartDate},'%Y%m%d')
             </if>
             <if test="queryPO.validEndDate != null  ">
-                and  date_format(tr.create_tm,'%Y-%m-%d') &lt;= #{queryPO.validEndDate}
+                and  date_format(tr.create_tm,'%Y%m%d') &lt;= date_format(#{queryPO.validEndDate},'%Y%m%d')
             </if>
             <if test="queryPO.parkingLotCode != null and queryPO.parkingLotCode != '' ">
                 and tr.parking_lot_code = #{queryPO.parkingLotCode}
