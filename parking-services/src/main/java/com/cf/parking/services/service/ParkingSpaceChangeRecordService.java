@@ -20,6 +20,7 @@ import com.cf.parking.facade.dto.ParkingSpaceChangeApplyDTO;
 import com.cf.parking.services.constant.ParkingConstants;
 import com.cf.parking.services.enums.ChangeRecordStateEnum;
 import com.cf.parking.services.enums.UserSpaceStateEnum;
+import com.cf.parking.services.enums.UserSpaceTypeEnum;
 import com.cf.parking.services.utils.AssertUtil;
 import com.cf.support.exception.BusinessException;
 import cn.hutool.core.date.DateUtil;
@@ -87,6 +88,7 @@ public class ParkingSpaceChangeRecordService extends ServiceImpl<ParkingSpaceCha
 		userSpaceService.update(space, new LambdaUpdateWrapper<UserSpacePO>()
 									.eq(UserSpacePO::getJobNumber, user.getJobNumber())
 									.eq(UserSpacePO::getParkingLot, record.getParkingCode())
+									.eq(UserSpacePO::getType, UserSpaceTypeEnum.LOTTERY.getState())
 									.eq(UserSpacePO::getEndDate, DateUtil.format(record.getValidEndDate(), ParkingConstants.SHORT_DATE_FORMAT))
 		);
 		//更新交换人的车库信息
@@ -94,6 +96,7 @@ public class ParkingSpaceChangeRecordService extends ServiceImpl<ParkingSpaceCha
 		userSpaceService.update(space, new LambdaUpdateWrapper<UserSpacePO>()
 				.eq(UserSpacePO::getJobNumber, param.getAcceptJobNumber())
 				.eq(UserSpacePO::getParkingLot, param.getAcceptParkingCode())
+				.eq(UserSpacePO::getType, UserSpaceTypeEnum.LOTTERY.getState())
 				.eq(UserSpacePO::getEndDate, DateUtil.format(record.getValidEndDate(), ParkingConstants.SHORT_DATE_FORMAT))
 		);
 	}
