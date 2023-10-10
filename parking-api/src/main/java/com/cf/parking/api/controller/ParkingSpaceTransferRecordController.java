@@ -14,19 +14,15 @@ import com.cf.support.authertication.AdminUserAuthentication;
 import com.cf.support.authertication.UserAuthentication;
 import com.cf.parking.services.utils.AssertUtil;
 import com.cf.parking.services.utils.PageUtils;
-import com.cf.support.authertication.UserAuthenticationServer;
 import com.cf.support.authertication.token.dto.UserSessionDTO;
-import com.cf.support.exception.BusinessException;
 import com.cf.support.result.PageResponse;
 import com.cf.support.result.Result;
 import com.cf.support.utils.BeanConvertorUtils;
-
 import cn.hutool.core.date.DateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,17 +40,11 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/parkingSpace/transferRecord")
-public class ParkingSpaceTransferRecordController
+public class ParkingSpaceTransferRecordController  extends BaseController
 {
     @Resource
     private ParkingSpaceTransferRecordFacade parkingSpaceTransferRecordFacade;
     
-    @Resource
-    private UserAuthenticationServer userAuthenticationServer;
-
-    private UserSessionDTO getUser() {
-        return userAuthenticationServer.getCurrentUser();
-    }
 
 
     //————————————————PC端————————————————————
@@ -62,7 +52,7 @@ public class ParkingSpaceTransferRecordController
     /**
      * 查询车位转赠记录列表
      */
-//    @AdminUserAuthentication
+    @AdminUserAuthentication
     @ApiOperation(value = "查询车位转赠记录列表————PC端", notes = "根据条件分页查询")
     @PostMapping("/pcList")
     public Result<PageResponse<ParkingSpaceTransferRecordRsp>> pcList(@RequestBody ParkingSpaceTransferRecordReq param)
@@ -108,14 +98,6 @@ public class ParkingSpaceTransferRecordController
         return PageUtils.pageResult(result,transferRecordRsps);
     }
 
-    private UserSessionDTO getUserSessionDTO() {
-        UserSessionDTO user = getUser();
-        if (ObjectUtils.isEmpty(user)){
-            throw new BusinessException("请先登录！");
-        }
-        log.info("登陆用户：{}",JSON.toJSONString(user));
-        return user;
-    }
 
 
     /**

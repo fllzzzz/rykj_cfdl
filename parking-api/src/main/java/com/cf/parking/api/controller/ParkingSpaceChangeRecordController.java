@@ -19,9 +19,7 @@ import com.cf.parking.services.enums.ChangeRecordStateEnum;
 import com.cf.parking.services.enums.UserSpaceTypeEnum;
 import com.cf.parking.services.utils.AssertUtil;
 import com.cf.parking.services.utils.PageUtils;
-import com.cf.support.authertication.UserAuthenticationServer;
 import com.cf.support.authertication.token.dto.UserSessionDTO;
-import com.cf.support.exception.BusinessException;
 import com.cf.support.result.PageResponse;
 import com.cf.support.result.Result;
 import com.cf.support.utils.BeanConvertorUtils;
@@ -30,7 +28,6 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,22 +44,16 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/parkingSpace/change")
-public class ParkingSpaceChangeRecordController
+public class ParkingSpaceChangeRecordController  extends BaseController
 {
     @Resource
     private ParkingSpaceChangeRecordFacade parkingSpaceChangeRecordFacade;
-    
-    @Resource
-    private UserAuthenticationServer userAuthenticationServer;
     
     
     @Resource
     private UserSpaceFacade userSpaceFacade;
     
 
-    private UserSessionDTO getUser() {
-        return userAuthenticationServer.getCurrentUser();
-    }
 
     //————————————————PC端————————————————————
     
@@ -187,13 +178,6 @@ public class ParkingSpaceChangeRecordController
     
     
     
-    private UserSessionDTO getUserSessionDTO() {
-        UserSessionDTO user = getUser();
-        if (ObjectUtils.isEmpty(user)){
-            throw new BusinessException("请先登录！");
-        }
-        return user;
-    }
 
 
     /**
