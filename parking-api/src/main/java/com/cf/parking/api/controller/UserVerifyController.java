@@ -351,9 +351,6 @@ public class UserVerifyController {
 
         //4.参数转换
         UserVerifyOptDTO  dto = BeanConvertorUtils.map(param, UserVerifyOptDTO.class);
-        dto.setId(param.getId());
-        dto.setUserId(getUser().getUserId());
-        dto.setUserName(getUser().getServerName());
 
 
         //5.修改
