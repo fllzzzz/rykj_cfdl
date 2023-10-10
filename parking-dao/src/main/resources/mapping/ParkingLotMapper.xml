@@ -26,6 +26,11 @@
         where id = #{id}
     </select>
 
+	<select id="getAllParkingLot" resultMap="ParkingLotResult" >
+		 <include refid="selectParkingLotVo" />
+		where parent_id != 0
+	</select>
+
     <insert id="insertWithImageInfo" parameterType="com.cf.parking.dao.po.ParkingLotPO">
         insert into parking_lot
         <trim prefix="(" suffix=")" suffixOverrides=",">

@@ -2,6 +2,9 @@ package com.cf.parking.dao.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.cf.parking.dao.po.ParkingLotPO;
+
+import java.util.List;
+
 import org.apache.ibatis.annotations.Param;
 
 /**
@@ -33,4 +36,10 @@ public interface ParkingLotMapper extends BaseMapper<ParkingLotPO> {
      * @return
      */
     int updateWithImageInfo(ParkingLotPO po);
+
+	/**
+	 * 获取所有停车场
+	 * @return
+	 */
+	List<ParkingLotPO> getAllParkingLot();
 }

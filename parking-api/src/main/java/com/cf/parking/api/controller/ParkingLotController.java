@@ -281,5 +281,14 @@ public class ParkingLotController  extends BaseController
         return Result.buildSuccessResult(BeanConvertorUtils.map(bo,ParkingLotImageRsp.class));
     }
 
+    
+    @ApiOperation(value = "获取所有非园区的停车场" , notes = "获取所有非园区的停车场")
+    @PostMapping("/parkingLot/all")
+    public Result<List<ParkingLotImageRsp>> getAllParkingLot()
+    {
+        List<ParkingLotImageBO> bo = parkingLotFacade.getAllParkingLot();
+        return Result.buildSuccessResult(BeanConvertorUtils.copyList(bo,ParkingLotImageRsp.class));
+    }
+
 
 }

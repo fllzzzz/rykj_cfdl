@@ -353,4 +353,20 @@ public class ParkingLotFacadeImpl implements ParkingLotFacade
         return boList;
     }
 
+	@Override
+	public List<ParkingLotImageBO> getAllParkingLot() {
+		List<ParkingLotImageBO> result = new ArrayList<>();
+		List<ParkingLotPO> list = mapper.getAllParkingLot();
+        list.forEach(po -> {
+        	 ParkingLotImageBO bo = new ParkingLotImageBO();
+             BeanUtils.copyProperties(po, bo);
+             //将字符串转为图片信息对象
+             List<ParkingLotImageInfoBO> parkingLotImageInfoBOS = JSON.parseObject(po.getImageInfo(), new TypeReference<List<ParkingLotImageInfoBO>>() {});
+             bo.setFiles(parkingLotImageInfoBOS);
+             result.add(bo);
+        });
+        
+		return result;
+	}
+
 }

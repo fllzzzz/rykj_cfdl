@@ -87,4 +87,9 @@ public interface ParkingLotFacade
      */
     List<ParkingLotBO> getParkingLotIdRegionList();
 
+	/**
+	 * 获取所有非园区停车场信息
+	 */
+	List<ParkingLotImageBO> getAllParkingLot();
+
 }
