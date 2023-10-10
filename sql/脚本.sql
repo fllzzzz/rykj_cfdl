@@ -223,3 +223,5 @@ create table lottery_rule_description(
 
 ALTER table parking_space_change_record add index user_id_idx(user_id);
 ALTER table parking_space_change_record add index acc_user_id_idx(accept_user_id);
+
+alter table parking_lot modify column   `remark` varchar(4000) DEFAULT '' COMMENT '备注';
