@@ -18,7 +18,6 @@ import com.cf.parking.services.service.LotteryBlackListService;
 import com.cf.parking.services.utils.AssertUtil;
 import com.cf.support.authertication.AdminUserAuthentication;
 import com.cf.support.authertication.UserAuthentication;
-import com.cf.support.authertication.UserAuthenticationServer;
 import com.cf.support.authertication.token.dto.UserSessionDTO;
 import com.cf.support.exception.BusinessException;
 import com.cf.support.result.PageResponse;
@@ -31,13 +30,11 @@ import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
@@ -53,20 +50,14 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/user/verify")
-public class UserVerifyController {
+public class UserVerifyController extends BaseController {
 
     @Resource
     private UserVerifyFacade userVerifyFacade;
 
     @Resource
-    private UserAuthenticationServer userAuthenticationServer;
-
-    @Resource
     private LotteryBlackListService lotteryBlackListService;
 
-    private UserSessionDTO getUser() {
-        return userAuthenticationServer.getCurrentUser();
-    }
 
 
 
@@ -298,20 +289,13 @@ public class UserVerifyController {
 
         //4.参数转换
         UserVerifyOptDTO  dto = BeanConvertorUtils.map(param, UserVerifyOptDTO.class);
-        dto.setUserId(getUser().getUserId());
+        dto.setUserId(userId);
 
         //5.新增
         Integer result = userVerifyFacade.add(dto);
         return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult("提交审核失败，请重试！");
     }
 
-    private UserSessionDTO getUserSessionDTO() {
-        UserSessionDTO user = getUser();
-        if (ObjectUtils.isEmpty(user)){
-            throw new BusinessException("请先登录！");
-        }
-        return user;
-    }
 
     private String getBase64ImgStr(byte[] compressedBytes) throws IOException {
         return PictureInfoEnum.BASE64_JPG_PRE.getInfo() + Base64.getEncoder().encodeToString(compressedBytes);
