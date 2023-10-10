@@ -18,11 +18,11 @@ public class BaseController {
 	 private UserAuthenticationServer userAuthenticationServer;
 
 	 private UserSessionDTO getUser() {
-	     //return userAuthenticationServer.getCurrentUser();
-		 UserSessionDTO user = new UserSessionDTO();
-		 user.setOpenId("CFDL13967");
-		 user.setUserId(1668559697477717l);
-		 return user;
+	     return userAuthenticationServer.getCurrentUser();
+		// UserSessionDTO user = new UserSessionDTO();
+		// user.setOpenId("CFDL13967");
+		// user.setUserId(1668559697477717l);
+		// return user;
 	 }
 	 
 	 protected UserSessionDTO getUserSessionDTO() {
