@@ -184,6 +184,7 @@ public class ParkingSpaceChangeRecordController  extends BaseController
     	AssertUtil.checkNull(param.getValidStartDate(), "车位有效期起始日不能为空");
     	AssertUtil.checkNull(param.getValidEndDate(), "车位有效期结束日不能为空");
     	AssertUtil.checkNull(param.getAcceptJobNumber(), "交换人工号不能为空");
+    	AssertUtil.checkNull(param.getAcceptUserName(), "交换人名称不能为空");
         //1.获取当前登录用户的信息
         UserSessionDTO user = getUserSessionDTO();
         param.setUserId(user.getUserId());
