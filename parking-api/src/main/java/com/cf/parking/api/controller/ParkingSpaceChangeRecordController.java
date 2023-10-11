@@ -151,6 +151,25 @@ public class ParkingSpaceChangeRecordController  extends BaseController
     }
     
     /**
+     * 判断是否展示交换车位按钮，true 显示，false不显示
+     */
+    @UserAuthentication
+    @ApiOperation(value = "统计申请的交换数量", notes = "统计申请的交换数量")
+    @PostMapping("/count")
+    public Result<Long> countApply()
+    {
+    	
+        //1.获取当前登录用户的信息
+        UserSessionDTO user = getUserSessionDTO();
+        log.info("统计申请的交换数量， 用户：{}",JSON.toJSONString(user));
+        ParkingSpaceChangeRecordDTO dto = new ParkingSpaceChangeRecordDTO();
+        dto.setUserId(user.getUserId());
+        dto.setState(ChangeRecordStateEnum.APPLY.getState());
+        long count = parkingSpaceChangeRecordFacade.getParkingSpaceChangeRecoudCount(dto);
+        return Result.buildSuccessResult(count);
+    }
+    
+    /**
      * 申请互换车位
      */
     @SuppressWarnings("rawtypes")
@@ -165,7 +184,6 @@ public class ParkingSpaceChangeRecordController  extends BaseController
     	AssertUtil.checkNull(param.getValidStartDate(), "车位有效期起始日不能为空");
     	AssertUtil.checkNull(param.getValidEndDate(), "车位有效期结束日不能为空");
     	AssertUtil.checkNull(param.getAcceptJobNumber(), "交换人工号不能为空");
-    	AssertUtil.checkNull(param.getAcceptUserName(), "交换人名称不能为空");
         //1.获取当前登录用户的信息
         UserSessionDTO user = getUserSessionDTO();
         param.setUserId(user.getUserId());

@@ -27,9 +27,14 @@ public class ParkingSpaceGroupBO {
 
     
     /**
-     * 所属车场名
+     * 所属车场编码
      */
     private String parkingLot;
+    
+    /**
+     * 所属车场名
+     */
+    private String parkingName;
     
     /**
      * 开始时间

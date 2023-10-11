@@ -3,6 +3,7 @@ package com.cf.parking.services.facade.impl;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cf.parking.dao.mapper.UserSpaceMapper;
+import com.cf.parking.dao.po.ParkingLotPO;
 import com.cf.parking.dao.po.UserSpacePO;
 import com.cf.parking.facade.bo.ParkingSpaceGroupBO;
 import com.cf.parking.facade.bo.UserSpaceBO;
@@ -13,6 +14,7 @@ import com.cf.parking.facade.dto.UserSpacePageDTO;
 import com.cf.parking.facade.dto.UserSpaceSyncDTO;
 import com.cf.parking.facade.facade.UserSpaceFacade;
 import com.cf.parking.services.integration.GatewayHikvisionFeign;
+import com.cf.parking.services.service.ParkingLotService;
 import com.cf.parking.services.service.UserSpaceService;
 import com.cf.parking.services.utils.PageUtils;
 import com.cf.support.result.PageResponse;
@@ -47,6 +49,9 @@ public class UserSpaceFacadeImpl implements UserSpaceFacade {
 	private GatewayHikvisionFeign gatewayHikvisionFeign;
 	@Resource
 	private UserSpaceMapper userSpaceMapper;
+	
+	@Resource
+	private ParkingLotService parkingLotService;
 
 
 	@Override
@@ -131,8 +136,15 @@ public class UserSpaceFacadeImpl implements UserSpaceFacade {
 	public List<ParkingSpaceGroupBO> getUserSpaceGroupByParkingLot(String jobNumber, Integer type) {
 		List<UserSpacePO> list = userSpaceService.querySpaceGroupByExpireDate(jobNumber, type);
 		log.info("查询用户：{}类型为{}的车库信息：{}",jobNumber,type,JSON.toJSONString(list));
-		return BeanConvertorUtils.copyList(list, ParkingSpaceGroupBO.class);
 		
+		List<ParkingSpaceGroupBO> result = BeanConvertorUtils.copyList(list, ParkingSpaceGroupBO.class);
+		if (!CollectionUtils.isEmpty(result)) {
+			result.forEach(space -> {
+				ParkingLotPO park = parkingLotService.selectParkingLotByCode(space.getParkingLot());
+				space.setParkingName(park == null ? null : park.getRegion());
+			});
+		}
+		return result;
 	}
 
 
