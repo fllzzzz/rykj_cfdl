@@ -1,10 +1,13 @@
 package com.cf.parking.facade.dto;
 
 import com.cf.support.result.PageRequest;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
+
+import java.util.Date;
 
 
 /**
@@ -37,5 +40,16 @@ public class ParkingSpaceChangeRecordDTO extends PageRequest {
      */
 	@ApiModelProperty(value = "查询不等于nestate的记录")
     private String nestate;
+
+	/** 申请日期（起） */
+	@JsonFormat(pattern = "yyyy-MM-dd")
+	private Date applyStartDate;
+
+	/** 申请日期（止） */
+	@JsonFormat(pattern = "yyyy-MM-dd")
+	private Date applyEndDate;
+
+	/**停车场 */
+	private String parkingLotCode;
 
 }

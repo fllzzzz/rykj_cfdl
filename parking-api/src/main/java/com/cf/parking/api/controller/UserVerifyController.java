@@ -289,7 +289,7 @@ public class UserVerifyController extends BaseController {
 
         //4.参数转换
         UserVerifyOptDTO  dto = BeanConvertorUtils.map(param, UserVerifyOptDTO.class);
-        dto.setUserId(getUserSessionDTO().getUserId());
+        dto.setUserId(userId);
 
         //5.新增
         Integer result = userVerifyFacade.add(dto);
@@ -335,9 +335,6 @@ public class UserVerifyController extends BaseController {
 
         //4.参数转换
         UserVerifyOptDTO  dto = BeanConvertorUtils.map(param, UserVerifyOptDTO.class);
-        dto.setId(param.getId());
-        dto.setUserId(getUserSessionDTO().getUserId());
-        dto.setUserName(getUserSessionDTO().getServerName());
 
 
         //5.修改
