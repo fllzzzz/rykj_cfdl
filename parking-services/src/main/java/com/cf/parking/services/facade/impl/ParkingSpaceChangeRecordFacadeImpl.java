@@ -220,7 +220,7 @@ public class ParkingSpaceChangeRecordFacadeImpl implements ParkingSpaceChangeRec
 		//下发通知
         OapiMessageCorpconversationAsyncsendV2Request.Link link = new OapiMessageCorpconversationAsyncsendV2Request.Link();
         link.setTitle("车位交换申请");
-        link.setMessageUrl("eapp://pages/lottery/lottery");
+        link.setMessageUrl("eapp://pages/lotteryManagement/lotteryManagement");
         link.setText("您有一条车位交换申请");
         link.setPicUrl("http://rongcloud-web.qiniudn.com/docs_demo_rongcloud_logo.png");
         dingTalkBean.sendLinkMessage(link, Arrays.asList(dto.getAcceptJobNumber()));
