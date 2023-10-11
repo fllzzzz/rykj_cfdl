@@ -1,5 +1,6 @@
 package com.cf.parking.services.facade.impl;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -36,9 +37,11 @@ import com.cf.parking.services.service.UserService;
 import com.cf.parking.services.service.UserSpaceService;
 import com.cf.parking.services.utils.AssertUtil;
 import com.cf.parking.services.utils.PageUtils;
+import com.cf.support.bean.DingTalkBean;
 import com.cf.support.bean.IdWorker;
 import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
+import com.dingtalk.api.request.OapiMessageCorpconversationAsyncsendV2Request;
 
 import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -71,6 +74,9 @@ public class ParkingSpaceChangeRecordFacadeImpl implements ParkingSpaceChangeRec
 	@Resource
 	private ParkingSpaceChangeRecordService parkingSpaceChangeRecordService;
 	
+	@Resource
+    private DingTalkBean dingTalkBean;
+	
 	
 	
 	
@@ -97,7 +103,8 @@ public class ParkingSpaceChangeRecordFacadeImpl implements ParkingSpaceChangeRec
         Page<ParkingSpaceChangeRecordPO> poPage = changeRecordPOMapper.selectPage(page, 
         		new LambdaQueryWrapper<ParkingSpaceChangeRecordPO>()
         		.eq(ObjectUtils.isNotEmpty(dto.getState()), ParkingSpaceChangeRecordPO::getState, dto.getState())
-                .like(ObjectUtils.isNotEmpty(dto.getAcceptUserName()), ParkingSpaceChangeRecordPO::getAcceptUserName, dto.getAcceptUserName())
+                .ne(ObjectUtils.isNotEmpty(dto.getNestate()), ParkingSpaceChangeRecordPO::getState, dto.getState())
+        		.like(ObjectUtils.isNotEmpty(dto.getAcceptUserName()), ParkingSpaceChangeRecordPO::getAcceptUserName, dto.getAcceptUserName())
                 .like(ObjectUtils.isNotEmpty(dto.getUserName()), ParkingSpaceChangeRecordPO::getUserName, dto.getUserName())
                 .and(ObjectUtils.isNotEmpty(dto.getUserId()), 
                 		i -> i.eq(ObjectUtils.isNotEmpty(dto.getUserId()), ParkingSpaceChangeRecordPO::getAcceptUserId, dto.getUserId())
@@ -210,6 +217,13 @@ public class ParkingSpaceChangeRecordFacadeImpl implements ParkingSpaceChangeRec
 			  .setAcceptUserId(acceptor.getUserId())
 			  ;
 		changeRecordPOMapper.insert(record);
+		//下发通知
+        OapiMessageCorpconversationAsyncsendV2Request.Link link = new OapiMessageCorpconversationAsyncsendV2Request.Link();
+        link.setTitle("车位交换申请");
+        link.setMessageUrl("eapp://pages/lottery/lottery");
+        link.setText("您有一条车位交换申请");
+        link.setPicUrl("http://rongcloud-web.qiniudn.com/docs_demo_rongcloud_logo.png");
+        dingTalkBean.sendLinkMessage(link, Arrays.asList(dto.getAcceptJobNumber()));
 	
 	}
 

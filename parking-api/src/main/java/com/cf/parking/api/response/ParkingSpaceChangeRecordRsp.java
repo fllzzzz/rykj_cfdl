@@ -93,4 +93,10 @@ public class ParkingSpaceChangeRecordRsp {
 	
 	@ApiModelProperty(value = "交换人车库名")
 	private String acceptParkingName;
+	
+	 /**
+     * 状态（0：申请，1：已同意，2：已拒绝，3：已撤销）
+     */
+	@ApiModelProperty(value = "查询不等于nestate的记录")
+    private String nestate;
 }

@@ -31,5 +31,11 @@ public class ParkingSpaceChangeRecordDTO extends PageRequest {
 	
 	@ApiModelProperty(value = "状态")
 	private String state;
+	
+	/**
+     * 状态（0：申请，1：已同意，2：已拒绝，3：已撤销）
+     */
+	@ApiModelProperty(value = "查询不等于nestate的记录")
+    private String nestate;
 
 }
