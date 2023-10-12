@@ -111,6 +111,8 @@ public class ParkingSpaceChangeRecordService extends ServiceImpl<ParkingSpaceCha
 			});
 			log.info("申请人：{}已存在交换车库：{},交换后原车库变更为：{}",user.getJobNumber(),record.getAcceptParkingCode(),JSON.toJSONString(applySpaceList));
 			userSpaceService.updateBatchById(applySpaceList);
+			//删除交换出去的车位
+			userSpaceService.deleteUserSpace(user.getJobNumber(),record.getParkingCode(),DateUtil.format(record.getValidEndDate(), ParkingConstants.SHORT_DATE_FORMAT),UserSpaceTypeEnum.LOTTERY.getState());
 		}
 		
 		//更新交换人的车库信息
@@ -138,6 +140,8 @@ public class ParkingSpaceChangeRecordService extends ServiceImpl<ParkingSpaceCha
 			});
 			log.info("交换人：{}已存在交换车库：{},交换后原车库变更为：{}",param.getAcceptJobNumber(),record.getParkingCode(),JSON.toJSONString(acceptSpaceList));
 			userSpaceService.updateBatchById(acceptSpaceList);
+			//删除交换出去的车位
+			userSpaceService.deleteUserSpace(param.getAcceptJobNumber(),param.getAcceptParkingCode(),DateUtil.format(record.getValidEndDate(), ParkingConstants.SHORT_DATE_FORMAT),UserSpaceTypeEnum.LOTTERY.getState());
 		}		
 		
 	}

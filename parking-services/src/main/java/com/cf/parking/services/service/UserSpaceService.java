@@ -594,5 +594,23 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 					.ge(UserSpacePO::getEndDate, scheduledate)
 				);
 	}
+
+
+	/**
+	 * 删除用户车位
+	 * @param jobNumber 工号
+	 * @param parkingCode 车库
+	 * @param endDate 截止日期
+	 * @param type 类型
+	 */
+	public void deleteUserSpace(String jobNumber, String parkingCode, String endDate, Integer type) {
+		userSpaceMapper.delete(new LambdaUpdateWrapper<UserSpacePO>()
+				.eq(UserSpacePO::getJobNumber, jobNumber)
+				.eq(UserSpacePO::getParkingLot, parkingCode)
+				.eq(UserSpacePO::getType, type)
+				.eq(UserSpacePO::getEndDate, endDate)
+				);
+		
+	}
 }
 
