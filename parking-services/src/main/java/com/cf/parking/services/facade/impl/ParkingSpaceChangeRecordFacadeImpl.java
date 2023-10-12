@@ -107,13 +107,16 @@ public class ParkingSpaceChangeRecordFacadeImpl implements ParkingSpaceChangeRec
                 		i -> i.eq(ObjectUtils.isNotEmpty(dto.getUserId()), ParkingSpaceChangeRecordPO::getAcceptUserId, dto.getUserId())
                 			.or()
                 			.eq(ObjectUtils.isNotEmpty(dto.getUserId()), ParkingSpaceChangeRecordPO::getUserId, dto.getUserId()))
-				.eq(StringUtils.isNotBlank(dto.getParkingLotCode()),ParkingSpaceChangeRecordPO::getParkingCode,dto.getParkingLotCode())
 				.ge(ObjectUtils.isNotEmpty(dto.getApplyStartDate()),ParkingSpaceChangeRecordPO::getCreateTm,dto.getApplyStartDate())
 				.le(ObjectUtils.isNotEmpty(dto.getApplyEndDate()),ParkingSpaceChangeRecordPO::getCreateTm,null == dto.getApplyEndDate() ? null : DateUtil.endOfDay(dto.getApplyEndDate()))
 				.and(ObjectUtils.isNotEmpty(dto.getUserName()),
 						i -> i.like(ObjectUtils.isNotEmpty(dto.getUserName()),ParkingSpaceChangeRecordPO::getUserName,dto.getUserName())
 								.or()
 								.like(ObjectUtils.isNotEmpty(dto.getUserName()),ParkingSpaceChangeRecordPO::getAcceptUserName,dto.getUserName()))
+                .and(ObjectUtils.isNotEmpty(dto.getParkingLotCode()),
+                		i -> i.eq(StringUtils.isNotBlank(dto.getParkingLotCode()),ParkingSpaceChangeRecordPO::getParkingCode,dto.getParkingLotCode())	
+                			.or()
+                			.eq(StringUtils.isNotBlank(dto.getParkingLotCode()),ParkingSpaceChangeRecordPO::getAcceptParkingCode,dto.getParkingLotCode()))
                 .orderByDesc(ParkingSpaceChangeRecordPO::getCreateTm));
 
         List<ParkingSpaceChangeRecordBO> boList = BeanConvertorUtils.copyList(poPage.getRecords(), ParkingSpaceChangeRecordBO.class);
