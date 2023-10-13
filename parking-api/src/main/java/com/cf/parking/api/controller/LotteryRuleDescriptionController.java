@@ -45,7 +45,6 @@ public class LotteryRuleDescriptionController {
     /**
      * 点击查询摇号规则描述信息
      */
-    @AdminUserAuthentication
     @ApiOperation(value = "摇号规则描述查询————PC端", notes = "摇号批次页面的描述信息")
     @PostMapping("/info")
     public Result<LotteryRuleDescriptionRsp> info()
