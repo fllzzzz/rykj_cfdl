@@ -1,5 +1,6 @@
 package com.cf.parking.services.facade.impl;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,6 +14,7 @@ import com.cf.parking.facade.dto.LotteryApplyRecordDTO;
 import com.cf.parking.facade.facade.LotteryApplyRecordFacade;
 import com.cf.parking.services.enums.LotteryApplyRecordStateEnum;
 import com.cf.parking.services.service.*;
+import com.cf.parking.services.utils.AssertUtil;
 import com.cf.parking.services.utils.PageUtils;
 import com.cf.support.bean.IdWorker;
 import com.cf.support.exception.BusinessException;
@@ -54,6 +56,9 @@ public class LotteryApplyRecordFacadeImpl implements LotteryApplyRecordFacade
 
     @Resource
     private UserProfileService userProfileService;
+    
+    @Resource
+    private UserVerifyService userVerifyService;
 
 
 
@@ -186,7 +191,9 @@ public class LotteryApplyRecordFacadeImpl implements LotteryApplyRecordFacade
      */
     @Override
     public Integer apply(Long userId, Long batchId) {
-        LotteryApplyRecordPO lotteryApplyRecordPO = mapper.selectOne(new LambdaQueryWrapper<LotteryApplyRecordPO>()
+    	List<UserVerifyPO>  verifyList = userVerifyService.queryVerifyListByUserIdList(Arrays.asList(userId));
+    	AssertUtil.checkNull(verifyList, "您无审核过的车辆，不能报名摇号");
+    	LotteryApplyRecordPO lotteryApplyRecordPO = mapper.selectOne(new LambdaQueryWrapper<LotteryApplyRecordPO>()
                 .eq(LotteryApplyRecordPO::getUserId, userId)
                 .eq(LotteryApplyRecordPO::getBatchId, batchId)
                 .eq(LotteryApplyRecordPO::getApplyState,LotteryApplyRecordStateEnum.CANCEL.getState()));
