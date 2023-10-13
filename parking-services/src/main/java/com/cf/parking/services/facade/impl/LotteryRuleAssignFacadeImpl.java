@@ -199,13 +199,12 @@ public class LotteryRuleAssignFacadeImpl implements LotteryRuleAssignFacade
 
         //1.如果是部门，查询对应部门下的人员
         if (RuleAssignTypeEnum.DEPARMENT.getState().equals(assignPO.getType())){
-            LinkedHashSet<String> deptSet = new LinkedHashSet<>(codeList);
-            //1.1添加所有子部门
-            codeList.forEach(deptCode->{
-                addDeptCode(deptSet,deptCode);
-            });
+			/*
+			 * LinkedHashSet<String> deptSet = new LinkedHashSet<>(codeList); //1.1添加所有子部门
+			 * codeList.forEach(deptCode->{ addDeptCode(deptSet,deptCode); });
+			 */
             //1.2.查询部门下的所有人员
-            jobNumList = employeeService.queryEmployeeListByDept(Arrays.asList(deptSet.toArray(new String[0])));
+            jobNumList = employeeService.queryEmployeeListByDept(codeList);
 
         }
         //2.如果是人员

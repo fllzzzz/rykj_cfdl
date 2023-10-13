@@ -3,25 +3,26 @@ package com.cf.parking.services.service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
-
 import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cf.parking.dao.mapper.LotteryRuleAssignMapper;
 import com.cf.parking.dao.po.LotteryApplyRecordPO;
 import com.cf.parking.dao.po.LotteryResultPO;
 import com.cf.parking.dao.po.LotteryRuleAssignPO;
+import com.cf.parking.dao.po.LotteryRuleRoundPO;
 import com.cf.parking.dao.po.ParkingLotPO;
+import com.cf.parking.facade.constant.ParkingSysCodeConstant;
 import com.cf.parking.services.enums.EnableStateEnum;
 import com.cf.parking.services.enums.LotteryResultStateEnum;
 import com.cf.parking.services.enums.RuleAssignTypeEnum;
+import com.cf.parking.services.utils.AssertUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,6 +41,10 @@ public class LotteryRuleAssignService extends ServiceImpl<LotteryRuleAssignMappe
 	
 	@Resource
 	private LotteryResultService lotteryResultService;
+	
+	@Resource
+	private LotteryRuleRoundService lotteryRuleRoundService;
+	
 	
 	
 	
@@ -154,6 +159,35 @@ public class LotteryRuleAssignService extends ServiceImpl<LotteryRuleAssignMappe
 		deptCodeList.clear();
 		log.info("根据部门人员规则{}获取对应的人员工号：{}",JSON.toJSONString(ruleJobList),JSON.toJSONString(ruleJobList));
 		return ruleJobList;
+	}
+
+
+	/**
+	 * 根据轮次ID删除部门/人员配置
+	 * @param roundId 轮次ID
+	 */
+	public void deleteByRoundId(Long roundId) {
+		ruleAssignMapper.delete(new LambdaUpdateWrapper<LotteryRuleAssignPO>()
+					.eq(LotteryRuleAssignPO::getRoundId, roundId)
+				);
+	}
+
+
+	/**
+	 * 根据轮次ID修改部门/人员配置
+	 * @param roundId 轮次ID
+	 */
+	public void updateByRoundId(Long roundId) {
+		LotteryRuleRoundPO rule = lotteryRuleRoundService.getById(roundId);
+		AssertUtil.checkNull(rule, "轮次不存在");
+		LotteryRuleAssignPO assign = new LotteryRuleAssignPO();
+		assign.setParkingLotCode(rule.getParkingLotCode());
+		String parkName = ParkingSysCodeConstant.codeRegionMap.get(rule.getParkingLotCode());
+		assign.setParkingLotRegion(parkName);
+		assign.setRoundName(rule.getName());
+		ruleAssignMapper.update(assign, new LambdaUpdateWrapper<LotteryRuleAssignPO>()
+				.eq(LotteryRuleAssignPO::getRoundId, roundId)
+			);
 	}
 
 }

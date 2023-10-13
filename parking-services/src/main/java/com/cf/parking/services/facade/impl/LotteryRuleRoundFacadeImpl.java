@@ -15,6 +15,7 @@ import com.cf.parking.facade.bo.LotteryRuleRoundBaseBO;
 import com.cf.parking.facade.dto.LotteryRuleRoundDTO;
 import com.cf.parking.facade.dto.LotteryRuleRoundOptDTO;
 import com.cf.parking.facade.facade.LotteryRuleRoundFacade;
+import com.cf.parking.services.service.LotteryRuleAssignService;
 import com.cf.parking.services.service.ParkingLotService;
 import com.cf.parking.services.utils.PageUtils;
 import com.cf.support.bean.IdWorker;
@@ -27,6 +28,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 
@@ -48,6 +50,10 @@ public class LotteryRuleRoundFacadeImpl implements LotteryRuleRoundFacade
 
     @Resource
     private IdWorker idWorker;
+    
+    @Resource
+    private LotteryRuleAssignService lotteryRuleAssignService;
+    
 
     /** 根据摇号轮数id转换成对应的轮数名称并进行拼接
      * roundId：[1,2,3]*/
@@ -152,18 +158,15 @@ public class LotteryRuleRoundFacadeImpl implements LotteryRuleRoundFacade
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Integer update(LotteryRuleRoundOptDTO dto) {
         LotteryRuleRoundPO po = new LotteryRuleRoundPO();
         BeanUtils.copyProperties(dto,po);
         po.setUpdateTm(new Date());
-        try{
-            int result = mapper.updateById(po);
-            log.info("修改摇号规则-轮数成功  ——  {}",po);
-            return result;
-        }catch (Exception e){
-            log.error("修改摇号规则-轮数失败：{}，失败原因：{}",po,e);
-            return 0;
-        }
+        int result = mapper.updateById(po);
+        log.info("修改摇号规则-轮数成功  ——  {}",po);
+        lotteryRuleAssignService.updateByRoundId(po.getId());
+        return result;
     }
 
     /**
@@ -172,15 +175,12 @@ public class LotteryRuleRoundFacadeImpl implements LotteryRuleRoundFacade
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Integer deleteById(Long id) {
-        try{
             int result = mapper.deleteById(id);
+            lotteryRuleAssignService.deleteByRoundId(id);
             log.info("摇号规则-轮数删除成功，id：{}",id);
             return result;
-        }catch (Exception e){
-            log.error("摇号规则-轮数删除失败，id：{}，失败原因：{}",id,e);
-            return 0;
-        }
     }
 
 
