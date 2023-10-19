@@ -3,19 +3,25 @@ package com.cf.parking.api.controller;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.cf.parking.dao.po.EmployeePO;
 import com.cf.parking.dao.po.LotteryApplyRecordPO;
 import com.cf.parking.dao.po.LotteryBatchPO;
 import com.cf.parking.dao.po.UserPO;
 import com.cf.parking.dao.po.UserProfilePO;
 import com.cf.parking.dao.po.UserVerifyPO;
+import com.cf.parking.facade.dto.LinkMessageDTO;
+import com.cf.parking.facade.facade.DingTalkMessageFacade;
 import com.cf.parking.services.service.EmployeeService;
 import com.cf.parking.services.service.LotteryApplyRecordService;
 import com.cf.parking.services.service.LotteryBatchService;
@@ -25,6 +31,7 @@ import com.cf.parking.services.service.UserVerifyService;
 import com.cf.support.bean.IdWorker;
 import com.cf.support.result.Result;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 
 
 
@@ -64,6 +71,9 @@ public class InitDataController {
 	
 	@Resource
 	private LotteryApplyRecordService lotteryApplyRecordService;
+	
+	@Resource
+	private DingTalkMessageFacade dingTalkMessageFacade;
 	
 	
 	
@@ -144,6 +154,23 @@ public class InitDataController {
 		return Result.buildSuccessResult();
 	}
 	
+	@PostMapping("/sendMsg")
+	public Result sendMsg(String url) {
+		List<UserProfilePO> user = userProfileService.list(new LambdaQueryWrapper<UserProfilePO>()
+					.in(UserProfilePO::getName, Arrays.asList("周锋","张华健"))
+					);
+		if (CollectionUtils.isEmpty(user)) {
+			return Result.buildErrorResult("无人员");
+		}
+			LinkMessageDTO dto = new LinkMessageDTO();
+	        dto.setMessage("测试");
+	        dto.setOpenIdList(user.stream().map(item -> item.getJobNumber()).collect(Collectors.toList()));
+	        dto.setUrl(url);
+	        
+	        dingTalkMessageFacade.asyncSendLink(dto, "摇号通知");
+	        
+			return Result.buildSuccessResult("已发送");
+	}
 	
 	/**
 	 * 生成报名数据
