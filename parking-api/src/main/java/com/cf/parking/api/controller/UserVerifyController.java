@@ -211,9 +211,6 @@ public class UserVerifyController extends BaseController {
     @ApiOperation(value = "单张文件上传——小程序", notes = "单张文件上传")
     @PostMapping("/imageUpload")
     public Result<String> imageUpload(MultipartFile image) throws IOException {
-    	//1.获取当前登录用户的信息
-        UserSessionDTO user = getUserSessionDTO();
-        log.info("用户：{}上传车辆图片开始",user.getOpenId());
         //1.参数校验
         if (null == image){
         	log.info("未选择图片上传");
