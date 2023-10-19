@@ -15,20 +15,20 @@ import com.cf.parking.facade.bo.LotteryBatchBO;
 import com.cf.parking.facade.bo.LotteryResultDetailBO;
 import com.cf.parking.facade.bo.LotteryResultExportBO;
 import com.cf.parking.facade.constant.ParkingSysCodeConstant;
+import com.cf.parking.facade.dto.LinkMessageDTO;
 import com.cf.parking.facade.dto.LotteryBatchDTO;
 import com.cf.parking.facade.dto.LotteryBatchOptDTO;
+import com.cf.parking.facade.facade.DingTalkMessageFacade;
 import com.cf.parking.facade.facade.LotteryBatchFacade;
 import com.cf.parking.services.enums.LotteryBatchStateEnum;
 import com.cf.parking.services.enums.LotteryResultStateEnum;
 import com.cf.parking.services.service.*;
 import com.cf.parking.services.utils.AssertUtil;
 import com.cf.parking.services.utils.PageUtils;
-import com.cf.support.bean.DingTalkBean;
 import com.cf.support.bean.IdWorker;
 import com.cf.support.exception.BusinessException;
 import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
-import com.dingtalk.api.request.OapiMessageCorpconversationAsyncsendV2Request;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -70,13 +70,13 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
     private LotteryBatchService lotteryBatchService;
 
     @Resource
-    private DingTalkBean dingTalkBean;
-    
-    @Resource
     private LotteryDealService lotteryDealService;
 
     @Resource
     private LotteryResultDetailService lotteryResultDetailService;
+    
+    @Resource
+    private DingTalkMessageFacade dingTalkMessageFacade;
 
     @Resource
     private IdWorker idWorker;
@@ -290,13 +290,20 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
 
         //1.2下发通知
         String notifyMessage = String.format(message, DateUtil.format(lotteryBatchPO.getBatchNum(), "yyyy-MM-dd"));
+        
+        /**
         OapiMessageCorpconversationAsyncsendV2Request.Link link = new OapiMessageCorpconversationAsyncsendV2Request.Link();
         link.setTitle("摇号通知");
         link.setMessageUrl("eapp://pages/lottery/lottery");
         link.setText(notifyMessage);
         link.setPicUrl("http://rongcloud-web.qiniudn.com/docs_demo_rongcloud_logo.png");
         dingTalkBean.sendLinkMessage(link, jobNumList);
-
+        **/
+        LinkMessageDTO dto = new LinkMessageDTO();
+        dto.setMessage(notifyMessage);
+        dto.setOpenIdList(jobNumList);
+        dto.setUrl("eapp://pages/lottery/lottery");
+        dingTalkMessageFacade.asyncSendLink(dto, "摇号通知");
         //2.修改批次状态为已通知
         lotteryBatchPO.setState(LotteryBatchStateEnum.HAVE_NOTIFIED.getState());
         return mapper.updateById(lotteryBatchPO);
