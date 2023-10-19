@@ -211,6 +211,7 @@ public class UserVerifyController extends BaseController {
     @ApiOperation(value = "单张文件上传——小程序", notes = "单张文件上传")
     @PostMapping("/imageUpload")
     public Result<String> imageUpload(MultipartFile image) throws IOException {
+    	log.info("开始上传文件");
         //1.参数校验
         if (null == image){
         	log.info("未选择图片上传");
