@@ -256,7 +256,6 @@ public class UserVerifyController extends BaseController {
     /**
      * 新增车辆审核
      */
-    @AdminOptLogTitle("小程序用户新增车辆信息")
     @UserAuthentication
     @ApiOperation(value = "新增车辆审核——小程序", notes = "移动端个人中心模块点击车辆录入")
     @PostMapping("/add")

@@ -3,6 +3,8 @@ package com.cf.parking.services.facade.impl;
 import cn.afterturn.easypoi.excel.ExcelExportUtil;
 import cn.afterturn.easypoi.excel.entity.enmus.ExcelType;
 import cn.hutool.core.date.DateUtil;
+
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -122,10 +124,11 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
      */
     @Override
     public Integer add(UserVerifyOptDTO dto) {
+    	log.info("add car params :{}",JSON.toJSONString(dto));
         //1.新增时车牌唯一性判断
         List<UserVerifyPO> poList = mapper.selectList(new LambdaQueryWrapper<UserVerifyPO>()
-                .eq(UserVerifyPO::getPlateNo, dto.getPlateNo())
-                .eq(UserVerifyPO::getUserId, dto.getUserId()));
+                .eq(UserVerifyPO::getPlateNo, dto.getPlateNo()));
+        log.info("plate exist data：{}",JSON.toJSONString(poList));
         if (CollectionUtils.isNotEmpty(poList)){
             throw new BusinessException("车牌号已存在！");
         }
@@ -135,6 +138,7 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
         BeanUtils.copyProperties(dto,userVerifyPO);
         userVerifyPO.setId(idWorker.nextId());
         UserInfoPO userInfoPO = userProfileService.getUserInfoByUserId(dto.getUserId());
+        log.info("user data :{}",JSON.toJSONString(userInfoPO));
         if (null != userInfoPO){
             userVerifyPO.setUserName(userInfoPO.getName());
         }
@@ -142,6 +146,7 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
         userVerifyPO.setCreateTm(new Date());
         userVerifyPO.setUpdateTm(new Date());
         try{
+        	log.info("insert user palte:{}",JSON.toJSONString(userVerifyPO));
             int result = mapper.insert(userVerifyPO);
             log.info("新增车辆审核成功  ——  {}",userVerifyPO);
             return result;
