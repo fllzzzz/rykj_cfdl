@@ -1,9 +1,6 @@
 package com.cf.parking.services.facade.impl;
 
-import cn.afterturn.easypoi.excel.ExcelExportUtil;
-import cn.afterturn.easypoi.excel.entity.enmus.ExcelType;
 import cn.hutool.core.date.DateUtil;
-
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -26,7 +23,6 @@ import com.cf.support.bean.IdWorker;
 import com.cf.support.exception.BusinessException;
 import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
-import com.cf.support.utils.ExcelUtiles;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -37,11 +33,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
-
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.Base64;
@@ -148,10 +141,9 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
         try{
         	log.info("insert user palte:{}",JSON.toJSONString(userVerifyPO));
             int result = mapper.insert(userVerifyPO);
-            log.info("新增车辆审核成功  ——  {}",userVerifyPO);
             return result;
         }catch (Exception e){
-            log.error("新增车辆审核失败——  {}，失败原因：{}",userVerifyPO,e);
+            log.error("新增车辆审核失败，失败原因：{}",JSON.toJSONString(e));
             return 0;
         }
     }
@@ -192,7 +184,7 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
     @Override
     public void batchAudit(UserVerifyOptDTO dto) {
         //1.批量审核
-        Integer result = mapper.batchAudit(dto.getIds(), dto.getState(), dto.getReason());
+        mapper.batchAudit(dto.getIds(), dto.getState(), dto.getReason());
         //2.如果是审核通过，为停车场信息为空的用户默认停车场
         //2.1查询用户ids
         List<UserVerifyPO> poList = mapper.selectBatchIds(dto.getIds());
