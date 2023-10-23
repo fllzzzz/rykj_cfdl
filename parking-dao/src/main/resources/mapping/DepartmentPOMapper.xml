@@ -3,13 +3,18 @@
 <mapper namespace="com.cf.parking.dao.mapper.DepartmentPOMapper">
   <resultMap id="BaseResultMap" type="com.cf.parking.dao.po.DepartmentPO">
     <id column="dept_code" jdbcType="VARCHAR" property="deptCode" />
+    <id column="parent_code" jdbcType="VARCHAR" property="parentCode" />
     <result column="department_name" jdbcType="VARCHAR" property="departmentName" />
     <result column="full_path" jdbcType="VARCHAR" property="fullPath" />
     <result column="state" jdbcType="INTEGER" property="state" />
     <result column="create_tm" jdbcType="TIMESTAMP" property="createTm" />
   </resultMap>
   <sql id="Base_Column_List">
-    dept_code, department_name, full_path, state, create_tm
+    dept_code,parent_code, department_name, full_path, state, create_tm
   </sql>
-  
+
+  <select id="getTopParentList" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"/> from department where (parent_code is null  or parent_code = '')
+    and state = 0
+  </select>
 </mapper>

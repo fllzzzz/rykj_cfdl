@@ -16,6 +16,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cf.parking.dao.mapper.DepartmentPOMapper;
 import com.cf.parking.dao.po.DepartmentPO;
+import org.springframework.util.StringUtils;
 
 
 @Service
@@ -45,15 +46,12 @@ public class DepartmentService extends ServiceImpl<DepartmentPOMapper, Departmen
 	public List<DepartmentTreeBO> departmentTree() {
 		List<DepartmentTreeBO> resultBOList = new ArrayList<>();
 
-		List<DepartmentPO> poList = departmentPOMapper.selectList(new LambdaQueryWrapper<DepartmentPO>()
-				.eq(DepartmentPO::getState, 0)
-				//过滤掉parentCode不为null和""的记录
-				.gt(DepartmentPO::getParentCode,""));
+		List<DepartmentPO> poList = departmentPOMapper.getTopParentList();
 
 		if (!CollectionUtils.isEmpty(poList)){
 			List<DepartmentTreeBO> departmentTreeBOList = poList.stream().map(po -> new DepartmentTreeBO().setCode(po.getDeptCode()).setName(po.getDepartmentName()).setParentCode(po.getParentCode())).collect(Collectors.toList());
 			//1.查出顶级
-			resultBOList = departmentTreeBOList.stream().filter(bo -> bo.getParentCode().equals("0")).collect(Collectors.toList());
+			resultBOList = departmentTreeBOList.stream().filter(bo -> StringUtils.isEmpty(bo.getParentCode())).collect(Collectors.toList());
 			//2.递归设置children
 			for (DepartmentTreeBO departmentTreeBO : resultBOList) {
 				departmentTreeBO.setChildren(getDepartmentChildren(departmentTreeBOList,departmentTreeBO));
