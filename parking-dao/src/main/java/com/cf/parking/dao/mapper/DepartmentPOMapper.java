@@ -18,10 +18,4 @@ public interface DepartmentPOMapper extends BaseMapper<DepartmentPO> {
     int updateByPrimaryKeySelective(DepartmentPO record);
 
     int updateByPrimaryKey(DepartmentPO record);
-
-    /**
-     * 查询部门列表中的顶级节点
-     * @return
-     */
-    List<DepartmentPO> getTopParentList();
 }

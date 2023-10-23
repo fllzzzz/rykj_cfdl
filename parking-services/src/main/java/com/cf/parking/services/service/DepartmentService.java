@@ -46,7 +46,8 @@ public class DepartmentService extends ServiceImpl<DepartmentPOMapper, Departmen
 	public List<DepartmentTreeBO> departmentTree() {
 		List<DepartmentTreeBO> resultBOList = new ArrayList<>();
 
-		List<DepartmentPO> poList = departmentPOMapper.getTopParentList();
+		List<DepartmentPO> poList = departmentPOMapper.selectList(new LambdaQueryWrapper<DepartmentPO>()
+				.eq(DepartmentPO::getState, 0));
 
 		if (!CollectionUtils.isEmpty(poList)){
 			List<DepartmentTreeBO> departmentTreeBOList = poList.stream().map(po -> new DepartmentTreeBO().setCode(po.getDeptCode()).setName(po.getDepartmentName()).setParentCode(po.getParentCode())).collect(Collectors.toList());

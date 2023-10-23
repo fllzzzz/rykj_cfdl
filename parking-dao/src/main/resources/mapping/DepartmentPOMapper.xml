@@ -12,9 +12,4 @@
   <sql id="Base_Column_List">
     dept_code,parent_code, department_name, full_path, state, create_tm
   </sql>
-
-  <select id="getTopParentList" resultMap="BaseResultMap">
-    select <include refid="Base_Column_List"/> from department where (parent_code is null  or parent_code = '')
-    and state = 0
-  </select>
 </mapper>
