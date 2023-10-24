@@ -23,8 +23,10 @@ import com.cf.parking.dao.po.UserInfoPO;
 import com.cf.parking.dao.po.UserPO;
 import com.cf.parking.dao.po.UserSpacePO;
 import com.cf.parking.facade.bo.ParkingSpaceChangeRecordBO;
+import com.cf.parking.facade.dto.LinkMessageDTO;
 import com.cf.parking.facade.dto.ParkingSpaceChangeApplyDTO;
 import com.cf.parking.facade.dto.ParkingSpaceChangeRecordDTO;
+import com.cf.parking.facade.facade.DingTalkMessageFacade;
 import com.cf.parking.facade.facade.ParkingSpaceChangeRecordFacade;
 import com.cf.parking.services.constant.ParkingConstants;
 import com.cf.parking.services.enums.ChangeRecordStateEnum;
@@ -36,12 +38,9 @@ import com.cf.parking.services.service.UserService;
 import com.cf.parking.services.service.UserSpaceService;
 import com.cf.parking.services.utils.AssertUtil;
 import com.cf.parking.services.utils.PageUtils;
-import com.cf.support.bean.DingTalkBean;
 import com.cf.support.bean.IdWorker;
 import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
-import com.dingtalk.api.request.OapiMessageCorpconversationAsyncsendV2Request;
-
 import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -74,9 +73,7 @@ public class ParkingSpaceChangeRecordFacadeImpl implements ParkingSpaceChangeRec
 	private ParkingSpaceChangeRecordService parkingSpaceChangeRecordService;
 	
 	@Resource
-    private DingTalkBean dingTalkBean;
-	
-	
+    private DingTalkMessageFacade dingTalkMessageFacade;
 	
 	
 	@Override
@@ -225,16 +222,11 @@ public class ParkingSpaceChangeRecordFacadeImpl implements ParkingSpaceChangeRec
 			  ;
 		changeRecordPOMapper.insert(record);
 		//下发通知
-        try {
-			OapiMessageCorpconversationAsyncsendV2Request.Link link = new OapiMessageCorpconversationAsyncsendV2Request.Link();
-			link.setTitle("车位交换申请");
-			link.setMessageUrl("eapp://pages/lotteryManagement/lotteryManagement");
-			link.setText("您有一条车位交换申请");
-			link.setPicUrl("http://rongcloud-web.qiniudn.com/docs_demo_rongcloud_logo.png");
-			dingTalkBean.sendLinkMessage(link, Arrays.asList(dto.getAcceptJobNumber()));
-		} catch (Exception e) {
-			log.error("发送钉钉通知失败：{}", e);
-		}
+		LinkMessageDTO link = new LinkMessageDTO();
+		link.setMessage("您有一条车位交换申请");
+		link.setOpenIdList(Arrays.asList(dto.getAcceptJobNumber()));
+		link.setUrl("eapp://pages/lotteryManagement/lotteryManagement");
+		dingTalkMessageFacade.asyncSendLink(link, "车位交换申请");
 	
 	}
 

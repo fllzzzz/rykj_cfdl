@@ -10,7 +10,6 @@ import com.cf.parking.facade.facade.LotteryRuleDescriptionFacade;
 import com.cf.support.bean.IdWorker;
 import com.cf.support.utils.BeanConvertorUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
@@ -40,7 +39,11 @@ public class LotteryRuleDescriptionFacadeImpl implements LotteryRuleDescriptionF
      */
     @Override
     public LotteryRuleDescriptionBO getDescription() {
-        List<LotteryRuleDescriptionPO> poList = mapper.selectList(new LambdaQueryWrapper<LotteryRuleDescriptionPO>().orderByDesc(LotteryRuleDescriptionPO::getUpdateTm));
+        List<LotteryRuleDescriptionPO> poList = mapper.selectList(
+        		new LambdaQueryWrapper<LotteryRuleDescriptionPO>()
+        		.orderByDesc(LotteryRuleDescriptionPO::getUpdateTm)
+        		.last(" limit 1 ")
+        		);
         if (CollectionUtils.isEmpty(poList)){
             return new LotteryRuleDescriptionBO();
         }

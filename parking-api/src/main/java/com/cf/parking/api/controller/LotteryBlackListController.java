@@ -2,6 +2,7 @@ package com.cf.parking.api.controller;
 
 import javax.annotation.Resource;
 
+import com.alibaba.fastjson.JSON;
 import com.cf.parking.api.annotation.AdminOptLogTitle;
 import com.cf.parking.api.request.LotteryBlackListOptReq;
 import com.cf.parking.api.request.LotteryBlackListReq;
@@ -52,7 +53,7 @@ public class LotteryBlackListController
     {
         LotteryBlackListDTO dto = new LotteryBlackListDTO();
         BeanUtils.copyProperties(param,dto);
-
+        log.info("查询摇号黑名单列表参数:{}",JSON.toJSONString(dto));
         PageResponse<LotteryBlackListBO> result = lotteryBlackListFacade.getLotteryBlackList(dto);
         List<LotteryBlackListRsp> lotteryBlackListRsps = BeanConvertorUtils.copyList(result.getList(), LotteryBlackListRsp.class);
         return Result.buildSuccessResult(new PageResponse(lotteryBlackListRsps,result.getPageNo(),result.getTotal(),result.getPageSize()));
@@ -69,7 +70,7 @@ public class LotteryBlackListController
     public Result add(@RequestBody LotteryBlackListOptReq param)
     {
         AssertUtil.checkNull(param.getName(),"请选择员工！");
-
+        log.info("新增摇号黑名单参数:{}",JSON.toJSONString(param));
         LotteryBlackListOptDTO dto = new LotteryBlackListOptDTO();
         BeanUtils.copyProperties(param,dto);
 

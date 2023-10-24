@@ -25,6 +25,7 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -254,4 +255,16 @@ public class UserProfileService extends ServiceImpl<UserProfilePOMapper, UserPro
         UserProfilePO userProfilePO = userProfilePOMapper.selectById(userId);
         return BeanConvertorUtils.map(userProfilePO,UserProfileBO.class);
     }
+
+	/**
+	 * 根据工号查询人员
+	 * @param jobNumList
+	 * @return
+	 */
+	public List<UserProfilePO> getProfileListByJobNumList(List<String> jobNumList) {
+		return CollectionUtils.isEmpty(jobNumList) ? Collections.emptyList() : userProfilePOMapper.selectList(
+					new LambdaQueryWrapper<UserProfilePO>()
+					.in(UserProfilePO::getJobNumber, jobNumList)
+				);
+	}
 }

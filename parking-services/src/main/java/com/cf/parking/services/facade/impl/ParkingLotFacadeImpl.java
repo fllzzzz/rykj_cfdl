@@ -148,10 +148,7 @@ public class ParkingLotFacadeImpl implements ParkingLotFacade
         } catch (DataIntegrityViolationException e){
             log.error("新增停车场重复：{}，失败原因：{}",po,e);
             throw new BusinessException("停车场编码已存在，请修改后重试！");
-        } catch (Exception e){
-            log.error("新增停车场失败：{}，失败原因：{}",po,e);
-            return 0;
-        }
+        } 
     }
 
     /**
@@ -172,10 +169,7 @@ public class ParkingLotFacadeImpl implements ParkingLotFacade
         } catch (DataIntegrityViolationException e){
             log.error("修改停车场重复：{}，失败原因：{}",po,e);
             throw new BusinessException("园区编码已存在，请修改后重试！");
-        } catch (Exception e){
-            log.error("修改停车场失败：{}，失败原因：{}",po,e);
-            return 0;
-        }
+        } 
     }
 
     private void setImageInfo(List<ParkingLotImageDTO> images, ParkingLotPO po) {
@@ -193,7 +187,6 @@ public class ParkingLotFacadeImpl implements ParkingLotFacade
      */
     @Override
     public Integer deleteById(Long id) {
-        try{
             //1.根据id查询
             List<Long> ids = new ArrayList<>();
             ids.add(id);
@@ -217,10 +210,6 @@ public class ParkingLotFacadeImpl implements ParkingLotFacade
             int result = mapper.deleteBatchIds(ids);
             log.info("停车场删除成功，id：{}",id);
             return result;
-        }catch (Exception e){
-            log.error("停车场删除失败，id：{}，失败原因：{}",id,e);
-            return 0;
-        }
     }
 
     /**
@@ -245,10 +234,7 @@ public class ParkingLotFacadeImpl implements ParkingLotFacade
         } catch (DataIntegrityViolationException e){
             log.error("新增停车场园区入口重复：{}，失败原因：{}",po,e);
             throw new BusinessException("园区编码已存在，请修改后重试！");
-        } catch (Exception e){
-            log.error("新增停车场园区失败：{}，失败原因：{}",po,e);
-            return 0;
-        }
+        } 
     }
 
     /**
@@ -272,10 +258,7 @@ public class ParkingLotFacadeImpl implements ParkingLotFacade
         }catch (DataIntegrityViolationException e){
             log.error("修改停车场园区入口重复：{}，失败原因：{}",po,e);
             throw new BusinessException("入口重复，请修改后重试！");
-        } catch (Exception e){
-            log.error("修改停车场园区失败：{}，失败原因：{}",po,e);
-            return 0;
-        }
+        } 
     }
 
     /**

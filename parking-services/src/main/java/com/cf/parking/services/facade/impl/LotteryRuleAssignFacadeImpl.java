@@ -145,14 +145,9 @@ public class LotteryRuleAssignFacadeImpl implements LotteryRuleAssignFacade
 
         //2.属性设置
         propertySet(dto, po);
-        try{
-            int result = mapper.updateById(po);
-            log.info("停车场分配修改成功  ——  {}",po);
-            return result;
-        }catch (Exception e){
-            log.error("停车场分配修改失败：{}，失败原因：{}",po,e);
-            return 0;
-        }
+        int result = mapper.updateById(po);
+        log.info("停车场分配修改成功  ——  {}",po);
+        return result;
     }
 
     /**
@@ -162,14 +157,9 @@ public class LotteryRuleAssignFacadeImpl implements LotteryRuleAssignFacade
      */
     @Override
     public Integer deleteById(Long id) {
-        try{
-            int result = mapper.deleteById(id);
-            log.info("停车场分配删除成功，id：{}",id);
-            return result;
-        }catch (Exception e){
-            log.error("停车场分配删除失败，id：{}，失败原因：{}",id,e);
-            return 0;
-        }
+        int result = mapper.deleteById(id);
+        log.info("停车场分配删除成功，id：{}",id);
+        return result;
     }
 
     /**
@@ -212,8 +202,11 @@ public class LotteryRuleAssignFacadeImpl implements LotteryRuleAssignFacade
             jobNumList = codeList;
         }
         //3.根据工号list生成结果
+        List<UserProfilePO> profileList = userProfileService.getProfileListByJobNumList(jobNumList);
+        Map<String,UserProfilePO> map = profileList.stream().collect(Collectors.toMap(UserProfilePO::getJobNumber, each -> each, (value1,value2) -> value1 ));
+        profileList.clear();
         jobNumList.stream().forEach(jobNum ->{
-            UserProfilePO userProfilePO = userProfileService.selectUserProfileByNameAndJobNumber(null, jobNum);
+            UserProfilePO userProfilePO = map.get(jobNum);
             if (null != userProfilePO){
                 LotteryRuleAssignExportBO bo = new LotteryRuleAssignExportBO().setCode(jobNum).setName(userProfilePO.getName()).setParkingLotRegion(parkingLotRegion);
                 boList.add(bo);

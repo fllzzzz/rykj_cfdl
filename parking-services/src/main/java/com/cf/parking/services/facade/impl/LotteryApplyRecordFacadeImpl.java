@@ -87,19 +87,6 @@ public class LotteryApplyRecordFacadeImpl implements LotteryApplyRecordFacade
         return PageUtils.toResponseList(page,lotteryApplyRecordBOList);
     }
 
-    //摇号申请记录中的摇号结果设置
-    private void applyResultSet(LotteryApplyRecordPO x) {
-        if (x.getResult().equals(LotteryApplyRecordStateEnum.NOTOPEN.getState())){
-            x.setResult(LotteryApplyRecordStateEnum.NOTOPEN.getRemark());
-        }
-        if (x.getResult().equals(LotteryApplyRecordStateEnum.NOTGET.getState())){
-            x.setResult(LotteryApplyRecordStateEnum.NOTGET.getRemark());
-        }
-        if (x.getResult().equals(LotteryApplyRecordStateEnum.GET.getState())){
-            //摇号结果模块设置的是停车场名称，这里直接返回此字段即可
-            x.setResult(x.getParkingLotCode());
-        }
-    }
 
     /**
      * 个人申请摇号页面信息查询
@@ -241,5 +228,18 @@ public class LotteryApplyRecordFacadeImpl implements LotteryApplyRecordFacade
         return mapper.deleteById(lotteryApplyRecordPO.getId());
     }
 
-
+  //摇号申请记录中的摇号结果设置
+    private void applyResultSet(LotteryApplyRecordPO apply) {
+        if (LotteryApplyRecordStateEnum.NOTOPEN.getState().equals(apply.getResult())){
+        	apply.setResult(LotteryApplyRecordStateEnum.NOTOPEN.getRemark());
+        }
+        if (LotteryApplyRecordStateEnum.NOTGET.getState().equals(apply.getResult())){
+        	apply.setResult(LotteryApplyRecordStateEnum.NOTGET.getRemark());
+        }
+        
+        if (LotteryApplyRecordStateEnum.GET.getState().equals(apply.getResult())){
+        	apply.setResult(apply.getParkingLotCode());
+        }
+        
+    }
 }

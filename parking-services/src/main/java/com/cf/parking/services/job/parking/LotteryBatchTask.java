@@ -23,12 +23,13 @@ public class LotteryBatchTask {
 	private LotteryBatchService lotteryBatchService;
 	
 	
-	@Scheduled(cron = "0 0 6 20 1,3,5,7,9,11 ? ") //奇数月的15号早上6点执行
+	@Scheduled(cron = "0 0 6 15-20 1,3,5,7,9,11 ? ") //奇数月的15-20号早上6点执行
 	@TaskLock(key = RedisConstant.AUTO_CREATE_BATCH)
 	public void autoCreateBatch() {
+		
 		boolean exist = lotteryBatchService.queryNextMonthBatchExist(DateUtil.format(DateUtil.beginOfMonth( DateUtil.nextMonth()), ParkingConstants.SHORT_DATE_FORMAT),
 				DateUtil.format(DateUtil.endOfMonth( DateUtil.nextMonth()), ParkingConstants.SHORT_DATE_FORMAT));
-		
+		log.info("摇号批次是否存在：{}", exist);
 		if (!exist) {
 			lotteryBatchService.autoCreateBatch();
 		}

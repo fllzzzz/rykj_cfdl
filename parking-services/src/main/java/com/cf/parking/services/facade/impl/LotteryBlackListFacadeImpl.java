@@ -101,14 +101,11 @@ public class LotteryBlackListFacadeImpl implements LotteryBlackListFacade
         LotteryBlackListPO po = new LotteryBlackListPO();
         BeanUtils.copyProperties(dto,po);
         po.setUpdateTm(new Date());
-        try{
-            int result = mapper.updateById(po);
-            log.info("修改黑名单成功  ——  {}",po);
-            return result;
-        }catch (Exception e){
-            log.error("修改黑名单失败：{}，失败原因：{}",po,e);
-            return 0;
-        }
+        
+        int result = mapper.updateById(po);
+        log.info("修改黑名单成功  ——  {}",po);
+        return result;
+        
     }
 
     /**
@@ -118,14 +115,9 @@ public class LotteryBlackListFacadeImpl implements LotteryBlackListFacade
      */
     @Override
     public Integer deleteById(Long id) {
-        try{
-            int result = mapper.deleteById(id);
-            log.info("移出摇号黑名单成功，id：{}",id);
-            return result;
-        }catch (Exception e){
-            log.error("移出摇号黑名单失败：{}，失败原因：{}",id,e);
-            return 0;
-        }
+         int result = mapper.deleteById(id);
+         log.info("移出摇号黑名单成功，id：{}",id);
+         return result;
     }
 
 

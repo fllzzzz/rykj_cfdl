@@ -67,15 +67,8 @@ public class ParkingSpaceChangeRecordController  extends BaseController
     public Result<PageResponse<ParkingSpaceChangeRecordRsp>> pcList(@RequestBody ParkingSpaceChangeRecordReq param)
     {
 
-        log.info("互换记录查询参数：{}",JSON.toJSONString(param));
-        //2.参数转换
-        ParkingSpaceChangeRecordDTO dto = new ParkingSpaceChangeRecordDTO();
-        BeanUtils.copyProperties(param,dto);
-
-        //3.列表查询
-        PageResponse<ParkingSpaceChangeRecordBO> result = parkingSpaceChangeRecordFacade.getParkingSpaceChangeRecordList(dto);
-        List<ParkingSpaceChangeRecordRsp> transferRecordRsps = BeanConvertorUtils.copyList(result.getList(), ParkingSpaceChangeRecordRsp.class);
-        return PageUtils.pageResult(result,transferRecordRsps);
+        log.info("PC互换记录查询参数：{}",JSON.toJSONString(param));
+        return converResult(param);
     }
     
     
@@ -95,19 +88,13 @@ public class ParkingSpaceChangeRecordController  extends BaseController
         UserSessionDTO user = getUserSessionDTO();
         Long userId = user.getUserId();
         param.setUserId(userId);
-        log.info("互换记录查询参数：{}",JSON.toJSONString(param));
-        //2.参数转换
-        ParkingSpaceChangeRecordDTO dto = new ParkingSpaceChangeRecordDTO();
-        BeanUtils.copyProperties(param,dto);
-
-        //3.列表查询
-        PageResponse<ParkingSpaceChangeRecordBO> result = parkingSpaceChangeRecordFacade.getParkingSpaceChangeRecordList(dto);
-        List<ParkingSpaceChangeRecordRsp> transferRecordRsps = BeanConvertorUtils.copyList(result.getList(), ParkingSpaceChangeRecordRsp.class);
-        return PageUtils.pageResult(result,transferRecordRsps);
+        log.info("h5互换记录查询参数：{}",JSON.toJSONString(param));
+       
+        return converResult(param);
     }
 
     
-    /**
+	/**
      * 查询用户车位列表
      */
     @UserAuthentication
@@ -147,7 +134,7 @@ public class ParkingSpaceChangeRecordController  extends BaseController
         dto.setUserId(user.getUserId());
         dto.setState(ChangeRecordStateEnum.APPLY.getState());
         long count = parkingSpaceChangeRecordFacade.getParkingSpaceChangeRecoudCount(dto);
-        return Result.buildSuccessResult(count > 0 ? false : true);
+        return Result.buildSuccessResult(count <= 0 );
     }
     
     /**
@@ -228,4 +215,16 @@ public class ParkingSpaceChangeRecordController  extends BaseController
     	return Result.buildSuccessResult();
     }
 
+    
+    private Result<PageResponse<ParkingSpaceChangeRecordRsp>> converResult(ParkingSpaceChangeRecordReq param) {
+   	 //1.参数转换
+       ParkingSpaceChangeRecordDTO dto = new ParkingSpaceChangeRecordDTO();
+       BeanUtils.copyProperties(param,dto);
+
+       //2.列表查询
+       PageResponse<ParkingSpaceChangeRecordBO> result = parkingSpaceChangeRecordFacade.getParkingSpaceChangeRecordList(dto);
+       List<ParkingSpaceChangeRecordRsp> transferRecordRsps = BeanConvertorUtils.copyList(result.getList(), ParkingSpaceChangeRecordRsp.class);
+       return PageUtils.pageResult(result,transferRecordRsps);
+       
+	}
 }
