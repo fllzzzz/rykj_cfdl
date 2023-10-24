@@ -6,15 +6,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
-
 import com.cf.parking.facade.bo.DepartmentTreeBO;
-import com.cf.support.utils.BeanConvertorUtils;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
