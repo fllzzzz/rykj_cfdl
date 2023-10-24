@@ -53,5 +53,19 @@ public class LotteryApplyRecordService extends ServiceImpl<LotteryApplyRecordMap
 		applyRecordMapper.update(record, new LambdaUpdateWrapper<LotteryApplyRecordPO>().in(LotteryApplyRecordPO::getJobNumber, openIdList));
 	}
 
+
+
+
+	/**
+	 * 根据批次ID查询报名人数
+	 * @param batchId
+	 * @return
+	 */
+	public Long queryApplyCountByBatchId(Long batchId) {
+		return applyRecordMapper.selectCount(new LambdaQueryWrapper<LotteryApplyRecordPO>()
+					.eq(LotteryApplyRecordPO::getBatchId, batchId)
+				);
+	}
+
 	
 }

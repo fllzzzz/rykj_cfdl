@@ -77,6 +77,9 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
     
     @Resource
     private DingTalkMessageFacade dingTalkMessageFacade;
+    
+    @Resource
+    private LotteryApplyRecordService lotteryApplyRecordService;
 
     @Resource
     private IdWorker idWorker;
@@ -107,6 +110,9 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
             bo.setLotteryRule(lotteryRule);
             Long[] roundIdArr = lotteryRuleRoundFacade.getRoundIdArrByRoundIdStr(bo.getRoundId());
             bo.setRoundIdArr(roundIdArr);
+            Long count = lotteryApplyRecordService.queryApplyCountByBatchId(bo.getId());
+            bo.setApplyCount(count);
+            
         });
         return PageUtils.toResponseList(page,boList);
     }

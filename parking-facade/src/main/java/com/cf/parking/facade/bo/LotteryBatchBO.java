@@ -59,5 +59,10 @@ public class LotteryBatchBO {
 
     /** 备注 */
     private String remark;
+    
+    /**
+     * 报名人数
+     */
+    private Long applyCount;
 
 }

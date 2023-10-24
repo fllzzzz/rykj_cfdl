@@ -70,5 +70,10 @@ public class LotteryBatchRsp {
 
     /** 更新时间 */
     private Date updateTm;
+    
+    /**
+     * 报名人数
+     */
+    private Long applyCount;
 
 }
