@@ -225,3 +225,11 @@ ALTER table parking_space_change_record add index user_id_idx(user_id);
 ALTER table parking_space_change_record add index acc_user_id_idx(accept_user_id);
 
 alter table parking_lot modify column   `remark` varchar(4000) DEFAULT '' COMMENT '备注';
+
+alter table user_verify MODIFY driving_license_img LONGTEXT default null comment '驾驶证照片';
+
+alter table user_verify MODIFY driving_permit_img LONGTEXT default null comment '行驶证照片';
+
+alter table user_verify MODIFY vehicle_img LONGTEXT default null comment '车辆照片';
+
+alter table `department` add column parent_code varchar(50) not null default '' comment '父级部门code' after dept_code;

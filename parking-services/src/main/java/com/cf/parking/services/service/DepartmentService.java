@@ -52,8 +52,8 @@ public class DepartmentService extends ServiceImpl<DepartmentPOMapper, Departmen
 		log.info("查询部门数据:{}",JSON.toJSONString(poList));
 		if (!CollectionUtils.isEmpty(poList)){
 			List<DepartmentTreeBO> departmentTreeBOList = poList.stream().map(po -> new DepartmentTreeBO().setCode(po.getDeptCode()).setName(po.getDepartmentName()).setParentCode(po.getParentCode())).collect(Collectors.toList());
-			//1.查出顶级
-			resultBOList = departmentTreeBOList.stream().filter(bo -> StringUtils.isEmpty(bo.getParentCode())).collect(Collectors.toList());
+			//1.查出顶级 107为根目录的上级code代码
+			resultBOList = departmentTreeBOList.stream().filter(bo -> "107".equals(bo.getParentCode())).collect(Collectors.toList());
 			log.info("获取到部门根节点:{}",JSON.toJSONString(resultBOList));
 			//2.递归设置children
 			for (DepartmentTreeBO departmentTreeBO : resultBOList) {
@@ -62,6 +62,7 @@ public class DepartmentService extends ServiceImpl<DepartmentPOMapper, Departmen
 		}
 		return resultBOList;
 	}
+	
 
 	private List<DepartmentTreeBO> getDepartmentChildren(List<DepartmentTreeBO> departmentTreeBOList, DepartmentTreeBO departmentTreeBO) {
 		List<DepartmentTreeBO> children = departmentTreeBOList.stream().filter(bo -> bo.getParentCode().equals(departmentTreeBO.getCode())).collect(Collectors.toList());
