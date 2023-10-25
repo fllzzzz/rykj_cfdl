@@ -97,7 +97,7 @@ public class UserSpaceTask {
 			log.info("确认中的结果数据{}",JSON.toJSONString(resultList));
 			resultList.forEach(result -> {
 				long num = userSpaceService.queryUnSyncListByBatch(result.getBatchId(),result.getRoundId());
-				log.info("未同步成功的数据量：{}",num);
+				log.info("batch={},round={}未同步成功的数据量：{}",result.getBatchId(),result.getRoundId(), num);
 				if (num == 0) {
 					result.setState(LotteryResultStateEnum.UNPUBLIC.getState());
 					result.setUpdateTm(new Date());
