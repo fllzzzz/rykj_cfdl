@@ -88,7 +88,7 @@ public class UserSpaceTask {
 	/**
 	 * 判断摇号结果表中的数据是否都已下发闸机成功，是的话就更新结果状态
 	 */
-	@Scheduled(cron = "0 0 0/1 * * ? ") //间隔1小时
+	@Scheduled(cron = "0 0/30 * * * ? ") //间隔30分钟
 	@TaskLock(key = RedisConstant.PARKING_RESULT_LOCK_KEY)
 	public void syncLotteryResultState() {
 		try {
@@ -97,10 +97,12 @@ public class UserSpaceTask {
 			log.info("确认中的结果数据{}",JSON.toJSONString(resultList));
 			resultList.forEach(result -> {
 				long num = userSpaceService.queryUnSyncListByBatch(result.getBatchId(),result.getRoundId());
+				log.info("未同步成功的数据量：{}",num);
 				if (num == 0) {
 					result.setState(LotteryResultStateEnum.UNPUBLIC.getState());
 					result.setUpdateTm(new Date());
 					lotteryResultService.updateById(result);
+					log.info("更新摇号结果表：{}",JSON.toJSONString(result));
 				}
 			});
 		} catch (Exception e) {
