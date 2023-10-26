@@ -14,7 +14,9 @@ import com.cf.parking.dao.po.UserVerifyPO;
 import com.cf.parking.facade.bo.LotteryResultBO;
 import com.cf.parking.facade.bo.LotteryResultDetailBO;
 import com.cf.parking.facade.dto.LotteryResultDTO;
+import com.cf.parking.facade.dto.TextMessageDTO;
 import com.cf.parking.facade.dto.UserSpaceDTO;
+import com.cf.parking.facade.facade.DingTalkMessageFacade;
 import com.cf.parking.facade.facade.LotteryResultFacade;
 import com.cf.parking.services.constant.ParkingConstants;
 import com.cf.parking.services.enums.EnableStateEnum;
@@ -37,22 +39,19 @@ import com.cf.parking.services.service.UserProfileService;
 import com.cf.parking.services.service.UserSpaceService;
 import com.cf.parking.services.service.UserVerifyService;
 import com.cf.parking.services.utils.AssertUtil;
-import com.cf.support.bean.DingTalkBean;
 import com.cf.support.exception.BusinessException;
 import com.cf.parking.services.utils.PageUtils;
 import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
-
 import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
-
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -119,12 +118,10 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
     @Resource
     private UserProfileService userProfileService;
 
-    @Autowired
-    private DingTalkBean dingTalkBean;
-    
     private final String  message = "恭喜您抽中%s车位,有效期为%s~%s";
     
-    
+    @Resource
+    private DingTalkMessageFacade dingTalkMessageFacade;
     
     
     
@@ -349,8 +346,14 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 		if (!CollectionUtils.isEmpty(detailList)) {
 			List<String> openIdList = detailList.stream().map(item -> item.getUserJobNumber()).collect(Collectors.toList());
 			log.info("中奖人员工号：{},摇中停车场：{}",JSON.toJSONString(openIdList),JSON.toJSONString(parking));
-			dingTalkBean.sendTextMessage(String.format(message, parking.getRegion(),DateUtil.format(batch.getValidStartDate(),ParkingConstants.SHORT_DATE_FORMAT),
-					DateUtil.format(batch.getValidEndDate(),ParkingConstants.SHORT_DATE_FORMAT)) ,openIdList);
+			
+			List<TextMessageDTO> messageList = new ArrayList<>();
+			TextMessageDTO messageDto = new TextMessageDTO()
+					.setOpenIdList(openIdList)
+					.setMessage(String.format(message, parking.getRegion(),DateUtil.format(batch.getValidStartDate(),ParkingConstants.SHORT_DATE_FORMAT),
+							DateUtil.format(batch.getValidEndDate(),ParkingConstants.SHORT_DATE_FORMAT)));
+			messageList.add(messageDto);
+			dingTalkMessageFacade.asyncSendBatchText(messageList);
 			List<Long> userIdList = detailList.stream().map(item -> item.getUserId()).collect(Collectors.toList());
 			//更新默认停车场
 			userProfileService.batchSetDefaultParkingLotByUserIds(userIdList,parking.getRegion());
@@ -368,7 +371,12 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 			log.info("未中奖人员工号：{}",JSON.toJSONString(applyIdList));
 			applyIdList.removeAll(spaceList);
 			//userProfileService.batchSetParkingLotByJobNum(applyIdList,parking.getRegion());
-			dingTalkBean.sendTextMessage("很遗憾，您本次摇号未中奖",applyIdList);
+			List<TextMessageDTO> messageList = new ArrayList<>();
+			TextMessageDTO messageDto = new TextMessageDTO()
+					.setOpenIdList(applyIdList)
+					.setMessage("很遗憾，您本次摇号未中奖");
+			messageList.add(messageDto);
+			dingTalkMessageFacade.asyncSendBatchText(messageList);
 		}
 		
 	}
