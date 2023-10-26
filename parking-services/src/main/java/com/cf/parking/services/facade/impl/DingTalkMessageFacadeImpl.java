@@ -34,7 +34,7 @@ public class DingTalkMessageFacadeImpl implements DingTalkMessageFacade {
             try {
                 dingTalkBean.sendTextMessage(messageDTO.getMessage(), messageDTO.getOpenIdList());
             } catch (Exception e) {
-                log.error("send text message error", e);
+                log.error("send text message error:{}", e);
             }
         });
     }

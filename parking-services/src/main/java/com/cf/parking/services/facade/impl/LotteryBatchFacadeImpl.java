@@ -15,9 +15,9 @@ import com.cf.parking.facade.bo.LotteryBatchBO;
 import com.cf.parking.facade.bo.LotteryResultDetailBO;
 import com.cf.parking.facade.bo.LotteryResultExportBO;
 import com.cf.parking.facade.constant.ParkingSysCodeConstant;
-import com.cf.parking.facade.dto.LinkMessageDTO;
 import com.cf.parking.facade.dto.LotteryBatchDTO;
 import com.cf.parking.facade.dto.LotteryBatchOptDTO;
+import com.cf.parking.facade.dto.TextMessageDTO;
 import com.cf.parking.facade.facade.DingTalkMessageFacade;
 import com.cf.parking.facade.facade.LotteryBatchFacade;
 import com.cf.parking.services.enums.LotteryBatchStateEnum;
@@ -84,7 +84,7 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
     @Resource
     private IdWorker idWorker;
 
-    private final String  message = "%s期摇号报名时间已发布，点击查看详情。";
+    private final String  message = "%s期摇号报名时间已发布，请到小程序->摇号->车位摇号模块查看";
 
     /**
      * 查询摇号批次列表
@@ -305,11 +305,12 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
         link.setPicUrl("http://rongcloud-web.qiniudn.com/docs_demo_rongcloud_logo.png");
         dingTalkBean.sendLinkMessage(link, jobNumList);
         **/
-        LinkMessageDTO dto = new LinkMessageDTO();
-        dto.setMessage(notifyMessage);
-        dto.setOpenIdList(jobNumList);
-        dto.setUrl("eapp://pages/lottery/lottery");
-        dingTalkMessageFacade.asyncSendLink(dto, "摇号通知");
+        List<TextMessageDTO> messageList = new ArrayList<>();
+        TextMessageDTO message = new TextMessageDTO();
+        message.setMessage(notifyMessage);
+        message.setOpenIdList(jobNumList) ;
+        messageList.add(message);
+        dingTalkMessageFacade.asyncSendBatchText(messageList);
         //2.修改批次状态为已通知
         lotteryBatchPO.setState(LotteryBatchStateEnum.HAVE_NOTIFIED.getState());
         return mapper.updateById(lotteryBatchPO);
