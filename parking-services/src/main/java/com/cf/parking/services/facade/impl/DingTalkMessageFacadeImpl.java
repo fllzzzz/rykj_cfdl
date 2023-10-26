@@ -87,7 +87,7 @@ public class DingTalkMessageFacadeImpl implements DingTalkMessageFacade {
             link.setPicUrl(dingTalkProperties.getImageId());
             dingTalkBean.sendLinkMessage(link, messageDTO.getOpenIdList());
         } catch (Exception e) {
-            log.error("send link message error", e);
+            log.error("send link message error：{}", e);
         }
     }
 
