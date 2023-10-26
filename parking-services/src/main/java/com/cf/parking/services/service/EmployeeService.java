@@ -77,5 +77,16 @@ public class EmployeeService extends ServiceImpl<EmployeePOMapper, EmployeePO> i
 					.eq(EmployeePO::getEmplNo, openId)
 				);
 	}
+
+
+	/**
+	 * 查询所有状态正常的员工
+	 * @return
+	 */
+	public List<EmployeePO> queryAllEmployee() {
+		return employeePOMapper.selectList(new LambdaQueryWrapper<EmployeePO>()
+				.eq(EmployeePO::getState, 0)
+			);
+	}
 	
 }

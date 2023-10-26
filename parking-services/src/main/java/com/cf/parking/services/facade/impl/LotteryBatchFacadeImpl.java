@@ -34,6 +34,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,7 +65,7 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
     private ParkingLotService parkingLotService;
 
     @Resource
-    private UserProfileService userProfileService;
+    private EmployeeService employeeService;
 
     @Resource
     private LotteryBatchService lotteryBatchService;
@@ -85,6 +86,14 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
     private IdWorker idWorker;
 
     private final String  message = "%s期摇号报名时间已发布";
+    
+    @Resource
+    private LotteryRuleRoundService lotteryRuleRoundService;
+    
+    @Value("${spring.profiles.active}")
+    private String env;
+    
+    private static final String PRODUCE = "prod";
 
     /**
      * 查询摇号批次列表
@@ -287,9 +296,15 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
     public Integer notifyAllUserByBatchId(Long id) {
         LotteryBatchPO lotteryBatchPO = mapper.selectById(id);
         //1.钉钉通知
-        //1.1查询所有用户
-        List<UserProfilePO> userProfilePOS = userProfileService.queryBaseList();
-        List<String> jobNumList = userProfilePOS.stream().filter(userProfilePO -> StringUtils.isNotBlank(userProfilePO.getJobNumber())).map(UserProfilePO::getJobNumber).collect(Collectors.toList());
+        //1.1查询所有用户,不是正式环境就只发给固定的人
+        List<String> jobNumList = new ArrayList<>();
+        log.info("env:{}",env);
+        if (PRODUCE.equals(env)) {
+        	List<EmployeePO> userProfilePOS = employeeService.queryAllEmployee();
+        	jobNumList = userProfilePOS.stream().map(EmployeePO::getEmplNo).collect(Collectors.toList());
+        } else {
+        	jobNumList.add("CFDL09860");
+        }
         if (CollectionUtils.isEmpty(jobNumList)){
             throw new BusinessException("未找到公司员工，无法通知！");
         }
@@ -358,17 +373,23 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
 
         //1.查询摇号批次基础信息
         LotteryBatchPO batchPO = mapper.selectById(batchId);
-
+        log.info("根据batchid查询到批次信息={}",batchId,JSON.toJSONString(batchPO));
         //2.查询状态为已归档的对应的摇号结果记录
         List<LotteryResultPO> resultPOList = lotteryResultService.selectArchivedResultListByBatchId(batchId);
+        log.info("batchid={} 已归档的数据：{}",batchId,JSON.toJSONString(resultPOList));
         if (CollectionUtils.isNotEmpty(resultPOList)){
 
             resultPOList.stream().forEach(resultPO->{
-                String roundName = lotteryRuleRoundFacade.getNameByRoundId(resultPO.getRoundId().toString());
+            	LotteryRuleRoundPO round = lotteryRuleRoundService.getById(resultPO.getRoundId());
+                String roundName = round == null ? "" : round.getName();
+                log.info("根据摇号结果数据{}查出轮次{}",JSON.toJSONString(resultPO),roundName);
                 List<LotteryResultDetailPO> resultDetailPOList = lotteryResultDetailService.queryDetailListByResultId(resultPO.getId());
+                log.info("根据摇号结果{}查出中签人员：{}",resultPO.getId(), JSON.toJSONString(resultDetailPOList));
                 if (CollectionUtils.isNotEmpty(resultDetailPOList)){
                     List<LotteryResultExportBO> resultExportBOS = BeanConvertorUtils.copyList(resultDetailPOList, LotteryResultExportBO.class);
+                    log.info("停车场静态信息{}",ParkingSysCodeConstant.codeRegionMap);
                     resultExportBOS.forEach(exportBO -> {
+                    	log.info("导出结果对象：{}",JSON.toJSONString(exportBO));
                         //1.设置停车场名称
                         exportBO.setParkingLotName(ParkingSysCodeConstant.codeRegionMap.getOrDefault(exportBO.getParkingLotCode(),""));
                         //2.设置摇号轮数
