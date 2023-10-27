@@ -22,6 +22,7 @@ import com.cf.parking.facade.facade.DingTalkMessageFacade;
 import com.cf.parking.facade.facade.LotteryBatchFacade;
 import com.cf.parking.services.enums.LotteryBatchStateEnum;
 import com.cf.parking.services.enums.LotteryResultStateEnum;
+import com.cf.parking.services.properties.DingTalkProperties;
 import com.cf.parking.services.service.*;
 import com.cf.parking.services.utils.AssertUtil;
 import com.cf.parking.services.utils.PageUtils;
@@ -85,15 +86,21 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
     @Resource
     private IdWorker idWorker;
 
-    private final String  message = "%s期摇号报名时间已发布";
-    
     @Resource
     private LotteryRuleRoundService lotteryRuleRoundService;
     
     @Value("${spring.profiles.active}")
     private String env;
     
+    @Resource
+    private DingTalkProperties dingTalkProperties;
+    
     private static final String PRODUCE = "prod";
+    private static final int  COUNT = 1000 ;
+    private final String  message = "%s期摇号报名时间已发布";
+    
+    
+    
 
     /**
      * 查询摇号批次列表
@@ -303,7 +310,9 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
         	List<EmployeePO> userProfilePOS = employeeService.queryAllEmployee();
         	jobNumList = userProfilePOS.stream().map(EmployeePO::getEmplNo).collect(Collectors.toList());
         } else {
-        	jobNumList.add("CFDL09860");
+        	jobNumList.add("CFDL09860");//周峰
+        	jobNumList.add("013622186224083959");//张华健
+        	jobNumList.add("28492530271177557");//郭欢
         }
         if (CollectionUtils.isEmpty(jobNumList)){
             throw new BusinessException("未找到公司员工，无法通知！");
@@ -320,13 +329,22 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
         link.setPicUrl("http://rongcloud-web.qiniudn.com/docs_demo_rongcloud_logo.png");
         dingTalkBean.sendLinkMessage(link, jobNumList);
         **/
-        List<CardMessageDTO> messageDTOList = new ArrayList<>();
+        
         CardMessageDTO message = new CardMessageDTO()
         		.setMessage(notifyMessage)
-        		.setOpenIdList(jobNumList)
-        		.setUrl("eapp://pages/lottery/lottery");   
-        messageDTOList.add(message);
-        dingTalkMessageFacade.asyncSendBatchCard(messageDTOList, notifyMessage);
+        		.setUrl(dingTalkProperties.getSignUrl() + "pages/lotteryManagement/lotteryManagement");   
+        int num = jobNumList.size() % COUNT == 0 ? jobNumList.size() / COUNT : jobNumList.size() / COUNT + 1;
+        log.info("循环总批次：{}",num);
+        for (int i = 0 ; i < num ; i++) {
+        	log.info("第{}次循环", i + 1);
+        	if (i == (num - 1 )) {
+        		//最后一次
+        		message.setOpenIdList(jobNumList.subList(i * COUNT, jobNumList.size()));
+        	} else {
+        		message.setOpenIdList(jobNumList.subList(i * COUNT, (i + 1) * COUNT ) );
+        	}
+        	dingTalkMessageFacade.asyncSendCard(message, notifyMessage);
+        }
         //2.修改批次状态为已通知
         lotteryBatchPO.setState(LotteryBatchStateEnum.HAVE_NOTIFIED.getState());
         return mapper.updateById(lotteryBatchPO);
