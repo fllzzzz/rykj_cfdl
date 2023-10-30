@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cf.parking.dao.mapper.LotteryApplyRecordMapper;
@@ -167,6 +169,7 @@ public class LotteryApplyRecordFacadeImpl implements LotteryApplyRecordFacade
                 }
             }
         }
+        log.info("摇号信息展示:{}",JSON.toJSONString(applyBO));;
         return applyBO;
     }
 
