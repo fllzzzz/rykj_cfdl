@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -148,6 +150,7 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
 
         //2.参数设置
         po.setId(idWorker.nextId());
+        po.setApplyEndTime(DateUtil.endOfDay(dto.getApplyEndTime()).offset(DateField.MILLISECOND,-999));
         po.setState(LotteryBatchStateEnum.NEED_NOTIFY.getState());
         po.setCreateTm(new Date());
         po.setUpdateTm(new Date());
@@ -199,6 +202,8 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
     public Integer update(LotteryBatchOptDTO dto) {
         LotteryBatchPO po = new LotteryBatchPO();
         BeanUtils.copyProperties(dto,po);
+        //mysql自动将毫秒数大于500的数进行进位，所以存入数据库时会变成第二天的00:00:00
+        po.setApplyEndTime(DateUtil.endOfDay(dto.getApplyEndTime()).offset(DateField.MILLISECOND,-999));
         po.setUpdateTm(new Date());
         //轮数设置（将数组转为字符串）
         AssertUtil.checkNull(dto.getRoundIdArr(),"请选择摇号轮数");

@@ -44,4 +44,11 @@ public interface LotteryApplyRecordFacade
      * @return
      */
     Integer cancel(Long userId, Long batchId);
+
+    /**
+     * 判断当前时间是否在该摇号批次的报名时间内
+     * @param batchId
+     * @return
+     */
+    boolean judgeInApplyTime(Long batchId);
 }

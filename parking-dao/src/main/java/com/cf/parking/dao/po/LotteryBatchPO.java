@@ -39,7 +39,7 @@ public class LotteryBatchPO
     private Date applyStartTime;
 
     /** 报名结束时间 */
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date applyEndTime;
 
     /** 车位有效开始日期 */

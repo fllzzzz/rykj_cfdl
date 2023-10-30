@@ -1,6 +1,5 @@
 package com.cf.parking.services.service;
 
-import cn.hutool.core.date.DateField;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.cf.parking.services.enums.LotteryBatchStateEnum;
 import com.cf.parking.services.utils.AssertUtil;
@@ -9,7 +8,6 @@ import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +22,6 @@ import com.cf.parking.dao.po.ParkingLotPO;
 import com.cf.parking.facade.dto.LotteryBatchOptDTO;
 import com.cf.parking.facade.facade.LotteryBatchFacade;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import javax.annotation.Resource;

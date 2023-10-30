@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cf.parking.dao.mapper.LotteryApplyRecordMapper;
@@ -20,6 +22,7 @@ import com.cf.support.bean.IdWorker;
 import com.cf.support.exception.BusinessException;
 import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -228,7 +231,9 @@ public class LotteryApplyRecordFacadeImpl implements LotteryApplyRecordFacade
         return mapper.deleteById(lotteryApplyRecordPO.getId());
     }
 
-  //摇号申请记录中的摇号结果设置
+
+
+    //摇号申请记录中的摇号结果设置
     private void applyResultSet(LotteryApplyRecordPO apply) {
         if (LotteryApplyRecordStateEnum.NOTOPEN.getState().equals(apply.getResult())){
         	apply.setResult(LotteryApplyRecordStateEnum.NOTOPEN.getRemark());
@@ -241,5 +246,25 @@ public class LotteryApplyRecordFacadeImpl implements LotteryApplyRecordFacade
         	apply.setResult(apply.getParkingLotCode());
         }
         
+    }
+
+
+
+    /**
+     * 判断当前时间是否在该摇号批次的报名时间内
+     * @param batchId
+     * @return
+     */
+    @Override
+    public boolean judgeInApplyTime(Long batchId) {
+        //1.查询该摇号批次信息
+        LotteryBatchPO batchPO = lotteryBatchService.getById(batchId);
+        if (null == batchPO){
+            throw new BusinessException("未找到摇号报名批次信息");
+        }
+
+        //2.判断
+        log.info("本期{}摇号报名时间：{}-{}，当前时间：{}",DateUtil.format(batchPO.getBatchNum(), "yyyy-MM-dd"), DateUtil.format(batchPO.getApplyStartTime(), "yyyy-MM-dd"),DateUtil.format(batchPO.getApplyEndTime(), "yyyy-MM-dd"),DateUtil.format(new Date(), "yyyy-MM-dd HH:mm:ss"));
+        return lotteryBatchService.judgeWhetherInApplyTime(batchPO.getApplyStartTime(),batchPO.getApplyEndTime());
     }
 }

@@ -90,8 +90,13 @@ public class LotteryApplyRecordController extends BaseController
             return Result.buildErrorResult("暂无权限，请联系管理员！");
         }
 
+        //3.当前时间是否在摇号报名时间内
+        if (!lotteryApplyRecordFacade.judgeInApplyTime(param.getBatchId())){
+            return Result.buildErrorResult("当前未在报名时间内！");
+        }
 
-        //3.申请摇号
+
+        //4.申请摇号
         Integer result = lotteryApplyRecordFacade.apply(userId,param.getBatchId());
         return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult("申请失败，请重试！");
     }
@@ -113,7 +118,12 @@ public class LotteryApplyRecordController extends BaseController
 
         AssertUtil.checkNull(param.getBatchId(),"请选择取消摇号批次！");
 
-        //2.申请摇号
+        //2.当前时间是否在摇号报名时间内
+        if (!lotteryApplyRecordFacade.judgeInApplyTime(param.getBatchId())){
+            return Result.buildErrorResult("当前未在报名时间内！");
+        }
+
+        //3.申请摇号
         Integer result = lotteryApplyRecordFacade.cancel(userId,param.getBatchId());
         return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult("取消失败，请重试！");
     }
