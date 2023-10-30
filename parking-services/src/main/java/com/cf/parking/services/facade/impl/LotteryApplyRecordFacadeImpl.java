@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-
+import com.alibaba.fastjson.JSON;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -170,6 +170,7 @@ public class LotteryApplyRecordFacadeImpl implements LotteryApplyRecordFacade
                 }
             }
         }
+        log.info("摇号信息展示:{}",JSON.toJSONString(applyBO));;
         return applyBO;
     }
 
@@ -231,9 +232,7 @@ public class LotteryApplyRecordFacadeImpl implements LotteryApplyRecordFacade
         return mapper.deleteById(lotteryApplyRecordPO.getId());
     }
 
-
-
-    //摇号申请记录中的摇号结果设置
+  //摇号申请记录中的摇号结果设置
     private void applyResultSet(LotteryApplyRecordPO apply) {
         if (LotteryApplyRecordStateEnum.NOTOPEN.getState().equals(apply.getResult())){
         	apply.setResult(LotteryApplyRecordStateEnum.NOTOPEN.getRemark());
