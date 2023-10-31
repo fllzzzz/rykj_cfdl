@@ -27,7 +27,11 @@ public class LotteryBlackListService extends ServiceImpl<LotteryBlackListMapper,
 	 * @return
 	 */
 	public List<String> queryBlackList() {
-		return lotteryBlackListMapper.selectList(null).stream().map(item -> item.getJobNumber()).collect(Collectors.toList());
+		return lotteryBlackListMapper.selectList(
+				new LambdaQueryWrapper<LotteryBlackListPO>() 
+					.eq(LotteryBlackListPO::getType, 1)
+				)
+				.stream().map(item -> item.getJobNumber()).collect(Collectors.toList());
 	}
 
 
@@ -39,7 +43,20 @@ public class LotteryBlackListService extends ServiceImpl<LotteryBlackListMapper,
 	public LotteryBlackListPO queryBlackUserInfo(Long userId) {
 		return lotteryBlackListMapper.selectOne(new LambdaQueryWrapper<LotteryBlackListPO>() 
 					.eq(LotteryBlackListPO::getUserId, userId)
+					.eq(LotteryBlackListPO::getType, 1)
 				);
+	}
+
+
+	/**
+	 * 查询所有的领导
+	 * @return
+	 */
+	public List<String> queryAllLeader() {
+		return lotteryBlackListMapper.selectList(
+				new LambdaQueryWrapper<LotteryBlackListPO>() 
+					.eq(LotteryBlackListPO::getType, 2)
+			).stream().map(item -> item.getJobNumber()).collect(Collectors.toList());
 	}
 
 	

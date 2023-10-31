@@ -91,7 +91,7 @@ public class ParkingSpaceTask {
     //@Scheduled(fixedDelay = 6000000) //间隔1小时
     @Async
     public void zombieVehicle() {
-        parkingFacade.dealZombieVehicle();
+       // parkingFacade.dealZombieVehicle();
         //parkingFacade.dealNoParking();
     }
     /**
@@ -102,7 +102,7 @@ public class ParkingSpaceTask {
     //@Scheduled(fixedDelay = 6000000) //间隔1小时
     @Async
     public void notParked() {
-        parkingFacade.dealNoParking();
+      //  parkingFacade.dealNoParking();
     }
 
 

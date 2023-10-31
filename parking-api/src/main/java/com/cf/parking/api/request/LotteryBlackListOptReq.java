@@ -29,5 +29,7 @@ public class LotteryBlackListOptReq {
     /** 原因 */
     @ApiModelProperty(value = "原因")
     private String reason;
+    
+    private Integer type;
 
 }

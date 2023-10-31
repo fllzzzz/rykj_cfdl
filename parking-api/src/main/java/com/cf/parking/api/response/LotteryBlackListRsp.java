@@ -44,4 +44,6 @@ public class LotteryBlackListRsp {
     /** 更新时间 */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updateTm;
+    
+    private Integer type;
 }

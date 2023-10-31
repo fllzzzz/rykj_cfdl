@@ -17,7 +17,6 @@ import com.cf.parking.dao.po.LotteryApplyRecordPO;
 import com.cf.parking.dao.po.LotteryResultPO;
 import com.cf.parking.dao.po.LotteryRuleAssignPO;
 import com.cf.parking.dao.po.LotteryRuleRoundPO;
-import com.cf.parking.dao.po.ParkingLotPO;
 import com.cf.parking.facade.constant.ParkingSysCodeConstant;
 import com.cf.parking.services.enums.EnableStateEnum;
 import com.cf.parking.services.enums.LotteryResultStateEnum;
@@ -45,7 +44,8 @@ public class LotteryRuleAssignService extends ServiceImpl<LotteryRuleAssignMappe
 	@Resource
 	private LotteryRuleRoundService lotteryRuleRoundService;
 	
-	
+	@Resource
+	private ParkingInitService parkingInitService;
 	
 	
 	/**
@@ -182,7 +182,7 @@ public class LotteryRuleAssignService extends ServiceImpl<LotteryRuleAssignMappe
 		AssertUtil.checkNull(rule, "轮次不存在");
 		LotteryRuleAssignPO assign = new LotteryRuleAssignPO();
 		assign.setParkingLotCode(rule.getParkingLotCode());
-		String parkName = ParkingSysCodeConstant.codeRegionMap.get(rule.getParkingLotCode());
+		String parkName = parkingInitService.queryParkingNameByCode(rule.getParkingLotCode());
 		assign.setParkingLotRegion(parkName);
 		assign.setRoundName(rule.getName());
 		ruleAssignMapper.update(assign, new LambdaUpdateWrapper<LotteryRuleAssignPO>()

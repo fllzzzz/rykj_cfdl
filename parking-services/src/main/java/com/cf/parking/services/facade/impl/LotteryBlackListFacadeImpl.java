@@ -18,6 +18,8 @@ import com.cf.support.bean.IdWorker;
 import com.cf.support.exception.BusinessException;
 import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
+
+import cn.hutool.core.util.ObjectUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -56,6 +58,7 @@ public class LotteryBlackListFacadeImpl implements LotteryBlackListFacade
         Page<LotteryBlackListPO> poPage = mapper.selectPage(page, new LambdaQueryWrapper<LotteryBlackListPO>()
                 .like(StringUtils.isNoneBlank(dto.getName()), LotteryBlackListPO::getName, dto.getName())
                 .like(StringUtils.isNoneBlank(dto.getJobNumber()), LotteryBlackListPO::getJobNumber, dto.getJobNumber())
+                .eq(ObjectUtil.isNotNull(dto.getType()), LotteryBlackListPO::getType,dto.getType())
                 .orderByDesc(LotteryBlackListPO::getCreateTm));
 
         List<LotteryBlackListBO> boList = BeanConvertorUtils.copyList(poPage.getRecords(), LotteryBlackListBO.class);
@@ -85,8 +88,8 @@ public class LotteryBlackListFacadeImpl implements LotteryBlackListFacade
             log.info("添加黑名单成功  ——  {}",po);
             return result;
         } catch (DataIntegrityViolationException e){
-            log.error("添加黑名单重复：{}，失败原因：{}",po,e);
-            throw new BusinessException("该用户已在黑名单，无须重复添加");
+            log.error("添加重复：{}，失败原因：{}",po,e);
+            throw new BusinessException("该用户已添加过，无须重复添加");
         } 
     }
 

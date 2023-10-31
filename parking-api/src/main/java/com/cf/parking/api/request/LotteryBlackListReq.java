@@ -27,5 +27,8 @@ public class LotteryBlackListReq extends PageRequest {
     /** 姓名 */
     @ApiModelProperty(value = "姓名")
     private String name;
+    
+    @ApiModelProperty(value = "类型")
+    private Integer type;
 
 }

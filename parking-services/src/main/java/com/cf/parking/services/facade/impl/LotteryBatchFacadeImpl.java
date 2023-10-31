@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
-
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
@@ -16,7 +16,6 @@ import com.cf.parking.dao.po.*;
 import com.cf.parking.facade.bo.LotteryBatchBO;
 import com.cf.parking.facade.bo.LotteryResultDetailBO;
 import com.cf.parking.facade.bo.LotteryResultExportBO;
-import com.cf.parking.facade.constant.ParkingSysCodeConstant;
 import com.cf.parking.facade.dto.CardMessageDTO;
 import com.cf.parking.facade.dto.LotteryBatchDTO;
 import com.cf.parking.facade.dto.LotteryBatchOptDTO;
@@ -87,6 +86,9 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
 
     @Resource
     private IdWorker idWorker;
+    
+    @Resource
+    private LotteryBlackListService lotteryBlackListService;
 
     @Resource
     private LotteryRuleRoundService lotteryRuleRoundService;
@@ -96,6 +98,12 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
     
     @Resource
     private DingTalkProperties dingTalkProperties;
+    
+    @Resource
+	private ParkingInitService parkingInitService;
+    
+    
+    
     
     private static final String PRODUCE = "prod";
     private static final int  COUNT = 1000 ;
@@ -301,7 +309,8 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
     }
 
     /**
-     * 钉钉通知所有用户摇号批次信息
+     * 钉钉通知用户摇号批次信息
+     * 排除领导
      * @param id
      */
     @Override
@@ -314,6 +323,8 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
         if (PRODUCE.equals(env)) {
         	List<EmployeePO> userProfilePOS = employeeService.queryAllEmployee();
         	jobNumList = userProfilePOS.stream().map(EmployeePO::getEmplNo).collect(Collectors.toList());
+        	List<String> leaderList = lotteryBlackListService.queryAllLeader();
+        	jobNumList.removeAll(leaderList);
         } else {
         	jobNumList.add("CFDL09860");//周峰
         	jobNumList.add("013622186224083959");//张华健
@@ -356,6 +367,7 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
 
     }
 
+    
     /**
      * 判断本期车位有效期是否正确（本期车位有效开始日期要晚于上一批车位有效截止日期）
      * @param validStartDate
@@ -410,11 +422,12 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
                 log.info("根据摇号结果{}查出中签人员：{}",resultPO.getId(), JSON.toJSONString(resultDetailPOList));
                 if (CollectionUtils.isNotEmpty(resultDetailPOList)){
                     List<LotteryResultExportBO> resultExportBOS = BeanConvertorUtils.copyList(resultDetailPOList, LotteryResultExportBO.class);
-                    log.info("停车场静态信息{}",ParkingSysCodeConstant.codeRegionMap);
+                    Map<String,String> parkingMap = parkingInitService.queryAllParking();
+                    log.info("停车场信息{}",parkingMap);
                     resultExportBOS.forEach(exportBO -> {
                     	log.info("导出结果对象：{}",JSON.toJSONString(exportBO));
                         //1.设置停车场名称
-                        exportBO.setParkingLotName(ParkingSysCodeConstant.codeRegionMap.getOrDefault(exportBO.getParkingLotCode(),""));
+                        exportBO.setParkingLotName(parkingMap.getOrDefault(exportBO.getParkingLotCode(),""));
                         //2.设置摇号轮数
                         exportBO.setRoundName(roundName);
                         //3.设置基础数据

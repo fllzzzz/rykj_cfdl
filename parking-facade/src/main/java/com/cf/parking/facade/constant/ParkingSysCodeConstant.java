@@ -12,10 +12,8 @@ public class ParkingSysCodeConstant {
     /**
      * 园区和parkSysCode对应关系map
      */
-    public static final Map<String, String> parkingSysCodeMap = new HashMap();
+    public static final Map<String, String> parkingSysCodeMap = new HashMap<>();
 
-    //停车场编码与名称的map
-    public static final Map<String, String> codeRegionMap = new HashMap();
 
     static {
         parkingSysCodeMap.put("老园区", "6dc5132a6a7046c09ffd7be54d27ea49");
@@ -25,7 +23,6 @@ public class ParkingSysCodeConstant {
         parkingSysCodeMap.put("组装车间4F停车库", "4680b7e1ec414a5ebdf48127f73acd71");
 //        parkingSysCodeMap.put("新厂区物流门", "4a6c46727d66489585736a69f214cace");
 
-        parkingSysCodeMap.keySet().forEach(key -> codeRegionMap.put(parkingSysCodeMap.get(key),key));
     }
 
 }

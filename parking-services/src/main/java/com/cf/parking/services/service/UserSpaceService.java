@@ -67,6 +67,8 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
     @Resource
     private ParkingLotService parkingLotService;
     
+    @Resource
+	private ParkingInitService parkingInitService;
     
     
     /**
@@ -511,7 +513,7 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 	private LotteryResultDetailBO getLotteryResultDetailBOByUserSpacePO(UserSpacePO po) {
 		LotteryResultDetailBO detailBO = new LotteryResultDetailBO();
 		detailBO.setId(po.getUserSpaceId());
-		detailBO.setParkingLotName(ParkingSysCodeConstant.codeRegionMap.getOrDefault(po.getParkingLot(),""));
+		detailBO.setParkingLotName(parkingInitService.queryParkingNameByCode(po.getParkingLot()));
 		detailBO.setUserName(po.getName());
 		detailBO.setUserJobNumber(po.getJobNumber());
 		detailBO.setState(po.getState());

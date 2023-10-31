@@ -1,6 +1,5 @@
 package com.cf.parking.services.facade.impl;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -13,7 +12,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -25,15 +23,14 @@ import com.cf.parking.dao.po.UserPO;
 import com.cf.parking.dao.po.UserSpacePO;
 import com.cf.parking.facade.bo.ParkingSpaceChangeRecordBO;
 import com.cf.parking.facade.dto.CardMessageDTO;
-import com.cf.parking.facade.dto.LinkMessageDTO;
 import com.cf.parking.facade.dto.ParkingSpaceChangeApplyDTO;
 import com.cf.parking.facade.dto.ParkingSpaceChangeRecordDTO;
-import com.cf.parking.facade.dto.TextMessageDTO;
 import com.cf.parking.facade.facade.DingTalkMessageFacade;
 import com.cf.parking.facade.facade.ParkingSpaceChangeRecordFacade;
 import com.cf.parking.services.constant.ParkingConstants;
 import com.cf.parking.services.enums.ChangeRecordStateEnum;
 import com.cf.parking.services.enums.UserSpaceTypeEnum;
+import com.cf.parking.services.properties.DingTalkProperties;
 import com.cf.parking.services.service.ParkingLotService;
 import com.cf.parking.services.service.ParkingSpaceChangeRecordService;
 import com.cf.parking.services.service.UserProfileService;
@@ -77,6 +74,12 @@ public class ParkingSpaceChangeRecordFacadeImpl implements ParkingSpaceChangeRec
 	
 	@Resource
     private DingTalkMessageFacade dingTalkMessageFacade;
+	
+	@Resource
+    private DingTalkProperties dingTalkProperties;
+	
+	
+	
 	
 	
 	@Override
@@ -225,20 +228,11 @@ public class ParkingSpaceChangeRecordFacadeImpl implements ParkingSpaceChangeRec
 			  ;
 		changeRecordPOMapper.insert(record);
 		//下发通知
-		/**
-		LinkMessageDTO link = new LinkMessageDTO();
-		link.setMessage("您有一条车位交换申请");
-		link.setOpenIdList(Arrays.asList(dto.getAcceptJobNumber()));
-		link.setUrl("eapp://pages/lotteryManagement/lotteryManagement");
-		dingTalkMessageFacade.asyncSendLink(link, "车位交换申请");
-		**/
-		 List<CardMessageDTO> messageDTOList = new ArrayList<>();
-	     CardMessageDTO message = new CardMessageDTO()
+		 CardMessageDTO message = new CardMessageDTO()
 	        		.setMessage("您有一条车位交换申请")
 	        		.setOpenIdList(Arrays.asList(dto.getAcceptJobNumber()))
-	        		.setUrl("eapp://pages/lotteryManagement/lotteryManagement");   
-	     messageDTOList.add(message);
-	     dingTalkMessageFacade.asyncSendBatchCard(messageDTOList, "您有一条车位交换申请");
+	        		.setUrl(dingTalkProperties.getSignUrl() + "pages/lotteryManagement/lotteryManagement"); 
+		 dingTalkMessageFacade.asyncSendCard(message, "您有一条车位交换申请");
 		
 	}
 

@@ -40,5 +40,7 @@ public class LotteryBlackListPO
 
     /** 更新时间 */
     private Date updateTm;
+    
+    private Integer type;
 
 }

@@ -22,5 +22,7 @@ public class LotteryBlackListDTO extends PageRequest {
 
     /** 姓名 */
     private String name;
+    
+    private Integer type;
 
 }

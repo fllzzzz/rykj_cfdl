@@ -233,3 +233,28 @@ alter table user_verify MODIFY driving_permit_img LONGTEXT default null comment 
 alter table user_verify MODIFY vehicle_img LONGTEXT default null comment '车辆照片';
 
 alter table `department` add column parent_code varchar(50) not null default '' comment '父级部门code' after dept_code;
+
+-- 10-30
+alter table lottery_black_list add type int default 1 comment '类型，1：黑名单，2：领导';
+
+
+alter table lottery_black_list drop index udx_user_id;
+
+alter table lottery_black_list add unique index udx_user_id(user_id,type);
+
+CREATE TABLE `parking_init` (
+  `id` bigint NOT NULL COMMENT 'id',
+  `region` varchar(64) DEFAULT '' COMMENT '名称',
+  `region_code` varchar(64) DEFAULT '' COMMENT '区域编号',
+  `remark` varchar(4000) DEFAULT '' COMMENT '备注',
+ `create_tm` timestamp(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
+  `update_tm` timestamp(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '更新时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `udx_region_code` (`region_code`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC COMMENT='闸机表';
+
+INSERT INTO `parking_init`(`id`, `region`, `region_code`, `remark`, `create_tm`, `update_tm`) VALUES (1, '老园区', '6dc5132a6a7046c09ffd7be54d27ea49', '', '2023-10-30 19:28:12.902', '2023-10-30 19:28:12.902');
+INSERT INTO `parking_init`(`id`, `region`, `region_code`, `remark`, `create_tm`, `update_tm`) VALUES (2, '新园区南门', '5a277524d2bc408bbd3097e7ccaf2208', '', '2023-10-30 19:28:45.427', '2023-10-30 19:28:45.427');
+INSERT INTO `parking_init`(`id`, `region`, `region_code`, `remark`, `create_tm`, `update_tm`) VALUES (3, '地下停车场', 'aaed725983664c7aa0a1a4dddba3f05c', '', '2023-10-30 19:29:27.734', '2023-10-30 19:29:27.734');
+INSERT INTO `parking_init`(`id`, `region`, `region_code`, `remark`, `create_tm`, `update_tm`) VALUES (4, '组装车间1F', '2457999fe2914251976fd333d2816fb2', '', '2023-10-30 19:30:28.375', '2023-10-30 19:30:28.375');
+INSERT INTO `parking_init`(`id`, `region`, `region_code`, `remark`, `create_tm`, `update_tm`) VALUES (5, '组装车间4F停车库', '4680b7e1ec414a5ebdf48127f73acd71', '', '2023-10-30 19:31:10.020', '2023-10-30 19:31:10.020');

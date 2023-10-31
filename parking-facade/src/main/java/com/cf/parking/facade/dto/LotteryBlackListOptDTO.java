@@ -23,5 +23,7 @@ public class LotteryBlackListOptDTO  {
 
     /** 原因 */
     private String reason;
+    
+    private Integer type;
 
 }

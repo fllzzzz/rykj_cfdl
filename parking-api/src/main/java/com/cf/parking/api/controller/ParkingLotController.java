@@ -12,9 +12,9 @@ import com.cf.parking.facade.bo.ParkingLotAreaBO;
 import com.cf.parking.facade.bo.ParkingLotBO;
 import com.cf.parking.facade.bo.ParkingLotImageBO;
 import com.cf.parking.facade.bo.ParkingLotTreeBO;
-import com.cf.parking.facade.constant.ParkingSysCodeConstant;
 import com.cf.parking.facade.dto.*;
 import com.cf.parking.facade.facade.ParkingLotFacade;
+import com.cf.parking.services.service.ParkingInitService;
 import com.cf.parking.services.service.UserProfileService;
 import com.cf.parking.services.utils.AssertUtil;
 import com.cf.parking.services.utils.PageUtils;
@@ -56,6 +56,11 @@ public class ParkingLotController  extends BaseController
     @Resource
     private UserProfileService userProfileService;
 
+    @Resource
+	private ParkingInitService parkingInitService;
+    
+    
+    
 
     //————————————————PC端————————————————————
 
@@ -67,7 +72,7 @@ public class ParkingLotController  extends BaseController
     @PostMapping("/baseList")
     public Result<List<ParkingLotBaseRsp>> baseList()
     {
-        Map<String, String> parkingSysCodeMap = ParkingSysCodeConstant.parkingSysCodeMap;
+        Map<String, String> parkingSysCodeMap = parkingInitService.queryAllParking();
 
         List<ParkingLotBaseRsp> list = parkingSysCodeMap.entrySet().stream().map(x -> new ParkingLotBaseRsp().setRegion(x.getKey()).setRegionCode(x.getValue())).collect(Collectors.toList());
         return Result.buildSuccessResult(list);
