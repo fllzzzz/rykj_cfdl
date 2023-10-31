@@ -44,7 +44,7 @@ public class ParkingInitService extends ServiceImpl<ParkingInitMapper, ParkingIn
 	 			new LambdaQueryWrapper<ParkingInitPO>()
 	 			.eq(ParkingInitPO::getRegionCode, parkingCode)
 	 		);
-	 	log.info("闸机数据：{}",JSON.toJSONString(parkingList));
+	 	log.info("根据Code={}查询闸机数据：{}",parkingCode,JSON.toJSONString(parkingList));
 	 	return parkingList == null ? "" : parkingList.getRegion();
 	}
 	
