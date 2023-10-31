@@ -1,5 +1,6 @@
 package com.cf.parking.services.facade.impl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -25,6 +26,7 @@ import com.cf.parking.facade.bo.ParkingSpaceChangeRecordBO;
 import com.cf.parking.facade.dto.CardMessageDTO;
 import com.cf.parking.facade.dto.ParkingSpaceChangeApplyDTO;
 import com.cf.parking.facade.dto.ParkingSpaceChangeRecordDTO;
+import com.cf.parking.facade.dto.TextMessageDTO;
 import com.cf.parking.facade.facade.DingTalkMessageFacade;
 import com.cf.parking.facade.facade.ParkingSpaceChangeRecordFacade;
 import com.cf.parking.services.constant.ParkingConstants;
@@ -228,11 +230,12 @@ public class ParkingSpaceChangeRecordFacadeImpl implements ParkingSpaceChangeRec
 			  ;
 		changeRecordPOMapper.insert(record);
 		//下发通知
-		 CardMessageDTO message = new CardMessageDTO()
-	        		.setMessage("您有一条车位交换申请")
-	        		.setOpenIdList(Arrays.asList(dto.getAcceptJobNumber()))
-	        		.setUrl(dingTalkProperties.getSignUrl() + "pages/lotteryManagement/lotteryManagement"); 
-		 dingTalkMessageFacade.asyncSendCard(message, "您有一条车位交换申请");
+		List<TextMessageDTO> messageDTOList = new ArrayList<>();
+		TextMessageDTO message = new TextMessageDTO()
+				.setOpenIdList(Arrays.asList(dto.getAcceptJobNumber()))
+				.setMessage("您有一条车位交换申请,请到钉钉中的春风顺风车应用-->摇号-->车位交换中查看");
+		messageDTOList.add(message);
+		dingTalkMessageFacade.asyncSendBatchText(messageDTOList);
 		
 	}
 
