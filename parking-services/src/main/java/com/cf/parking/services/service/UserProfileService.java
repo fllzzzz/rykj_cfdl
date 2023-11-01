@@ -207,7 +207,9 @@ public class UserProfileService extends ServiceImpl<UserProfilePOMapper, UserPro
     public UserProfilePO selectUserProfileByNameAndJobNumber(String name, String jobNumber) {
         return userProfilePOMapper.selectOne(new LambdaQueryWrapper<UserProfilePO>()
                 .eq(ObjectUtils.isNotEmpty(name),UserProfilePO::getName,name)
-                .eq(UserProfilePO::getJobNumber,jobNumber));
+                .eq(UserProfilePO::getJobNumber,jobNumber)
+                .last(" limit 1 ")
+        		);
     }
 
     /**
