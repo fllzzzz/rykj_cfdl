@@ -60,5 +60,10 @@ public class LotteryApplyRsp {
      */
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date batchNum;
+    
+    /**
+     * 摇号停车场
+     */
+    private String parkingLotName;
 
 }

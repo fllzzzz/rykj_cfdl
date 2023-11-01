@@ -20,6 +20,7 @@
         <result column="round_id" property="roundId"/>
         <result column="batch_id" property="batchId"/>
         <result column="fail_reason" property="failReason"/>
+        <result column="retry_num" property="retryNum"/>
     </resultMap>
 
     <delete id="deleteAll">
@@ -28,6 +29,22 @@
     
     <select id="querySpaceGroupByExpireDate" resultMap="userSpaceMap">
     	select job_number,parking_lot ,start_date,end_date from user_space where job_number = #{jobNum} and type = #{type} GROUP BY parking_lot ,start_date,end_date
+    </select>
+    
+    <select id="queryUnSyncData" resultMap="userSpaceMap">
+    	select * from user_space where state != '1' and end_date <![CDATA[ >= ]]> #{endDate}
+    	and ifnull(schedule_date,'') = '' 
+    	order by retry_num asc
+    	limit 1 
+    </select>
+    
+    <select id="queryUnsyncBeforeScheduleDate" resultMap="userSpaceMap">
+    	select * FROM user_space WHERE 
+			ifnull(schedule_date,'') != '' 
+			and schedule_date <![CDATA[ <= ]]> #{scheduleDate}   
+			AND state != '1'
+			ORDER BY retry_num ASC
+			limit 1
     </select>
     
 </mapper>

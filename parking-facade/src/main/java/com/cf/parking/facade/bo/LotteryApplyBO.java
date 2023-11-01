@@ -51,4 +51,9 @@ public class LotteryApplyBO {
      * 期号
      */
     private Date batchNum;
+    
+    /**
+     * 摇号停车场
+     */
+    private String parkingLotName;
 }

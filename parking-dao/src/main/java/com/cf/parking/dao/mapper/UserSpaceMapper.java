@@ -27,5 +27,19 @@ public interface UserSpaceMapper extends BaseMapper<UserSpacePO> {
 	 */
 	List<UserSpacePO> querySpaceGroupByExpireDate(@Param("jobNum") String jobNum,@Param("type")Integer type);
 
+	/**
+	 * 查询未同步成功数据，按失败次数排序，每次返回一条
+	 * @param endDate
+	 * @return
+	 */
+	UserSpacePO queryUnSyncData(String endDate);
+
+	/**
+	 * 查询定时日期之前的数据
+	 * @param scheduleDate
+	 * @return
+	 */
+	UserSpacePO queryUnsyncBeforeScheduleDate(String scheduleDate);
+
 }
 

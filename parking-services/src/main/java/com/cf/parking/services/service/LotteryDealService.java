@@ -221,7 +221,7 @@ public class LotteryDealService {
 					
 					if( !(inSpace.getStartDate().compareTo(outSpace.getEndDate()) > 0 ||
 							outSpace.getStartDate().compareTo(inSpace.getEndDate()) > 0	)) {
-						throw new BusinessException("受让人持有的车位有效期和转让人的车位有效期不能存在重叠，无法进行转让");
+						throw new BusinessException("双方停车场有效期不能存在重叠，无法转让");
 					}
 					
 				});

@@ -1,10 +1,13 @@
 package com.cf.parking.services.service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -46,6 +49,20 @@ public class ParkingInitService extends ServiceImpl<ParkingInitMapper, ParkingIn
 	 		);
 	 	log.info("根据Code={}查询闸机数据：{}",parkingCode,JSON.toJSONString(parkingList));
 	 	return parkingList == null ? "" : parkingList.getRegion();
+	}
+
+
+	/**
+	 * 根据车库编码查询车库列表
+	 * @param parkingLot
+	 * @return
+	 */
+	public List<ParkingInitPO> queryParkingInitList(List<String> parkingLot) {
+		return CollectionUtils.isEmpty(parkingLot) ? Collections.emptyList() : 
+			parkingInitMapper.selectList(
+		 			new LambdaQueryWrapper<ParkingInitPO>()
+		 			.in(ParkingInitPO::getRegionCode, parkingLot)
+		 		);
 	}
 	
 }

@@ -97,4 +97,10 @@ public class UserSpacePO {
      * 类型，1摇号，2默认
      */
     private Integer type;
+    
+    
+    /**
+     * 重试次数
+     */
+    private Integer retryNum = 0;
 }

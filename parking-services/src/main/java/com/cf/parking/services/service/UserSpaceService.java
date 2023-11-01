@@ -411,20 +411,9 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 	 * @param time
 	 */
 	public void parkingDownOnStartTtime(String time) {
-		List<UserSpacePO> spaceList = userSpaceMapper.selectList(new LambdaQueryWrapper<UserSpacePO>()
-					.le(UserSpacePO::getScheduleDate, time)
-					.ne(UserSpacePO::getState, UserSpaceStateEnum.SUCCESS.getState())
-				);
-		log.info("获取定时任务列表：{}",JSON.toJSONString(spaceList));
-		UserSpaceDTO dto = new UserSpaceDTO();
-		spaceList.forEach(space->{
-			try {
-				invokeCarAddService(space);
-				Thread.sleep(5000);
-			} catch (Exception e) {
-				log.info("定时任务车位同步id={}出错{}",space.getUserSpaceId(),e);
-			}
-		});
+		UserSpacePO space = userSpaceMapper.queryUnsyncBeforeScheduleDate(time);
+		log.info("获取定时下发任务数据：{}",JSON.toJSONString(space));
+		invokeCarAddService(space);
 	}
 
 	
@@ -433,16 +422,8 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 	 * 同步车位信息到闸机系统
 	 */
 	public void syncSpace() {
-		UserSpacePO space = userSpaceMapper.selectOne(new LambdaQueryWrapper<UserSpacePO>()
-					.ne(UserSpacePO::getState, UserSpaceStateEnum.SUCCESS.getState())
-					.ge(UserSpacePO::getEndDate, DateUtil.format(new Date(), ParkingConstants.SHORT_DATE_FORMAT))
-					.last(" and ifnull(schedule_date,'') = '' limit 1 ")
-				);
+		UserSpacePO space = userSpaceMapper.queryUnSyncData(DateUtil.format(new Date(), ParkingConstants.SHORT_DATE_FORMAT));
 		log.info("获取到待同步车位信息：{}",JSON.toJSONString(space));
-		if (space == null) {
-			return ;
-		}
-		
 		invokeCarAddService(space);
 	}
 
@@ -452,6 +433,9 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 	 * @param space
 	 */
 	public void invokeCarAddService(UserSpacePO space) {
+		if (space == null) {
+			return ;
+		}
 		log.info("同步车位信息：{}",JSON.toJSONString(space));
 		UserSpaceDTO dto = new UserSpaceDTO();
 		BeanUtils.copyProperties(space, dto);
@@ -467,6 +451,7 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 			stateSpace.setFailReason(resp == null ? "系统异常" : (resp.getResult() == null ? resp.getResMsg() : resp.getResult().getMessage()));
 		}
 		stateSpace.setUserSpaceId(space.getUserSpaceId());
+		stateSpace.setRetryNum((space.getRetryNum() == null ? 0 : space.getRetryNum()) + 1);
 		log.info("车位同步id={}结果{}",stateSpace.getUserSpaceId(),JSON.toJSONString(resp));
 		userSpaceMapper.updateById(stateSpace);
 	}

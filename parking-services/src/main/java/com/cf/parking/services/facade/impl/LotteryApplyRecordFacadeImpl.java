@@ -22,6 +22,8 @@ import com.cf.support.bean.IdWorker;
 import com.cf.support.exception.BusinessException;
 import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
+import com.google.common.collect.Lists;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -61,7 +63,12 @@ public class LotteryApplyRecordFacadeImpl implements LotteryApplyRecordFacade
     
     @Resource
     private UserVerifyService userVerifyService;
+    
+    @Resource
+    private LotteryRuleRoundService lotteryRuleRoundService;
 
+    @Resource
+    private ParkingInitService parkingInitService;
 
 
     /**
@@ -114,6 +121,9 @@ public class LotteryApplyRecordFacadeImpl implements LotteryApplyRecordFacade
         applyBO.setValidStartDate(lotteryBatchPO.getValidStartDate());
         applyBO.setValidEndDate(lotteryBatchPO.getValidEndDate());
         applyBO.setBatchNum(lotteryBatchPO.getBatchNum());
+        List<Long> roundList = JSON.parseArray(lotteryBatchPO.getRoundId(), Long.class);
+        log.info("批次{}包含的轮次数据为：{}",lotteryBatchPO.getId() ,roundList);
+        applyBO.setParkingLotName(getParkingLotName(roundList));
         //2.判断当前时间是否处于报名时间内
         boolean InTime = lotteryBatchService.judgeWhetherInApplyTime(lotteryBatchPO.getApplyStartTime(),lotteryBatchPO.getApplyEndTime());
         applyBO.setTimeState(InTime);
@@ -173,7 +183,8 @@ public class LotteryApplyRecordFacadeImpl implements LotteryApplyRecordFacade
         return applyBO;
     }
 
-    /**
+
+	/**
      * 申请摇号
      * @param userId
      * @param batchId
@@ -264,5 +275,27 @@ public class LotteryApplyRecordFacadeImpl implements LotteryApplyRecordFacade
         //2.判断
         log.info("本期{}摇号报名时间：{}-{}，当前时间：{}",DateUtil.format(batchPO.getBatchNum(), "yyyy-MM-dd"), DateUtil.format(batchPO.getApplyStartTime(), "yyyy-MM-dd"),DateUtil.format(batchPO.getApplyEndTime(), "yyyy-MM-dd"),DateUtil.format(new Date(), "yyyy-MM-dd HH:mm:ss"));
         return lotteryBatchService.judgeWhetherInApplyTime(batchPO.getApplyStartTime(),batchPO.getApplyEndTime());
+    }
+    
+    
+    /**
+     * 获取轮次对应的停车场
+     * @param roundIdList
+     * @return
+     */
+    private String getParkingLotName(List<Long> roundIdList) {
+    	if (CollectionUtils.isEmpty(roundIdList)){
+    		return null;
+    	}
+    	List<LotteryRuleRoundPO> roundList = lotteryRuleRoundService.listByIds(roundIdList);
+    	log.info("根据id：{}查询轮次：{}",roundIdList,JSON.toJSONString(roundList));
+    	if (CollectionUtils.isEmpty(roundList)){
+    		return null;
+    	}
+    	List<String> parkingLot = roundList.stream().map(item -> item.getParkingLotCode()).collect(Collectors.toList());
+        List<ParkingInitPO> initList =	parkingInitService.queryParkingInitList(parkingLot);
+        log.info("根据车库编码：{}查询车库：{}",parkingLot,JSON.toJSONString(initList));
+        String names = initList.stream().map(item -> item.getRegion()).collect(Collectors.joining(","));
+        return names;
     }
 }

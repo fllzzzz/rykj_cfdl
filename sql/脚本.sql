@@ -258,3 +258,6 @@ INSERT INTO `parking_init`(`id`, `region`, `region_code`, `remark`, `create_tm`,
 INSERT INTO `parking_init`(`id`, `region`, `region_code`, `remark`, `create_tm`, `update_tm`) VALUES (3, '地下停车场', 'aaed725983664c7aa0a1a4dddba3f05c', '', '2023-10-30 19:29:27.734', '2023-10-30 19:29:27.734');
 INSERT INTO `parking_init`(`id`, `region`, `region_code`, `remark`, `create_tm`, `update_tm`) VALUES (4, '组装车间1F', '2457999fe2914251976fd333d2816fb2', '', '2023-10-30 19:30:28.375', '2023-10-30 19:30:28.375');
 INSERT INTO `parking_init`(`id`, `region`, `region_code`, `remark`, `create_tm`, `update_tm`) VALUES (5, '组装车间4F停车库', '4680b7e1ec414a5ebdf48127f73acd71', '', '2023-10-30 19:31:10.020', '2023-10-30 19:31:10.020');
+
+
+alter table user_space add column retry_num int default 0 comment '重试次数';
