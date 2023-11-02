@@ -22,8 +22,6 @@ import com.cf.support.bean.IdWorker;
 import com.cf.support.exception.BusinessException;
 import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
-import com.google.common.collect.Lists;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -164,7 +162,7 @@ public class LotteryApplyRecordFacadeImpl implements LotteryApplyRecordFacade
                 LotteryResultDetailPO detailPO = lotteryResultDetailService.selectUserDetailByResultIds(userId,resultIds);
                 if (null != detailPO){
                     ParkingLotPO parkingLotPO = parkingLotService.selectParkingLotByCode(detailPO.getParkingLotCode());
-                    applyBO.setResult("恭喜您摇中" + parkingLotPO.getRegion() + "停车场！");
+                    applyBO.setResult("恭喜您摇中" + parkingLotPO.getRegion() + "！");
                     applyBO.setResultColor(4);
                 }else {
                     //如果都已经发布了
