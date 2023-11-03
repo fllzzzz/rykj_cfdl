@@ -35,7 +35,7 @@
     	select * from user_space where state != '1' and end_date <![CDATA[ >= ]]> #{endDate}
     	and ifnull(schedule_date,'') = '' 
     	order by retry_num asc
-    	limit 1 
+    	limit 500 
     </select>
     
     <select id="queryUnsyncBeforeScheduleDate" resultMap="userSpaceMap">
@@ -44,7 +44,7 @@
 			and schedule_date <![CDATA[ <= ]]> #{scheduleDate}   
 			AND state != '1'
 			ORDER BY retry_num ASC
-			limit 1
+			limit 500
     </select>
     
 </mapper>

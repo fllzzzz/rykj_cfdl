@@ -32,14 +32,14 @@ public interface UserSpaceMapper extends BaseMapper<UserSpacePO> {
 	 * @param endDate
 	 * @return
 	 */
-	UserSpacePO queryUnSyncData(String endDate);
+	List<UserSpacePO> queryUnSyncData(String endDate);
 
 	/**
 	 * 查询定时日期之前的数据
 	 * @param scheduleDate
 	 * @return
 	 */
-	UserSpacePO queryUnsyncBeforeScheduleDate(String scheduleDate);
+	List<UserSpacePO> queryUnsyncBeforeScheduleDate(String scheduleDate);
 
 }
 

@@ -411,9 +411,16 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 	 * @param time
 	 */
 	public void parkingDownOnStartTtime(String time) {
-		UserSpacePO space = userSpaceMapper.queryUnsyncBeforeScheduleDate(time);
-		log.info("获取定时下发任务数据：{}",JSON.toJSONString(space));
-		invokeCarAddService(space);
+		List<UserSpacePO> spaceList = userSpaceMapper.queryUnsyncBeforeScheduleDate(time);
+		log.info("获取定时下发任务数据：{}",JSON.toJSONString(spaceList));
+		spaceList.forEach(space -> {
+			try {
+				invokeCarAddService(space);
+				Thread.sleep(5000);
+			} catch (Exception e) {
+				log.error("同步定时下发闸机数据失败：{}，失败原因：{}",JSON.toJSONString(space),e);
+			}
+		});
 	}
 
 	
@@ -422,9 +429,17 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 	 * 同步车位信息到闸机系统
 	 */
 	public void syncSpace() {
-		UserSpacePO space = userSpaceMapper.queryUnSyncData(DateUtil.format(new Date(), ParkingConstants.SHORT_DATE_FORMAT));
-		log.info("获取到待同步车位信息：{}",JSON.toJSONString(space));
-		invokeCarAddService(space);
+		List<UserSpacePO> spaceList = userSpaceMapper.queryUnSyncData(DateUtil.format(new Date(), ParkingConstants.SHORT_DATE_FORMAT));
+		log.info("获取到待同步车位信息：{}",JSON.toJSONString(spaceList));
+		spaceList.forEach(space -> {
+			try {
+				invokeCarAddService(space);
+				Thread.sleep(5000);
+			} catch (Exception e) {
+				log.error("同步闸机数据失败：{}，失败原因：{}",JSON.toJSONString(space),e);
+			}
+		});
+		
 	}
 
 	
