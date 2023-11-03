@@ -16,7 +16,6 @@ import com.cf.parking.dao.po.*;
 import com.cf.parking.facade.bo.LotteryBatchBO;
 import com.cf.parking.facade.bo.LotteryResultDetailBO;
 import com.cf.parking.facade.bo.LotteryResultExportBO;
-import com.cf.parking.facade.dto.CardMessageDTO;
 import com.cf.parking.facade.dto.LotteryBatchDTO;
 import com.cf.parking.facade.dto.LotteryBatchOptDTO;
 import com.cf.parking.facade.dto.TextMessageDTO;
@@ -318,6 +317,10 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
     public Integer notifyAllUserByBatchId(Long id) {
         LotteryBatchPO lotteryBatchPO = mapper.selectById(id);
         //1.钉钉通知
+        
+        //黑名单
+        List<String> blackList = lotteryBlackListService.queryBlackList();
+        
         //1.1查询所有用户,不是正式环境就只发给固定的人
         List<String> jobNumList = new ArrayList<>();
         log.info("env:{}",env);
@@ -331,6 +334,8 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
         	jobNumList.add("013622186224083959");//张华健
         	jobNumList.add("28492530271177557");//郭欢
         }
+        
+        jobNumList.removeAll(blackList);
         if (CollectionUtils.isEmpty(jobNumList)){
             throw new BusinessException("未找到公司员工，无法通知！");
         }
