@@ -261,3 +261,5 @@ INSERT INTO `parking_init`(`id`, `region`, `region_code`, `remark`, `create_tm`,
 
 
 alter table user_space add column retry_num int default 0 comment '重试次数';
+
+update user_space set state = '1' where state <> '1';
