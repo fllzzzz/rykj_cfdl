@@ -1,9 +1,8 @@
 package com.cf.parking.services.job.aspect;
 
-import com.cf.parking.facade.constant.RedisConstant;
 import com.cf.parking.services.job.annotation.TaskLock;
 import com.cf.support.utils.DingAlarmUtils;
-import com.cf.support.utils.RedissonUtil;
+import com.cf.support.utils.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.aspectj.lang.JoinPoint;
@@ -12,7 +11,6 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.redisson.api.RLock;
 import org.slf4j.MDC;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -20,7 +18,6 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.lang.reflect.Method;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @Classname CommitAspect
@@ -33,7 +30,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class TaskLockAspect {
     @Resource
-    private RedissonUtil redissonUtil;
+    private RedisUtil redisUtil;
 
     @Pointcut("@annotation(com.cf.parking.services.job.annotation.TaskLock)")
     public void taskLockPointCut() {
@@ -54,12 +51,14 @@ public class TaskLockAspect {
         Object result = null;
         if (ObjectUtils.isNotEmpty(annotation)) {
             String lockKey = annotation.key();
-            RLock rLock = redissonUtil.getRLock(lockKey);
+            log.info("methodName={}",methodName);
+
+            if(!redisUtil.lock(lockKey, "1", 300)){
+                log.info("{}repeat", methodName);
+                return null;
+            }
             try {
-                if (!redissonUtil.tryLock(rLock, RedisConstant.JOB_SYCNDATA_LOCK_KEY_WAIT, RedisConstant.JOB_SYCNDATA_LOCK_KEY_EXPIRE, TimeUnit.MINUTES)) {
-                    log.info("{}repeat", methodName);
-                    return null;
-                }
+
                 String traceId = UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
                 MDC.put("traceId", traceId);
 
@@ -71,11 +70,6 @@ public class TaskLockAspect {
                 log.error("{}Err", methodName, e);
                 DingAlarmUtils.alarmException(methodName + "Err" + e.getMessage());
             } finally {
-                try {
-                    redissonUtil.unlock(rLock);
-                } catch (Exception e) {
-                    log.error("解锁异常,key:[{}],e:", lockKey, e);
-                }
                 MDC.clear();
             }
         }

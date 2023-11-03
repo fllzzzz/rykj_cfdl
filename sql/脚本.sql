@@ -155,8 +155,6 @@ create table parking_space_transfer_record(
 
 alter table lottery_apply_record add index batch_id_idx(batch_id);
 
-alter table lottery_apply_record add column parking_lot_code varchar(256) default '' comment '停车场编号';
-
 
 alter table user_space add schedule_date varchar(10) default '' comment '定时器执行时间';
 alter table user_space add column batch_num date comment '期号',add column round_id bigint default 0 comment '摇号轮数id';
@@ -183,18 +181,18 @@ alter table lottery_rule_assign add column round_id bigint comment '轮次id';
 alter table lottery_rule_assign add index round_idx(round_id);
 alter table user_space add column  type char(1) default '0' comment '类型，1摇号，2默认';
 
---20230927
+-- 20230927
 alter table lottery_rule_assign add column round_name varchar(32) default ''  comment '轮数名称';
 alter table lottery_rule_assign add column  parking_lot_region  varchar(64) default '' comment '停车场区域';
 alter table lottery_rule_assign MODIFY column parking_lot_code  varchar(64) default '' comment '停车场编号';
 alter table lottery_rule_assign MODIFY COLUMN code VARCHAR(2048) default '' comment '部门编码/人员工号（可多选）';
 alter table lottery_rule_assign MODIFY COLUMN name VARCHAR(2048) default '' comment '名称（部门或者人员名称）';
 
---20231008
+-- 20231008
 alter table lottery_apply_record MODIFY column result varchar(16) default '' comment '摇号结果(-1：未开号；0：未中；1：摇中)';
 alter table user_space add column  state char(1) default '0' comment '状态（0：未同步；1：同步成功；2：同步失败）';
 
---20231009
+-- 20231009
 drop table if exists parking_space_change_record;
 CREATE TABLE `parking_space_change_record` (
   `id` bigint NOT NULL COMMENT 'id',

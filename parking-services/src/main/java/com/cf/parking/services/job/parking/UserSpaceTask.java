@@ -1,12 +1,6 @@
 package com.cf.parking.services.job.parking;
 
-import java.util.Date;
-import java.util.List;
-import javax.annotation.Resource;
-
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
+import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
 import com.cf.parking.dao.po.LotteryResultPO;
 import com.cf.parking.facade.constant.RedisConstant;
@@ -15,8 +9,15 @@ import com.cf.parking.services.enums.LotteryResultStateEnum;
 import com.cf.parking.services.job.annotation.TaskLock;
 import com.cf.parking.services.service.LotteryResultService;
 import com.cf.parking.services.service.UserSpaceService;
-import cn.hutool.core.date.DateUtil;
+import com.cf.support.utils.DingAlarmUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+import java.util.Date;
+import java.util.List;
 
 
 
@@ -49,6 +50,8 @@ public class UserSpaceTask {
 			userSpaceService.deleteExpiredSpace(time);
 		} catch (Exception e) {
 			log.error("删除过期车定时任务={}",e);
+			DingAlarmUtils.alarmException("dealExpiredSpaceJobErr" + e.getMessage());
+
 		}
 	}
 	
@@ -66,6 +69,8 @@ public class UserSpaceTask {
 			userSpaceService.parkingDownOnStartTtime(time);
 		} catch (Exception e) {
 			log.error("按照表里的定时器时间进行下发闸机失败={}",e);
+			DingAlarmUtils.alarmException("parkingDownJobErr" + e.getMessage());
+
 		}
 	}
 	
@@ -81,6 +86,8 @@ public class UserSpaceTask {
 			userSpaceService.syncSpace();
 		} catch (Exception e) {
 			log.error("同步车位信息失败：{}",e);
+			DingAlarmUtils.alarmException("syncSpaceJobErr" + e.getMessage());
+
 		}
 	}
 	
@@ -107,6 +114,8 @@ public class UserSpaceTask {
 			});
 		} catch (Exception e) {
 			log.error("同步结果状态失败：{}",e);
+			DingAlarmUtils.alarmException("syncLotteryResultStateJobErr" + e.getMessage());
+
 		}
 	}
 	
