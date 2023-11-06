@@ -1,39 +1,30 @@
 package com.cf.parking.services.integration;
 
-import java.util.HashMap;
-import java.util.Map;
-import javax.annotation.Resource;
-
-import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpResponseException;
-import org.springframework.stereotype.Service;
+import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
-import com.cf.parking.facade.bo.ParkBaseDetailRespBO;
-import com.cf.parking.facade.bo.ParkBaseRespBO;
-import com.cf.parking.facade.bo.ParkingCarInfoBO;
-import com.cf.parking.facade.bo.ParkingCarQueryRespBO;
-import com.cf.parking.facade.bo.ParkingTokenBO;
-import com.cf.parking.facade.bo.ParkingYardBO;
-import com.cf.parking.facade.bo.YardDetailBO;
-import com.cf.parking.facade.bo.YardPageBO;
+import com.cf.parking.facade.bo.*;
 import com.cf.parking.facade.constant.RedisConstant;
-import com.cf.parking.facade.dto.Carmanagement;
-import com.cf.parking.facade.dto.ParkingCarQueryDTO;
-import com.cf.parking.facade.dto.ParkingDeleteCarDTO;
-import com.cf.parking.facade.dto.QueryYardDTO;
-import com.cf.parking.facade.dto.UserSpaceDTO;
+import com.cf.parking.facade.dto.*;
 import com.cf.parking.services.constant.ParkingConstants;
 import com.cf.parking.services.enums.ParkingRemoteCodeEnum;
 import com.cf.parking.services.properties.ParkingProperties;
 import com.cf.parking.services.utils.AssertUtil;
 import com.cf.parking.services.utils.HttpClientUtils;
 import com.cf.support.exception.BusinessException;
+import com.cf.support.utils.DingAlarmUtils;
 import com.cf.support.utils.HttpClientUtil;
 import com.cf.support.utils.RedisUtil;
-
-import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpResponseException;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -47,7 +38,7 @@ public class ParkInvokeService {
 
 	/**
 	 * 新增或修改车辆信息
-	 * @param info
+	 * @param space
 	 * @return
 	 */
 	public ParkBaseRespBO<ParkBaseDetailRespBO> replaceCarInfo(UserSpaceDTO space) {
@@ -81,12 +72,13 @@ public class ParkInvokeService {
 			if(e.getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
 				redisUtil.del(RedisConstant.PARKING_TOKEN);
 			}
+			DingAlarmUtils.alarmException("调用添加车辆接口失败"+ ExceptionUtils.getStackTrace(e));
 			return ParkBaseRespBO.fail();
-			
 		} catch(BusinessException e) {
 			return ParkBaseRespBO.fail(e.getMsg());
 		} catch (Exception e) {
-			log.info("调用添加车辆接口入参：{},e={}",JSON.toJSONString(info),e);
+			log.error("调用添加车辆接口入参：{},e={}",JSON.toJSONString(info),e);
+			DingAlarmUtils.alarmException("调用添加车辆接口失败"+ ExceptionUtils.getStackTrace(e));
 			return ParkBaseRespBO.fail();
 		}
 	}
@@ -115,14 +107,18 @@ public class ParkInvokeService {
 			}
 			return null;
 		} catch(HttpResponseException e) {
-			log.info("调用查询车库接口入参：{},调用失败e={}",JSON.toJSONString(dto),e);
+			log.error("调用查询车库接口入参：{},调用失败e={}",JSON.toJSONString(dto),e);
 			if(e.getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
 				redisUtil.del(RedisConstant.PARKING_TOKEN);
 			}
+			DingAlarmUtils.alarmException("调用查询车库接口失败"+ ExceptionUtils.getStackTrace(e));
+
 			return null;
 			
 		} catch (Exception e) {
-			log.info("调用查询车库接口入参：{},e:{}",JSON.toJSONString(dto),e);
+			DingAlarmUtils.alarmException("调用查询车库接口失败"+ ExceptionUtils.getStackTrace(e));
+
+			log.error("调用查询车库接口入参：{},e:{}",JSON.toJSONString(dto),e);
 			return null;
 		}
 	}
@@ -149,14 +145,18 @@ public class ParkInvokeService {
 			}
 			return null;
 		} catch(HttpResponseException e) {
-			log.info("调用查询车辆接口入参：{},调用失败e={}",JSON.toJSONString(dto),e);
+			log.error("调用查询车辆接口入参：{},调用失败e={}",JSON.toJSONString(dto),e);
 			if(e.getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
 				redisUtil.del(RedisConstant.PARKING_TOKEN);
 			}
+			DingAlarmUtils.alarmException("调用查询车辆接口失败"+ ExceptionUtils.getStackTrace(e));
+
 			return null;
 			
 		} catch (Exception e) {
-			log.error("查询车辆信息出错：{}",e);
+			log.error("查询车辆信息出错",e);
+			DingAlarmUtils.alarmException("调用查询车辆接口失败"+ ExceptionUtils.getStackTrace(e));
+
 			return null;
 
 		}
@@ -173,7 +173,7 @@ public class ParkInvokeService {
 
 	/**
 	 * 删除车辆
-	 * @param info
+	 * @param dto
 	 * @return
 	 */
 	public ParkBaseRespBO<ParkBaseDetailRespBO> deleteCarInfo(ParkingDeleteCarDTO dto) {
@@ -189,14 +189,18 @@ public class ParkInvokeService {
 			}
 			return resp;
 		} catch(HttpResponseException e) {
-			log.info("调用删除车辆接口入参：{},调用失败e={}",JSON.toJSONString(dto),e);
+			log.error("调用删除车辆接口入参：{},调用失败e={}",JSON.toJSONString(dto),e);
 			if(e.getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
 				redisUtil.del(RedisConstant.PARKING_TOKEN);
 			}
+			DingAlarmUtils.alarmException("调用删除车辆接口失败"+ ExceptionUtils.getStackTrace(e));
+
 			return ParkBaseRespBO.fail();
 			
 		} catch (Exception e) {
-			log.info("调用删除辆接口入参：{},e={}",JSON.toJSONString(dto),e);
+			log.error("调用删除辆接口入参：{},e={}",JSON.toJSONString(dto),e);
+			DingAlarmUtils.alarmException("调用删除车辆接口失败"+ ExceptionUtils.getStackTrace(e));
+
 			return ParkBaseRespBO.fail();
 		}
 	}
