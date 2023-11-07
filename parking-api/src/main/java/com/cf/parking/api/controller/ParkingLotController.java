@@ -74,7 +74,7 @@ public class ParkingLotController  extends BaseController
     {
         Map<String, String> parkingSysCodeMap = parkingInitService.queryAllParking();
 
-        List<ParkingLotBaseRsp> list = parkingSysCodeMap.entrySet().stream().map(x -> new ParkingLotBaseRsp().setRegion(x.getKey()).setRegionCode(x.getValue())).collect(Collectors.toList());
+        List<ParkingLotBaseRsp> list = parkingSysCodeMap.entrySet().stream().map(x -> new ParkingLotBaseRsp().setRegion(x.getValue()).setRegionCode(x.getKey())).collect(Collectors.toList());
         return Result.buildSuccessResult(list);
     }
 
