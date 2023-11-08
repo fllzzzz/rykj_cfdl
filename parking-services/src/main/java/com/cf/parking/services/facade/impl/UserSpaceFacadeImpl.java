@@ -14,6 +14,7 @@ import com.cf.parking.facade.dto.UserSpacePageDTO;
 import com.cf.parking.facade.dto.UserSpaceSyncDTO;
 import com.cf.parking.facade.facade.UserSpaceFacade;
 import com.cf.parking.services.integration.GatewayHikvisionFeign;
+import com.cf.parking.services.service.ParkingInitService;
 import com.cf.parking.services.service.ParkingLotService;
 import com.cf.parking.services.service.UserSpaceService;
 import com.cf.parking.services.utils.PageUtils;
@@ -52,6 +53,9 @@ public class UserSpaceFacadeImpl implements UserSpaceFacade {
 	
 	@Resource
 	private ParkingLotService parkingLotService;
+	
+	@Resource
+	private ParkingInitService parkingInitService;
 
 
 	@Override
@@ -61,9 +65,12 @@ public class UserSpaceFacadeImpl implements UserSpaceFacade {
 			return PageUtils.emptyResponseList(userSpacePage);
 		}
 		List<UserSpacePO> spacePageRecords = userSpacePage.getRecords();
+		
+		Map<String,String> parkingMap = parkingInitService.queryAllParking();
 		Map<Long, UserSpacePO> userSpacePOMap = spacePageRecords.stream().collect(Collectors.toMap(UserSpacePO::getUserSpaceId, userSpacePO -> userSpacePO));
 		List<UserSpaceBO> userSpaceBOS = BeanConvertorUtils.copyList(spacePageRecords, UserSpaceBO.class);
 		userSpaceBOS.forEach(userSpaceBO -> {
+			userSpaceBO.setParkingLot(parkingMap.getOrDefault(userSpaceBO.getParkingLot(), userSpaceBO.getParkingLot()));
 			UserSpacePO userSpacePO = userSpacePOMap.get(userSpaceBO.getUserSpaceId());
 			userSpaceBO.setStartDate(DateFormatUtils.format(userSpacePO.getStartDate(), "yyyy/MM/dd"))
 					.setEndDate(DateFormatUtils.format(userSpacePO.getEndDate(), "yyyy/MM/dd"));

@@ -68,7 +68,7 @@ swagger:
   
 #闸机系统
 parking:
-  host: https://abc.hicampuscube.com
+  host: https://abc.hicampuscube.com:9443
   addCarmanagementUrl: /service/cfdl__ConvenientAccess/0.0.1/addCarmanagement
   queryyardUrl: /service/cfdl__ConvenientAccess/0.0.1/queryyard
   tokenUrl: /baas/auth/v1.0/oauth2/token
