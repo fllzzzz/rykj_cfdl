@@ -7,7 +7,7 @@ import com.cf.parking.api.annotation.AdminOptLogTitle;
 import com.cf.parking.api.request.LotteryRuleAssignOptReq;
 import com.cf.parking.api.request.LotteryRuleAssignReq;
 import com.cf.parking.api.response.*;
-import com.cf.parking.dao.po.UserProfilePO;
+import com.cf.parking.dao.po.EmployeePO;
 import com.cf.parking.facade.bo.DepartmentTreeBO;
 import com.cf.parking.facade.bo.LotteryRuleAssignBO;
 import com.cf.parking.facade.bo.LotteryRuleAssignExportBO;
@@ -15,7 +15,7 @@ import com.cf.parking.facade.dto.LotteryRuleAssignDTO;
 import com.cf.parking.facade.dto.LotteryRuleAssignOptDTO;
 import com.cf.parking.facade.facade.LotteryRuleAssignFacade;
 import com.cf.parking.services.service.DepartmentService;
-import com.cf.parking.services.service.UserProfileService;
+import com.cf.parking.services.service.EmployeeService;
 import com.cf.parking.services.utils.AssertUtil;
 import com.cf.support.authertication.AdminUserAuthentication;
 import com.cf.support.result.PageResponse;
@@ -54,7 +54,7 @@ public class LotteryRuleAssignController
     private DepartmentService departmentService;
 
     @Resource
-    private UserProfileService userProfileService;
+    private EmployeeService employeeService;
 
     //————————————————PC端————————————————————
 
@@ -65,10 +65,10 @@ public class LotteryRuleAssignController
     @PostMapping("/userList")
     public Result<List<UserProfileBaseRsp>> userList()
     {
-        List<UserProfilePO> poList = userProfileService.queryBaseList();
+    	List<EmployeePO> poList = employeeService.queryAllEmployee();
         List<UserProfileBaseRsp> rspList = new ArrayList<>();
         if (!CollectionUtils.isEmpty(poList)){
-            rspList = poList.stream().map(x -> new UserProfileBaseRsp().setName(x.getName()).setCode(x.getJobNumber())).collect(Collectors.toList());
+            rspList = poList.stream().map(x -> new UserProfileBaseRsp().setName(x.getName()).setCode(x.getEmplNo())).collect(Collectors.toList());
         }
         return Result.buildSuccessResult(rspList);
     }

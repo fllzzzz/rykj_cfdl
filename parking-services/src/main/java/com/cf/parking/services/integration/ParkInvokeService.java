@@ -3,12 +3,14 @@ package com.cf.parking.services.integration;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
+import com.cf.parking.dao.po.UserProfilePO;
 import com.cf.parking.facade.bo.*;
 import com.cf.parking.facade.constant.RedisConstant;
 import com.cf.parking.facade.dto.*;
 import com.cf.parking.services.constant.ParkingConstants;
 import com.cf.parking.services.enums.ParkingRemoteCodeEnum;
 import com.cf.parking.services.properties.ParkingProperties;
+import com.cf.parking.services.service.UserProfileService;
 import com.cf.parking.services.utils.AssertUtil;
 import com.cf.parking.services.utils.HttpClientUtils;
 import com.cf.support.exception.BusinessException;
@@ -35,6 +37,9 @@ public class ParkInvokeService {
 	
 	@Resource
 	private RedisUtil redisUtil;
+	
+	@Resource
+	private UserProfileService userProfileService;
 
 	/**
 	 * 新增或修改车辆信息
@@ -42,11 +47,15 @@ public class ParkInvokeService {
 	 * @return
 	 */
 	public ParkBaseRespBO<ParkBaseDetailRespBO> replaceCarInfo(UserSpaceDTO space) {
+		
+		UserProfilePO user = userProfileService.selectUserProfileByNameAndJobNumber(null,space.getJobNumber());
+		
 		Carmanagement info = new Carmanagement();
 		info.setLicensePlate(space.getPlateNo())
 			.setJobNo(space.getJobNumber())
 			.setParkIndexCode(space.getParkingLot().split(","))
 			.setCarOwner(space.getName())
+			.setOwnerPhone(user == null ? null : user.getMobile())
 			.setPermissStart(DateUtil.format(DateUtil.beginOfDay(space.getStartDate()), ParkingConstants.FULL_DATE_FORMAT) )
 			.setPermissEnd(DateUtil.format(DateUtil.endOfDay(space.getEndDate()), ParkingConstants.FULL_DATE_FORMAT));
 		try {
