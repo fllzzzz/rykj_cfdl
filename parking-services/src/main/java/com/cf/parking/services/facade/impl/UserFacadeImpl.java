@@ -80,11 +80,11 @@ public class UserFacadeImpl implements UserFacade {
         //防止重复注册对openId加锁
         String lockKey = RedisConstant.USER_LOGIN_LOCK_KEY + openId;
         RLock rLock = redissonUtil.getRLock(lockKey);
+        if (!redissonUtil.tryLock(rLock, RedisConstant.USER_LOGIN_LOCK_KEY_WAIT, RedisConstant.USER_LOGIN_LOCK_KEY_EXPIRE, TimeUnit.SECONDS)) {
+            log.error("注册用户获取锁失败, 等待重试, openid为{}", openId);
+            return Result.buildResult(BizResultCodeEnum.LOCK_ERROR);
+        }
         try {
-            if (!redissonUtil.tryLock(rLock, RedisConstant.USER_LOGIN_LOCK_KEY_WAIT, RedisConstant.USER_LOGIN_LOCK_KEY_EXPIRE, TimeUnit.MINUTES)) {
-                log.error("注册用户获取锁失败, 等待重试, openid为{}", openId);
-                return Result.buildResult(BizResultCodeEnum.LOCK_ERROR);
-            }
             //判断openId是否存在
             UserPO user = userService.selectByOpenId(openId);
             //如果用户不存在则进行注册
