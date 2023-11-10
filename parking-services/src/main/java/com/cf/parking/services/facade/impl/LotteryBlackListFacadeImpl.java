@@ -2,22 +2,24 @@ package com.cf.parking.services.facade.impl;
 
 import java.util.Date;
 import java.util.List;
+
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cf.parking.dao.mapper.LotteryBlackListMapper;
 import com.cf.parking.dao.po.LotteryBlackListPO;
-import com.cf.parking.dao.po.UserPO;
+import com.cf.parking.dao.po.UserProfilePO;
 import com.cf.parking.facade.bo.LotteryBlackListBO;
 import com.cf.parking.facade.dto.LotteryBlackListDTO;
 import com.cf.parking.facade.dto.LotteryBlackListOptDTO;
 import com.cf.parking.facade.facade.LotteryBlackListFacade;
-import com.cf.parking.services.service.UserService;
+import com.cf.parking.services.service.UserProfileService;
 import com.cf.parking.services.utils.AssertUtil;
 import com.cf.parking.services.utils.PageUtils;
 import com.cf.support.bean.IdWorker;
 import com.cf.support.exception.BusinessException;
 import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
+
 import cn.hutool.core.util.ObjectUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -40,7 +42,7 @@ public class LotteryBlackListFacadeImpl implements LotteryBlackListFacade
     private LotteryBlackListMapper mapper;
 
     @Resource
-    private UserService userService;
+    private UserProfileService userProfileService;
 
     @Resource
     private IdWorker idWorker;
@@ -72,14 +74,14 @@ public class LotteryBlackListFacadeImpl implements LotteryBlackListFacade
     @Override
     public Integer add(LotteryBlackListOptDTO dto) {
         //1.查询userId
-        UserPO user = userService.selectByOpenId(dto.getCode());
-        AssertUtil.checkNull(user, "用户不存在");
+        UserProfilePO userProfilePO = userProfileService.selectUserProfileByNameAndJobNumber(null,dto.getCode());
+        AssertUtil.checkNull(userProfilePO, "该用户未登录过钉钉应用，获取不到用户信息，无法加入");
         //2.设置对象
         LotteryBlackListPO po = new LotteryBlackListPO();
         BeanUtils.copyProperties(dto,po);
         po.setId(idWorker.nextId());
         po.setJobNumber(dto.getCode());
-        po.setUserId(user.getUserId());
+        po.setUserId(userProfilePO.getUserId());
         po.setCreateTm(new Date());
         po.setUpdateTm(new Date());
         try{
