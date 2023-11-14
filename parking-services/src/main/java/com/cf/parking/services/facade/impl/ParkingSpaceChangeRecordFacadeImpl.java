@@ -21,9 +21,9 @@ import com.cf.parking.dao.po.ParkingLotPO;
 import com.cf.parking.dao.po.ParkingSpaceChangeRecordPO;
 import com.cf.parking.dao.po.UserInfoPO;
 import com.cf.parking.dao.po.UserPO;
+import com.cf.parking.dao.po.UserProfilePO;
 import com.cf.parking.dao.po.UserSpacePO;
 import com.cf.parking.facade.bo.ParkingSpaceChangeRecordBO;
-import com.cf.parking.facade.dto.CardMessageDTO;
 import com.cf.parking.facade.dto.ParkingSpaceChangeApplyDTO;
 import com.cf.parking.facade.dto.ParkingSpaceChangeRecordDTO;
 import com.cf.parking.facade.dto.TextMessageDTO;
@@ -180,7 +180,7 @@ public class ParkingSpaceChangeRecordFacadeImpl implements ParkingSpaceChangeRec
 		UserInfoPO user = userProfileService.getUserInfoByUserId(dto.getUserId());
 		AssertUtil.checkNull(user, "用户不存在");
 		
-		UserPO acceptor = userService.selectByOpenId(dto.getAcceptJobNumber());		
+		UserProfilePO acceptor = userProfileService.selectUserProfileByNameAndJobNumber(null, dto.getAcceptJobNumber());
 		AssertUtil.checkNull(user, "交换人不存在");
 		
 		//过滤出时间有交集的，假如连续2期，AB人员有几种中签情况(必须中签才能交换)，可以看出来可以交换的情况开始日期和结束日期肯定有个相同的，目前限定结束日期必须相同
@@ -230,10 +230,11 @@ public class ParkingSpaceChangeRecordFacadeImpl implements ParkingSpaceChangeRec
 			  ;
 		changeRecordPOMapper.insert(record);
 		//下发通知
+		UserPO userPO = userService.getById(acceptor.getUserId());
 		List<TextMessageDTO> messageDTOList = new ArrayList<>();
-		TextMessageDTO message = new TextMessageDTO()
-				.setOpenIdList(Arrays.asList(dto.getAcceptJobNumber()))
-				.setMessage("您有一条车位交换申请,请到钉钉中的春风顺风车应用-->摇号-->车位交换中查看");
+		TextMessageDTO message = new TextMessageDTO();
+		message.setOpenIdList(Arrays.asList(userPO.getOpenId()));
+		message.setMessage("您有一条车位交换申请,请到钉钉中的春风顺风车应用-->摇号-->车位交换中查看");
 		messageDTOList.add(message);
 		dingTalkMessageFacade.asyncSendBatchText(messageDTOList);
 		

@@ -5,7 +5,6 @@ import cn.hutool.core.date.DateUtil;
 import com.cf.parking.facade.bo.LotteryResultDetailBO;
 import com.cf.parking.facade.bo.ParkBaseDetailRespBO;
 import com.cf.parking.facade.bo.ParkBaseRespBO;
-import com.cf.parking.facade.constant.ParkingSysCodeConstant;
 import com.cf.parking.services.utils.PageUtils;
 import lombok.extern.slf4j.Slf4j;
 import com.alibaba.fastjson.JSON;

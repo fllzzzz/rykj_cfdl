@@ -47,9 +47,6 @@ public class ParkingSpaceTransferRecordFacadeImpl implements ParkingSpaceTransfe
     private UserVerifyService userVerifyService;
     
     @Resource
-    private UserService userService;
-    
-    @Resource
     private LotteryBlackListService lotteryBlackListService;
     
     @Resource
@@ -57,6 +54,9 @@ public class ParkingSpaceTransferRecordFacadeImpl implements ParkingSpaceTransfe
 
 	@Resource
 	private ParkingLotService parkingLotService;
+	
+	@Resource
+	private UserProfileService userProfileService;
     
 	
 	
@@ -79,13 +79,12 @@ public class ParkingSpaceTransferRecordFacadeImpl implements ParkingSpaceTransfe
 		}
 		AssertUtil.checkTrue(!CollectionUtils.isEmpty(spaceList), "您的车位为当天到期或已到期，无法进行转赠");
 		
-		UserPO user = userService.selectByOpenId(inJobNum);
+		UserProfilePO user = userProfileService.selectUserProfileByNameAndJobNumber(null, inJobNum );
 		AssertUtil.checkNull(user, "受让人不存在"); 
-		AssertUtil.checkTrue(user.getState() == 1, "受让人不为有效状态"); 
 		List<UserVerifyPO> verifyList = userVerifyService.queryVerifyListByUserIdList(Arrays.asList(user.getUserId()));
 		AssertUtil.checkTrue(!CollectionUtils.isEmpty(verifyList), "受让人未绑定车辆,无法转赠");
 		
-		LotteryBlackListPO black =  lotteryBlackListService.queryBlackUserInfo(user.getOpenId());
+		LotteryBlackListPO black =  lotteryBlackListService.queryBlackUserInfo(user.getUserId());
 		AssertUtil.checkTrue(!(black != null), "受让人为黑名单用户,无法转赠");
 		//执行转让
 		lotteryDealService.transfer(spaceList,verifyList,inJobNum);

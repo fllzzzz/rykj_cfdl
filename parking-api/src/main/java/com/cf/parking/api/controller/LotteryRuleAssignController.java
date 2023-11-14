@@ -63,9 +63,9 @@ public class LotteryRuleAssignController
      */
     @ApiOperation(value = "人员列表", notes = "停车场分配模块中需要使用到人员列表")
     @PostMapping("/userList")
-    public Result<List<UserProfileBaseRsp>> userList()
+    public Result<List<UserProfileBaseRsp>> userList( String name)
     {
-    	List<EmployeePO> poList = employeeService.queryAllEmployee();
+    	List<EmployeePO> poList = employeeService.queryAllEmployee(name);
         List<UserProfileBaseRsp> rspList = new ArrayList<>();
         if (!CollectionUtils.isEmpty(poList)){
             rspList = poList.stream().map(x -> new UserProfileBaseRsp().setName(x.getName()).setCode(x.getEmplNo())).collect(Collectors.toList());

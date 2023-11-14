@@ -9,6 +9,8 @@ import com.cf.parking.dao.po.LotteryResultDetailPO;
 import com.cf.parking.dao.po.LotteryResultPO;
 import com.cf.parking.dao.po.LotteryRuleRoundPO;
 import com.cf.parking.dao.po.ParkingLotPO;
+import com.cf.parking.dao.po.UserPO;
+import com.cf.parking.dao.po.UserProfilePO;
 import com.cf.parking.dao.po.UserSpacePO;
 import com.cf.parking.dao.po.UserVerifyPO;
 import com.cf.parking.facade.bo.LotteryResultBO;
@@ -36,6 +38,7 @@ import com.cf.parking.services.service.LotteryRuleAssignService;
 import com.cf.parking.services.service.LotteryRuleRoundService;
 import com.cf.parking.services.service.ParkingLotService;
 import com.cf.parking.services.service.UserProfileService;
+import com.cf.parking.services.service.UserService;
 import com.cf.parking.services.service.UserSpaceService;
 import com.cf.parking.services.service.UserVerifyService;
 import com.cf.parking.services.utils.AssertUtil;
@@ -123,6 +126,9 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
     @Resource
     private DingTalkMessageFacade dingTalkMessageFacade;
     
+    @Resource
+    private UserService userService;
+    
     
     
     @Transactional(rollbackFor = Exception.class)
@@ -138,7 +144,7 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 		AssertUtil.checkTrue(EnableStateEnum.ENABLE.getState().equals(round.getState()),"摇号轮次未启用");
 		LotteryBatchPO batch = lotteryBatchService.getById(lottery.getBatchId());
 		AssertUtil.checkNull(batch, "批次数据不存在");
-		AssertUtil.checkTrue(batch.getApplyEndTime().compareTo(new Date()) < 0, "当前还处于申请日期内，不能进行摇号操作");
+		//AssertUtil.checkTrue(batch.getApplyEndTime().compareTo(new Date()) < 0, "当前还处于申请日期内，不能进行摇号操作");
 
 		//防并发
 		int num = lotteryResultMapper.updateByState(id,LotteryResultStateEnum.UNLOTTERY.getState(),LotteryResultStateEnum.UNCONFIRM.getState());
@@ -333,6 +339,7 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 		AssertUtil.checkNull(round, "轮次数据不存在");
 		ParkingLotPO parking = parkingLotService.selectParkingLotByCode(round.getParkingLotCode());
 		
+		//未发布的数量
 		long unfinshNum = lotteryResultMapper.selectCount(new LambdaQueryWrapper<LotteryResultPO>()
 					.eq(LotteryResultPO::getBatchId, lottery.getBatchId())
 					.in(LotteryResultPO::getState, Arrays.asList( 
@@ -344,9 +351,14 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 		//查询中奖数据
 		List<LotteryResultDetailPO> detailList = lotteryResultDetailService.queryDetailListByResultId(id);
 		if (!CollectionUtils.isEmpty(detailList)) {
-			List<String> openIdList = detailList.stream().map(item -> item.getUserJobNumber()).collect(Collectors.toList());
-			log.info("中奖人员工号：{},摇中停车场：{}",JSON.toJSONString(openIdList),JSON.toJSONString(parking));
+			//获取用户ID
+			List<Long> userIdList = detailList.stream().map(item -> item.getUserId()).collect(Collectors.toList());
+			List<UserPO> userList = userService.getUserByUserIdList(userIdList);		
 			
+			List<String> openIdList = userList.stream().map(item -> item.getOpenId()).collect(Collectors.toList());
+			
+			log.info("中奖人员工号：{},摇中停车场：{}",JSON.toJSONString(openIdList),JSON.toJSONString(parking));
+			userList.clear();
 			List<TextMessageDTO> messageList = new ArrayList<>();
 			TextMessageDTO messageDto = new TextMessageDTO()
 					.setOpenIdList(openIdList)
@@ -354,26 +366,36 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 							DateUtil.format(batch.getValidEndDate(),ParkingConstants.SHORT_DATE_FORMAT)));
 			messageList.add(messageDto);
 			dingTalkMessageFacade.asyncSendBatchText(messageList);
-			List<Long> userIdList = detailList.stream().map(item -> item.getUserId()).collect(Collectors.toList());
 			//更新默认停车场
 			userProfileService.batchSetDefaultParkingLotByUserIds(userIdList,parking.getRegion());
 			//更新申请记录表的摇号结果
-			lotteryApplyRecordService.updateResultByJobNum(openIdList,parking.getRegion());
+			lotteryApplyRecordService.updateResultByUserId(userIdList,parking.getRegion(),batch.getId());
 		}
-		
+		detailList.clear();;
 		
 		
 		if (unfinshNum == 0) {
 			//申请列表
 			List<LotteryApplyRecordPO> applyList = lotteryApplyRecordService.queryLotteryApplyList(lottery.getBatchId(), null);
-			List<String> spaceList = userSpaceService.querySpaceListByBatchId(lottery.getBatchId(),UserSpaceTypeEnum.LOTTERY.getState());
 			List<String> applyIdList = applyList.stream().map(item -> item.getJobNumber()).collect(Collectors.toList());
-			log.info("未中奖人员工号：{}",JSON.toJSONString(applyIdList));
+			applyList.clear();
+			//中奖人员
+			List<String> spaceList = userSpaceService.querySpaceListByBatchId(lottery.getBatchId(),UserSpaceTypeEnum.LOTTERY.getState());
 			applyIdList.removeAll(spaceList);
-			//userProfileService.batchSetParkingLotByJobNum(applyIdList,parking.getRegion());
+			spaceList.clear();
+			log.info("未中奖人员工号：{}",JSON.toJSONString(applyIdList));
+			//查询未中奖人员信息
+			List<UserProfilePO> profileList = userProfileService.getProfileListByJobNumList(applyIdList);
+			applyIdList.clear();
+			//查询openid
+			List<Long> userIdList = profileList.stream().map(item -> item.getUserId()).collect(Collectors.toList());
+			profileList.clear();
+			List<UserPO> userList = userService.getUserByUserIdList(userIdList);
+			List<String> openIdList = userList.stream().map(item -> item.getOpenId()).collect(Collectors.toList());
+			userList.clear();;
 			List<TextMessageDTO> messageList = new ArrayList<>();
 			TextMessageDTO messageDto = new TextMessageDTO()
-					.setOpenIdList(applyIdList)
+					.setOpenIdList(openIdList)
 					.setMessage("很遗憾，您本次摇号未中奖");
 			messageList.add(messageDto);
 			dingTalkMessageFacade.asyncSendBatchText(messageList);

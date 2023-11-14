@@ -11,7 +11,9 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cf.parking.dao.mapper.LotteryBlackListMapper;
+import com.cf.parking.dao.mapper.UserProfilePOMapper;
 import com.cf.parking.dao.po.LotteryBlackListPO;
+import com.cf.parking.dao.po.UserProfilePO;
 
 
 
@@ -21,6 +23,8 @@ public class LotteryBlackListService extends ServiceImpl<LotteryBlackListMapper,
 	@Resource
 	private LotteryBlackListMapper lotteryBlackListMapper;
 	
+	@Resource
+	private UserProfilePOMapper userProfilePOMapper;
 	
 	/**
 	 * 查询所有黑名单用户工号
@@ -40,9 +44,13 @@ public class LotteryBlackListService extends ServiceImpl<LotteryBlackListMapper,
 	 * @param userId
 	 * @return
 	 */
-	public LotteryBlackListPO queryBlackUserInfo(String jobNum) {
+	public LotteryBlackListPO queryBlackUserInfo(Long userId) {
+		UserProfilePO user = userProfilePOMapper.selectById(userId);
+		if (user == null) {
+			return null;
+		}
 		return lotteryBlackListMapper.selectOne(new LambdaQueryWrapper<LotteryBlackListPO>() 
-					.eq(LotteryBlackListPO::getJobNumber, jobNum)
+					.eq(LotteryBlackListPO::getJobNumber, user.getJobNumber())
 					.eq(LotteryBlackListPO::getType, 1)
 				);
 	}

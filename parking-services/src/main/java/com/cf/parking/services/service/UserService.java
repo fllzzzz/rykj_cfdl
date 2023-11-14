@@ -7,9 +7,11 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cf.parking.dao.mapper.UserPOMapper;
 import com.cf.parking.dao.po.UserPO;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -48,10 +50,19 @@ public class UserService extends ServiceImpl<UserPOMapper, UserPO>
      * @return 用户信息
      */
     public List<UserPO> getUserByUserIdList(Collection<Long> userIdList) {
+    	if(CollectionUtils.isEmpty(userIdList)) {
+    		return Collections.emptyList();
+    	}
+    	
         return list(new LambdaQueryWrapper<UserPO>().in( UserPO::getUserId, userIdList));
     }
     
     
+    /**
+     * 根据openid查询
+     * @param openIdList
+     * @return
+     */
     public List<UserPO> getUserByOpenIdList(Collection<String> openIdList) {
         return list(new LambdaQueryWrapper<UserPO>().in( UserPO::getOpenId, openIdList));
     }

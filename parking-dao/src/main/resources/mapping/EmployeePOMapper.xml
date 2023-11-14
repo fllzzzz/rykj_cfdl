@@ -14,7 +14,17 @@
     empl_no, name, dept_code, department_name, department_full_name, state, create_tm
   </sql>
   
-  
+  <select id="selectEmployeeList" parameterType="java.lang.String" resultMap="BaseResultMap">
+  		select empl_no, name, dept_code, department_name, department_full_name, state, create_tm 
+  		from employee 
+		where state = 0 
+		<if test="name != null and name != '' ">
+			and (
+				name like CONCAT ('%',#{name},'%') 
+			 OR empl_no LIKE CONCAT('%',#{name},'%')
+			)
+		</if>
+  </select>
   
   
 </mapper>

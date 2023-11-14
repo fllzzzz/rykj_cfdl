@@ -21,7 +21,7 @@ import com.cf.parking.dao.po.LotteryResultDetailPO;
 import com.cf.parking.dao.po.LotteryResultPO;
 import com.cf.parking.dao.po.ParkingLotPO;
 import com.cf.parking.dao.po.ParkingSpaceTransferRecordPO;
-import com.cf.parking.dao.po.UserPO;
+import com.cf.parking.dao.po.UserProfilePO;
 import com.cf.parking.dao.po.UserSpacePO;
 import com.cf.parking.dao.po.UserVerifyPO;
 import com.cf.parking.services.constant.ParkingConstants;
@@ -55,13 +55,13 @@ public class LotteryDealService {
 	private UserSpaceService userSpaceService;
 	
 	@Resource
-	private UserService userService;
-	
-	@Resource
 	private LotteryApplyRecordService lotteryApplyRecordService;
 	
 	@Resource
 	private UserVerifyService userVerifyService;
+	
+	@Resource
+	private UserProfileService userProfileService;
 	
 	
 	
@@ -148,7 +148,7 @@ public class LotteryDealService {
 		List<UserSpacePO> updateList = new ArrayList<>();
 		
 		//获取转让人
-		UserPO outUser = userService.selectByOpenId(outSpaceList.get(0).getJobNumber());
+		UserProfilePO outUser = userProfileService.selectUserProfileByNameAndJobNumber(null, outSpaceList.get(0).getJobNumber() );
 		//转让记录
 		List<ParkingSpaceTransferRecordPO> transferList = new ArrayList<>();
 		
@@ -390,7 +390,7 @@ public class LotteryDealService {
 		List<UserSpacePO> existSpaceList = userSpaceService.querySpaceListByJobNum(applyJobList, UserSpaceTypeEnum.LOTTERY.getState());
 		List<UserSpacePO> alloSpaceList = userSpaceService.querySpaceListByJobNum(applyJobList, UserSpaceTypeEnum.SETTING.getState());
 		//查询用户
-		List<UserPO> userList = userService.getUserByOpenIdList(applyJobList);
+		List<UserProfilePO> userList = userProfileService.getProfileListByJobNumList(jobNumList);
 		List<Long> userIdList = userList.stream().map(user -> user.getUserId()).collect(Collectors.toList());
 		//车牌列表
 		List<UserVerifyPO> vefifyList = userVerifyService.queryVerifyListByUserIdList(userIdList);

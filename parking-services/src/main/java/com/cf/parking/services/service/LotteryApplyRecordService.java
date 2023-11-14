@@ -42,15 +42,18 @@ public class LotteryApplyRecordService extends ServiceImpl<LotteryApplyRecordMap
 
 	/**
 	 * 
-	 * @param openIdList 工号
+	 * @param userIdList userid
 	 * @param result 结果
 	 */
-	public void updateResultByJobNum(List<String> openIdList, String parkCode) {
-		if (CollectionUtils.isEmpty(openIdList)) {
+	public void updateResultByUserId(List<Long> userIdList, String parkCode,Long batchId) {
+		if (CollectionUtils.isEmpty(userIdList)) {
 			return;
 		}
 		LotteryApplyRecordPO record = new LotteryApplyRecordPO().setResult("1").setParkingLotCode(parkCode);
-		applyRecordMapper.update(record, new LambdaUpdateWrapper<LotteryApplyRecordPO>().in(LotteryApplyRecordPO::getJobNumber, openIdList));
+		applyRecordMapper.update(record, 
+				new LambdaUpdateWrapper<LotteryApplyRecordPO>()
+				.eq(LotteryApplyRecordPO::getBatchId, batchId)
+				.in(LotteryApplyRecordPO::getUserId, userIdList));
 	}
 
 

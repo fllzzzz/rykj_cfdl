@@ -8,7 +8,6 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -81,12 +80,11 @@ public class EmployeeService extends ServiceImpl<EmployeePOMapper, EmployeePO> i
 
 	/**
 	 * 查询所有状态正常的员工
+	 * @param req 
 	 * @return
 	 */
-	public List<EmployeePO> queryAllEmployee() {
-		return employeePOMapper.selectList(new LambdaQueryWrapper<EmployeePO>()
-				.eq(EmployeePO::getState, 0)
-			);
+	public List<EmployeePO> queryAllEmployee(String name) {
+		return employeePOMapper.selectEmployeeList(name);
 	}
 	
 }

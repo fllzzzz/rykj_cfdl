@@ -323,9 +323,15 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
         
         //1.1查询所有用户,不是正式环境就只发给固定的人
         List<String> jobNumList = new ArrayList<>();
+        jobNumList.add("CFDL09860");//周峰
+    	jobNumList.add("013622186224083959");//张华健
+    	jobNumList.add("28492530271177557");//郭欢
+    	List<String> leaderList = lotteryBlackListService.queryAllLeader();
+    	jobNumList.removeAll(leaderList);
+        /**
         log.info("env:{}",env);
         if (PRODUCE.equals(env)) {
-        	List<EmployeePO> userProfilePOS = employeeService.queryAllEmployee();
+        	List<EmployeePO> userProfilePOS = employeeService.queryAllEmployee(null);
         	jobNumList = userProfilePOS.stream().map(EmployeePO::getEmplNo).collect(Collectors.toList());
         	List<String> leaderList = lotteryBlackListService.queryAllLeader();
         	jobNumList.removeAll(leaderList);
@@ -334,6 +340,8 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
         	jobNumList.add("013622186224083959");//张华健
         	jobNumList.add("28492530271177557");//郭欢
         }
+        
+        */
         
         jobNumList.removeAll(blackList);
         if (CollectionUtils.isEmpty(jobNumList)){
