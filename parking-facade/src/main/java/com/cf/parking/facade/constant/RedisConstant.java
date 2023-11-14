@@ -7,13 +7,13 @@ package com.cf.parking.facade.constant;
 public interface RedisConstant {
 
     //用户登录锁
-    String USER_LOGIN_LOCK_KEY = "visitor:user:login:lock:";
+    String USER_LOGIN_LOCK_KEY = "parking:user:login:lock:";
     int USER_LOGIN_LOCK_KEY_WAIT = 0;
     int USER_LOGIN_LOCK_KEY_EXPIRE = 5;
 
 
     //定时任务-更新停车状态锁
-    String JOB_SYCNDATA_LOCK_KEY = "visitor:job:sycnData:lock";
+    String JOB_SYCNDATA_LOCK_KEY = "parking:job:sycnData:lock";
     int JOB_SYCNDATA_LOCK_KEY_WAIT = 0;
     int JOB_SYCNDATA_LOCK_KEY_EXPIRE = 5;
 

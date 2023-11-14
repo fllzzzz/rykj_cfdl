@@ -268,7 +268,7 @@ public class UserVerifyController extends BaseController {
 
         //2.申请资格校验
         //2.1是否为黑名单判断
-        LotteryBlackListPO lotteryBlackListPO = lotteryBlackListService.queryBlackUserInfo(userId);
+        LotteryBlackListPO lotteryBlackListPO = lotteryBlackListService.queryBlackUserInfo(user.getOpenId());
         if (null != lotteryBlackListPO){
             return Result.buildErrorResult("暂无权限，请联系管理员！");
         }
@@ -325,7 +325,7 @@ public class UserVerifyController extends BaseController {
         Long userId = user.getUserId();
 
         //2.1是否为黑名单判断
-        LotteryBlackListPO lotteryBlackListPO = lotteryBlackListService.queryBlackUserInfo(userId);
+        LotteryBlackListPO lotteryBlackListPO = lotteryBlackListService.queryBlackUserInfo(user.getOpenId());
         if (null != lotteryBlackListPO){
             return Result.buildErrorResult("暂无权限，请联系管理员！");
         }

@@ -40,9 +40,9 @@ public class LotteryBlackListService extends ServiceImpl<LotteryBlackListMapper,
 	 * @param userId
 	 * @return
 	 */
-	public LotteryBlackListPO queryBlackUserInfo(Long userId) {
+	public LotteryBlackListPO queryBlackUserInfo(String jobNum) {
 		return lotteryBlackListMapper.selectOne(new LambdaQueryWrapper<LotteryBlackListPO>() 
-					.eq(LotteryBlackListPO::getUserId, userId)
+					.eq(LotteryBlackListPO::getJobNumber, jobNum)
 					.eq(LotteryBlackListPO::getType, 1)
 				);
 	}

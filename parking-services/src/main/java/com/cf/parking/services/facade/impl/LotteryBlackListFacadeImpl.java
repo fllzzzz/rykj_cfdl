@@ -75,13 +75,13 @@ public class LotteryBlackListFacadeImpl implements LotteryBlackListFacade
     public Integer add(LotteryBlackListOptDTO dto) {
         //1.查询userId
         UserProfilePO userProfilePO = userProfileService.selectUserProfileByNameAndJobNumber(null,dto.getCode());
-        AssertUtil.checkNull(userProfilePO, "该用户未登录过钉钉应用，获取不到用户信息，无法加入");
+       // AssertUtil.checkNull(userProfilePO, "该用户未登录过钉钉应用，获取不到用户信息，无法加入");
         //2.设置对象
         LotteryBlackListPO po = new LotteryBlackListPO();
         BeanUtils.copyProperties(dto,po);
         po.setId(idWorker.nextId());
         po.setJobNumber(dto.getCode());
-        po.setUserId(userProfilePO.getUserId());
+        po.setUserId(userProfilePO == null ? 0l : userProfilePO.getUserId());
         po.setCreateTm(new Date());
         po.setUpdateTm(new Date());
         try{

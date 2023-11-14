@@ -86,7 +86,7 @@ public class LotteryApplyRecordController extends BaseController
         AssertUtil.checkNull(param.getBatchId(),"请选择摇号报名批次！");
 
         //2.是否在摇号黑名单内
-        if (!ObjectUtils.isEmpty(lotteryBlackListService.queryBlackUserInfo(userId))){
+        if (!ObjectUtils.isEmpty(lotteryBlackListService.queryBlackUserInfo(user.getOpenId()))){
             return Result.buildErrorResult("暂无权限，请联系管理员！");
         }
 

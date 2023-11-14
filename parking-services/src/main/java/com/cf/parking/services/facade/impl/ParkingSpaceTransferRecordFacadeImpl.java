@@ -85,7 +85,7 @@ public class ParkingSpaceTransferRecordFacadeImpl implements ParkingSpaceTransfe
 		List<UserVerifyPO> verifyList = userVerifyService.queryVerifyListByUserIdList(Arrays.asList(user.getUserId()));
 		AssertUtil.checkTrue(!CollectionUtils.isEmpty(verifyList), "受让人未绑定车辆,无法转赠");
 		
-		LotteryBlackListPO black =  lotteryBlackListService.queryBlackUserInfo(user.getUserId());
+		LotteryBlackListPO black =  lotteryBlackListService.queryBlackUserInfo(user.getOpenId());
 		AssertUtil.checkTrue(!(black != null), "受让人为黑名单用户,无法转赠");
 		//执行转让
 		lotteryDealService.transfer(spaceList,verifyList,inJobNum);
