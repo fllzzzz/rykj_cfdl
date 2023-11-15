@@ -52,6 +52,7 @@ public class LotteryBlackListService extends ServiceImpl<LotteryBlackListMapper,
 		return lotteryBlackListMapper.selectOne(new LambdaQueryWrapper<LotteryBlackListPO>() 
 					.eq(LotteryBlackListPO::getJobNumber, user.getJobNumber())
 					.eq(LotteryBlackListPO::getType, 1)
+					.last(" limit 1 ")
 				);
 	}
 
