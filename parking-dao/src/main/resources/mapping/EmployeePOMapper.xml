@@ -19,10 +19,7 @@
   		from employee 
 		where state = 0 
 		<if test="name != null and name != '' ">
-			and (
-				name like CONCAT ('%',#{name},'%') 
-			 OR empl_no LIKE CONCAT('%',#{name},'%')
-			)
+			and name like CONCAT ('%',#{name},'%')
 		</if>
   </select>
   
