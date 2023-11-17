@@ -127,7 +127,8 @@ public class LotteryRuleAssignFacadeImpl implements LotteryRuleAssignFacade
         if (RuleAssignTypeEnum.DEPARMENT.getState().equals(dto.getType())){
             nameArr = codeArr.stream().map(code -> departmentService.getDepartmentNameByDeptCode(code)).collect(Collectors.toList());
         }else {
-            nameArr = codeArr.stream().map(code -> userProfileService.selectUserProfileByNameAndJobNumber(null,code).getName()).collect(Collectors.toList());
+        	List<UserProfilePO> profileList = userProfileService.getProfileListByJobNumList(codeArr);
+            nameArr = profileList.stream().map(profile -> profile.getName()).collect(Collectors.toList());
         }
         po.setName(String.join(",", nameArr));
     }
