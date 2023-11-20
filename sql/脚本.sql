@@ -266,3 +266,4 @@ update parking_init set region =  '组装车间1F(装配2期5F停车场)' where 
 update parking_lot  set region =  '组装车间1F(装配2期5F停车场)' where  region_code = '2457999fe2914251976fd333d2816fb2';
 
 ALTER TABLE lottery_black_list DROP index udx_user_id;
+alter table lottery_black_list add unique index job_num_idx(job_number,type) ;

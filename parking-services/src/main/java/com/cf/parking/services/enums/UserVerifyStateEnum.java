@@ -1,7 +1,6 @@
 package com.cf.parking.services.enums;
 
 
-import io.swagger.models.auth.In;
 
 /**
  * 车辆审核状态

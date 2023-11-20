@@ -7,17 +7,21 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cf.parking.dao.mapper.UserVerifyMapper;
 import com.cf.parking.dao.po.UserInfoPO;
+import com.cf.parking.dao.po.UserPO;
 import com.cf.parking.dao.po.UserProfilePO;
 import com.cf.parking.dao.po.UserVerifyPO;
 import com.cf.parking.facade.bo.UserProfileBO;
 import com.cf.parking.facade.bo.UserVerifyBO;
+import com.cf.parking.facade.dto.TextMessageDTO;
 import com.cf.parking.facade.dto.UserVerifyDTO;
 import com.cf.parking.facade.dto.UserVerifyOptDTO;
+import com.cf.parking.facade.facade.DingTalkMessageFacade;
 import com.cf.parking.facade.facade.UserVerifyFacade;
 import com.cf.parking.services.constant.ParkingConstants;
 import com.cf.parking.services.enums.PictureInfoEnum;
 import com.cf.parking.services.enums.UserVerifyStateEnum;
 import com.cf.parking.services.service.UserProfileService;
+import com.cf.parking.services.service.UserService;
 import com.cf.parking.services.utils.PageUtils;
 import com.cf.support.bean.IdWorker;
 import com.cf.support.exception.BusinessException;
@@ -37,6 +41,8 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
@@ -60,6 +66,12 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
 
     @Resource
     private UserProfileService userProfileService;
+    
+    @Resource
+    private DingTalkMessageFacade dingTalkMessageFacade;
+    
+    @Resource
+    private UserService userService;
 
     private static HashMap<Integer,String> stateMap = new HashMap<>();
 
@@ -166,8 +178,10 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
             int result = mapper.update(userVerifyPO,updateWrapper);
             log.info("车辆审核成功，审核结果：{}，审核意见：{}，审核对象：{}", dto.getState(),dto.getReason(),userVerifyPO);
             //2.修改用户默认停车场为"装配楼2期5F停车场"
-            userProfileService.setDefaultParkingLotByUserId(userVerifyPO.getUserId());
-
+            if (dto.getState() == UserVerifyStateEnum.SUCCESS.getState().intValue()) {
+            	userProfileService.setDefaultParkingLotByUserId(userVerifyPO.getUserId());
+            }
+            sendNoticeMessage(Arrays.asList(userVerifyPO.getUserId()) ,dto.getState());
             return result;
         }catch (Exception e){
             log.error("车辆审核失败：审核对象：{}，报错原因{}",userVerifyPO,e);
@@ -175,6 +189,7 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
         }
     }
 
+    
     /**
      * 批量审核车辆
      * @param dto
@@ -196,6 +211,7 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
             List<Long> changeUserIds = userProfilePOList.stream().filter(po -> StringUtils.isBlank(po.getParkingLotRegion())).map(UserProfilePO::getUserId).collect(Collectors.toList());
             userProfileService.batchSetDefaultParkingLotByUserIds(changeUserIds,ParkingConstants.DEFAULT_PARKINGLOT);
         }
+        sendNoticeMessage(userIds ,dto.getState());
     }
 
     /**
@@ -404,4 +420,23 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
         return CollectionUtils.isNotEmpty(poList);
     }
 
+    
+    /**
+     * 发送审核通知
+     * @param userId
+     * @param state
+     */
+    private void sendNoticeMessage(List<Long> userIds,Integer state) {
+    	List<UserPO> userList = userService.getUserByUserIdList(userIds); 
+    	if (CollectionUtils.isEmpty(userList)) {
+    		return;
+    	}
+    	List<String> openIdList = userList.stream().map(user -> user.getOpenId()).collect(Collectors.toList());
+    	List<TextMessageDTO> messageDTOList = new ArrayList<>();
+    	TextMessageDTO message = new TextMessageDTO()
+    			.setOpenIdList(openIdList)
+    			.setMessage("您的车辆审核结果已出，请到钉钉中的春风顺风车应用-->摇号-->车位管理中查看");
+    	messageDTOList.add(message);
+        dingTalkMessageFacade.asyncSendBatchText(messageDTOList);
+    }
 }
