@@ -120,7 +120,6 @@ public class UserVerifyController extends BaseController {
     @PostMapping("/batchAudit")
     public Result batchAudit(@RequestBody UserVerifyOptReq param)
     {
-    	log.info("批量审核车辆:{}", JSON.toJSONString(param));
         List<Long> ids = param.getIds();
         AssertUtil.checkNull(ids,"请选择要审核的记录！");
 
@@ -139,7 +138,6 @@ public class UserVerifyController extends BaseController {
     @PostMapping("/batchExport")
     public void batchExport(@RequestBody UserVerifyOptReq param, HttpServletResponse response)
     {
-        log.info("车辆审核信息批量导出:{}", JSON.toJSONString(param));
         //1.参数转换
         UserVerifyDTO dto = new UserVerifyDTO();
         BeanUtils.copyProperties(param,dto);
@@ -316,7 +314,6 @@ public class UserVerifyController extends BaseController {
     @PostMapping("/update")
     public Result update(@RequestBody UserVerifyOptReq param)
     {
-    	log.info("小程序用户修改车辆信息:{}", JSON.toJSONString(param));
         //1.获取当前登录用户的信息
         UserSessionDTO user = getUserSessionDTO();
         Long userId = user.getUserId();

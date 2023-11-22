@@ -173,7 +173,6 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
                     .set(UserVerifyPO::getState, dto.getState())
                     .set(UserVerifyPO::getReason, dto.getReason());
             int result = mapper.update(userVerifyPO,updateWrapper);
-            log.info("车辆审核成功，审核结果：{}，审核意见：{}，审核对象：{}", dto.getState(),dto.getReason(),userVerifyPO);
             //2.修改用户默认停车场为"装配楼2期5F停车场"
             if (dto.getState() == UserVerifyStateEnum.SUCCESS.getState().intValue()) {
             	userProfileService.setDefaultParkingLotByUserId(userVerifyPO.getUserId());
@@ -181,7 +180,7 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
             sendNoticeMessage(Arrays.asList(userVerifyPO.getUserId()) ,dto.getState());
             return result;
         }catch (Exception e){
-            log.error("车辆审核失败：审核对象：{}，报错原因{}",userVerifyPO,e);
+            log.error("车辆审核失败：报错原因{}",e);
             return 0;
         }
     }
@@ -247,10 +246,9 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
         userVerifyPO.setUpdateTm(new Date());
         try{
             int result = mapper.updateById(userVerifyPO);
-            log.info("修改个人车辆审核信息成功  ——  {}",userVerifyPO);
             return result;
         }catch (Exception e){
-            log.error("修改个人车辆审核信息失败：{}  ——  {}",e,userVerifyPO);
+            log.error("修改个人车辆审核信息失败：{}",e);
             return 0;
         }
     }
