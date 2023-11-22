@@ -129,11 +129,9 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
      */
     @Override
     public Integer add(UserVerifyOptDTO dto) {
-    	log.info("add car params :{}",JSON.toJSONString(dto));
         //1.新增时车牌唯一性判断
         List<UserVerifyPO> poList = mapper.selectList(new LambdaQueryWrapper<UserVerifyPO>()
                 .eq(UserVerifyPO::getPlateNo, dto.getPlateNo()));
-        log.info("plate exist data：{}",JSON.toJSONString(poList));
         if (CollectionUtils.isNotEmpty(poList)){
             throw new BusinessException("车牌号已存在！");
         }
@@ -151,7 +149,6 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
         userVerifyPO.setCreateTm(new Date());
         userVerifyPO.setUpdateTm(new Date());
         try{
-        	log.info("insert user palte:{}",JSON.toJSONString(userVerifyPO));
             int result = mapper.insert(userVerifyPO);
             return result;
         }catch (Exception e){

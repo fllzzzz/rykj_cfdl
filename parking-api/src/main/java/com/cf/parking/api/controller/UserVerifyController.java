@@ -105,7 +105,6 @@ public class UserVerifyController extends BaseController {
     @PostMapping("/audit")
     public Result audit(@RequestBody UserVerifyOptReq param)
     {
-    	log.info("审核车辆:{}", JSON.toJSONString(param));
         UserVerifyOptDTO dto = new UserVerifyOptDTO();
         BeanUtils.copyProperties(param,dto);
         Integer result = userVerifyFacade.audit(dto);
@@ -241,7 +240,6 @@ public class UserVerifyController extends BaseController {
             return Result.buildErrorResult("图片转换失败，请重试！");
         }
 
-        log.info("转换后的base64：{}",base64ImgStr);
         return Result.buildSuccessResult(base64ImgStr);
     }
 
@@ -261,7 +259,6 @@ public class UserVerifyController extends BaseController {
     @PostMapping("/add")
     public Result add(@RequestBody UserVerifyOptReq param)
     {
-    	log.info("小程序用户新增车辆信息:{}", JSON.toJSONString(param));
         //1.获取当前登录用户的信息
         UserSessionDTO user = getUserSessionDTO();
         Long userId = user.getUserId();
