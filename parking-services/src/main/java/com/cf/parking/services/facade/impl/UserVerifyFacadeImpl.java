@@ -435,7 +435,7 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
     	List<TextMessageDTO> messageDTOList = new ArrayList<>();
     	TextMessageDTO message = new TextMessageDTO()
     			.setOpenIdList(openIdList)
-    			.setMessage("您的车辆审核结果已出，请到钉钉中的春风顺风车应用-->摇号-->车位管理中查看");
+    			.setMessage("您的车辆审核结果已出，请到钉钉中的停车助手应用-->摇号-->车位管理中查看");
     	messageDTOList.add(message);
         dingTalkMessageFacade.asyncSendBatchText(messageDTOList);
     }

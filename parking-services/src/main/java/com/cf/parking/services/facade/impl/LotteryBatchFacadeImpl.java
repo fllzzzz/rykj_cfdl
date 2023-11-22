@@ -107,7 +107,7 @@ public class LotteryBatchFacadeImpl implements LotteryBatchFacade
     
     private static final String PRODUCE = "prod";
     private static final int  COUNT = 1000 ;
-    private final String  message = "%s期摇号报名时间已发布,请到钉钉中的春风顺风车应用-->摇号-->车位摇号中查看";
+    private final String  message = "%s期摇号报名时间已发布,请到钉钉中的停车助手应用-->摇号-->车位摇号中查看";
     
     
     

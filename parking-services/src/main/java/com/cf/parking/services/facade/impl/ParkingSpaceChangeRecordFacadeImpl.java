@@ -234,7 +234,7 @@ public class ParkingSpaceChangeRecordFacadeImpl implements ParkingSpaceChangeRec
 		List<TextMessageDTO> messageDTOList = new ArrayList<>();
 		TextMessageDTO message = new TextMessageDTO();
 		message.setOpenIdList(Arrays.asList(userPO.getOpenId()));
-		message.setMessage("您有一条车位交换申请,请到钉钉中的春风顺风车应用-->摇号-->车位交换中查看");
+		message.setMessage("您有一条车位交换申请,请到钉钉中的停车助手应用-->摇号-->车位交换中查看");
 		messageDTOList.add(message);
 		dingTalkMessageFacade.asyncSendBatchText(messageDTOList);
 		
