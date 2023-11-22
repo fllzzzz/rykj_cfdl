@@ -102,15 +102,10 @@ public class LotteryRuleAssignFacadeImpl implements LotteryRuleAssignFacade
         //2.属性设置
         propertySet(dto, po);
 
-        try{
-            //3.新增
-            int result = mapper.insert(po);
-            log.info("停车场分配新增成功  ——  {}",po);
-            return result;
-        }catch (Exception e){
-            log.error("停车场分配新增失败：{}，失败原因：{}",po,e);
-            return 0;
-        }
+        //3.新增
+        int result = mapper.insert(po);
+        log.info("停车场分配新增成功  ——  {}",po);
+        return result;
     }
 
     private void propertySet(LotteryRuleAssignOptDTO dto, LotteryRuleAssignPO po) {

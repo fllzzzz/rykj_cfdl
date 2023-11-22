@@ -142,14 +142,9 @@ public class LotteryRuleRoundFacadeImpl implements LotteryRuleRoundFacade
         po.setId(idWorker.nextId());
         po.setCreateTm(new Date());
         po.setUpdateTm(new Date());
-        try{
-            int result = mapper.insert(po);
-            log.info("添加摇号规则-轮数成功  ——  {}",po);
-            return result;
-        }catch (Exception e){
-            log.error("添加摇号规则-轮数失败：{}，失败原因：{}",po,e);
-            return 0;
-        }
+        int result = mapper.insert(po);
+        log.info("添加摇号规则-轮数成功  ——  {}",po);
+        return result;
     }
 
     /**

@@ -148,13 +148,8 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
         userVerifyPO.setState(UserVerifyStateEnum.UNAUDIT.getState());
         userVerifyPO.setCreateTm(new Date());
         userVerifyPO.setUpdateTm(new Date());
-        try{
-            int result = mapper.insert(userVerifyPO);
-            return result;
-        }catch (Exception e){
-            log.error("新增车辆审核失败，失败原因：{}",JSON.toJSONString(e));
-            return 0;
-        }
+        int result = mapper.insert(userVerifyPO);
+        return result;
     }
 
     /**
@@ -166,7 +161,6 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
     @Override
     public Integer audit(UserVerifyOptDTO dto) {
         UserVerifyPO userVerifyPO = mapper.selectById(dto.getId());
-        try{
             //1.审核
             LambdaUpdateWrapper<UserVerifyPO> updateWrapper = new LambdaUpdateWrapper<UserVerifyPO>()
                     .eq(UserVerifyPO::getId, dto.getId())
@@ -179,10 +173,6 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
             }
             sendNoticeMessage(Arrays.asList(userVerifyPO.getUserId()) ,dto.getState());
             return result;
-        }catch (Exception e){
-            log.error("车辆审核失败：报错原因{}",e);
-            return 0;
-        }
     }
 
     
@@ -244,13 +234,8 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
         userVerifyPO.setState(UserVerifyStateEnum.UNAUDIT.getState());
         userVerifyPO.setReason("");
         userVerifyPO.setUpdateTm(new Date());
-        try{
-            int result = mapper.updateById(userVerifyPO);
-            return result;
-        }catch (Exception e){
-            log.error("修改个人车辆审核信息失败：{}",e);
-            return 0;
-        }
+        int result = mapper.updateById(userVerifyPO);
+        return result;
     }
 
     /**

@@ -220,24 +220,12 @@ public class UserVerifyController extends BaseController {
         }
 
         //2.图片压缩
-        byte[] compressedBytes;
-        try {
-            compressedBytes = imageCompress(image);
-            log.info("压缩后文件大小：{}kb",compressedBytes.length/1024);
-        } catch (IOException e) {
-            log.error("图片压缩失败：{}",e);
-            return Result.buildErrorResult("图片压缩失败,请重试！");
-        }
+        
+       byte[] compressedBytes = imageCompress(image);
+       log.info("压缩后文件大小：{}kb",compressedBytes.length/1024);
 
         //2.图片转为base64
-        String base64ImgStr = null;
-        try {
-            base64ImgStr = getBase64ImgStr(compressedBytes);
-        } catch (IOException e) {
-            log.error("图片转base64失败：{}",e);
-            return Result.buildErrorResult("图片转换失败，请重试！");
-        }
-
+        String  base64ImgStr = getBase64ImgStr(compressedBytes);
         return Result.buildSuccessResult(base64ImgStr);
     }
 
