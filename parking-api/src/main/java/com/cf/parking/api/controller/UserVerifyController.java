@@ -150,6 +150,7 @@ public class UserVerifyController extends BaseController {
         if (CollectionUtils.isEmpty(exportUserVerifyRsps)){
             ExcelUtiles.exportExcel(exportUserVerifyRsps, "车辆审核记录", "车辆审核记录", ExportUserVerifyRsp.class, "车辆审核记录.xlsx", response);
         }else {
+        	exportUserVerifyRsps.clear();
             userVerifyFacade.batchExport(boList,response);
         }
     }

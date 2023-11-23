@@ -275,11 +275,11 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
         //1.设置title
         Row titleRow = sheet.createRow(0);
         setTitle(titleRow);
-
+        UserVerifyBO bo = new UserVerifyBO();
         //2.对于每一行，设置内容和图片
         for (int i = 0; i < boList.size(); i++) {
             //2.1设置内容
-            UserVerifyBO bo = boList.get(i);
+            bo = boList.get(i);
             Row dataRow = sheet.createRow(i + 1);
             dataRow.createCell(0).setCellValue(DateFormatUtils.format(bo.getCreateTm(),"yyyy-MM-dd"));
             dataRow.createCell(1).setCellValue(bo.getUserName());
@@ -334,7 +334,8 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
                 .like(!ObjectUtils.isEmpty(dto.getPlateNo()),UserVerifyPO::getPlateNo,dto.getPlateNo())
                 .le( !ObjectUtils.isEmpty(dto.getEndDate()) , UserVerifyPO::getCreateTm,null == dto.getEndDate() ? null : DateUtil.endOfDay(dto.getEndDate()) )
                 .ge(!ObjectUtils.isEmpty(dto.getStartDate()), UserVerifyPO::getCreateTm, dto.getStartDate())
-                .orderByDesc(UserVerifyPO::getCreateTm);
+                .orderByAsc(UserVerifyPO::getCreateTm)
+                .last(" limit 100 ");
         List<UserVerifyPO> poList = mapper.selectList(queryWrapper);
         return BeanConvertorUtils.copyList(poList,UserVerifyBO.class);
     }
