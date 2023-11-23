@@ -117,7 +117,8 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
     public UserVerifyBO getUserVerify(UserVerifyDTO dto) {
         UserVerifyPO userVerifyPO = mapper.selectOne(new LambdaQueryWrapper<UserVerifyPO>()
                                                         .eq(UserVerifyPO::getUserId,dto.getUserId())
-                                                        .eq(UserVerifyPO::getPlateNo,dto.getPlateNo()));
+                                                        .eq(UserVerifyPO::getPlateNo,dto.getPlateNo())
+                                                        .last(" limit 1 "));
 
         return BeanConvertorUtils.map(userVerifyPO, UserVerifyBO.class);
     }
@@ -222,8 +223,11 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
         //1.修改时判断车牌唯一性
         List<UserVerifyPO> poList = mapper.selectList(new LambdaQueryWrapper<UserVerifyPO>()
                 .eq(UserVerifyPO::getPlateNo, dto.getPlateNo())
-                .eq(UserVerifyPO::getUserId, dto.getUserId()));
+                );
         if (CollectionUtils.isNotEmpty(poList)){
+        	if (poList.size() > 1) {
+        		 throw new BusinessException("车牌号已存在！");
+        	}
             if (!poList.get(0).getId().equals(dto.getId())){
                 throw new BusinessException("车牌号已存在！");
             }
