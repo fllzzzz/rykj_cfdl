@@ -39,6 +39,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -144,13 +145,12 @@ public class UserVerifyController extends BaseController {
 
         //2.查询符合条件的要导出的记录
         List<UserVerifyBO> boList = userVerifyFacade.getAllUserVerifyList(dto);
-        List<ExportUserVerifyRsp> exportUserVerifyRsps = BeanConvertorUtils.copyList(boList, ExportUserVerifyRsp.class);
 
         //3.对记录内的base64字符串转换成图片并进行导出
-        if (CollectionUtils.isEmpty(exportUserVerifyRsps)){
+        if (CollectionUtils.isEmpty(boList)){
+        	List<ExportUserVerifyRsp> exportUserVerifyRsps = Collections.emptyList();
             ExcelUtiles.exportExcel(exportUserVerifyRsps, "车辆审核记录", "车辆审核记录", ExportUserVerifyRsp.class, "车辆审核记录.xlsx", response);
         }else {
-        	exportUserVerifyRsps.clear();
             userVerifyFacade.batchExport(boList,response);
         }
     }

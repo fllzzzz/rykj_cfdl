@@ -297,7 +297,6 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
             if (StringUtils.isNotBlank(bo.getDrivingLicenseImg())){
                 importPic2Excel(workbook, sheet, i+1,5, bo.getDrivingLicenseImg());
             }
-
         }
 
         try {
@@ -335,9 +334,11 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
                 .le( !ObjectUtils.isEmpty(dto.getEndDate()) , UserVerifyPO::getCreateTm,null == dto.getEndDate() ? null : DateUtil.endOfDay(dto.getEndDate()) )
                 .ge(!ObjectUtils.isEmpty(dto.getStartDate()), UserVerifyPO::getCreateTm, dto.getStartDate())
                 .orderByAsc(UserVerifyPO::getCreateTm)
-                .last(" limit 100 ");
+                .last(" limit 50 ");
         List<UserVerifyPO> poList = mapper.selectList(queryWrapper);
-        return BeanConvertorUtils.copyList(poList,UserVerifyBO.class);
+        List<UserVerifyBO> resList =  BeanConvertorUtils.copyList(poList,UserVerifyBO.class);
+        poList.clear();
+        return resList;
     }
 
     private void setTitle(Row titleRow) {
