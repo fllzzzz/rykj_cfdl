@@ -177,11 +177,14 @@ public class HikvisionService implements InitializingBean {
      * @return
      */
     public Result getCrossRecords(String apiPath, Long pageNo, Long pageSize) {
-        initPersonName();
+//        initPersonName();
         Result apiResult = getApiResult(apiPath, pageNo, pageSize);
 
         JSONObject result = JSONObject.parseObject(apiResult.getData().toString());
         JSONObject data = result.getJSONObject("data");
+        if(data.get("list") == null){
+            return Result.buildSuccessResult();
+        }
         JSONArray list = data.getJSONArray("list");
         for (int i = 0; i < list.size(); i++) {
             JSONObject eachObj = list.getJSONObject(i);

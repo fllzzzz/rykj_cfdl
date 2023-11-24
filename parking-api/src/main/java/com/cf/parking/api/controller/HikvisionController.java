@@ -54,7 +54,8 @@ public class HikvisionController {
     @PostMapping("/getCrossRecords")
     public Result getCrossRecords(@RequestBody HikvisionReq param) {
         param.setApiPath("/api/pms/v1/crossRecords/page");
-        return hikvisionService.getCrossRecords(param.getApiPath(), param.getPageNo(), param.getPageSize());
+        //暂时不用
+        return Result.buildSuccessResult();//hikvisionService.getCrossRecords(param.getApiPath(), param.getPageNo(), param.getPageSize());
     }
 
     @ApiOperation(value = "获取场内车停车信息接口", notes = "获取场内车停车信息接口")
