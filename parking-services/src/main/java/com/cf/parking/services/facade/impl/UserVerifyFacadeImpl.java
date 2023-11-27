@@ -425,4 +425,12 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
     	messageDTOList.add(message);
         dingTalkMessageFacade.asyncSendBatchText(messageDTOList);
     }
+
+	@Override
+	public long queryAuditedCarCount(Long userId) {
+		return mapper.selectCount(new LambdaQueryWrapper<UserVerifyPO>()
+					.eq(UserVerifyPO::getUserId, userId)
+					.eq(UserVerifyPO::getState, UserVerifyStateEnum.SUCCESS.getState())
+				);
+	}
 }

@@ -5,8 +5,6 @@ import com.cf.parking.facade.bo.UserVerifyBO;
 import com.cf.parking.facade.dto.UserVerifyDTO;
 import com.cf.parking.facade.dto.UserVerifyOptDTO;
 import com.cf.support.result.PageResponse;
-import com.cf.support.result.Result;
-
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
@@ -108,4 +106,11 @@ public interface UserVerifyFacade {
      * @return
      */
     Boolean judgePlateNoRepeat(String plateNo);
+
+	/**
+	 * 根据userid查询审核通过的车辆数量
+	 * @param userId
+	 * @return
+	 */
+	long queryAuditedCarCount(Long userId);
 }

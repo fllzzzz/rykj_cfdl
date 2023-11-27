@@ -30,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -363,4 +364,21 @@ public class UserVerifyController extends BaseController {
         return Result.buildSuccessResult(BeanConvertorUtils.map(bo,UserProfileRsp.class));
     }
 
+    
+    /**
+     * 判断用户是否有审核通过的车辆
+     */
+    @UserAuthentication
+    @ApiOperation(value = "判断用户是否有审核通过的车辆")
+    @GetMapping("/checkAuditCar")
+    public Result<Boolean> checkAuditCar()
+    {
+    	//1.获取当前登录用户的信息
+        UserSessionDTO user = getUserSessionDTO();
+        Long userId = user.getUserId();
+        //2.查询
+        long num = userVerifyFacade.queryAuditedCarCount(userId);
+        return Result.buildSuccessResult(num > 0);
+    }
+    
 }
