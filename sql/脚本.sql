@@ -267,3 +267,6 @@ update parking_lot  set region =  '组装车间1F(装配2期5F停车场)' where 
 
 ALTER TABLE lottery_black_list DROP index udx_user_id;
 alter table lottery_black_list add unique index job_num_idx(job_number,type) ;
+
+ alter table  lottery_rule_assign  modify column `code` LONGTEXT DEFAULT null COMMENT '部门编码/人员工号（可多选）';
+ alter table  lottery_rule_assign  modify column `name` LONGTEXT DEFAULT null COMMENT '名称（部门或者人员名称）';

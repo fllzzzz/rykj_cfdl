@@ -101,9 +101,10 @@ public class LotteryRuleAssignService extends ServiceImpl<LotteryRuleAssignMappe
 		//取两个集合的交集做摇号人员
 		applyList = applyList.stream().filter(apply -> ruleJobList.contains(apply.getJobNumber())).collect(Collectors.toList()); 
 		//获取前几轮已配置摇号人员工号
-		List<String> excludeList = queryRuleAssignList(batchId,roundId);
-		log.info("本轮：{}根据配置排除摇号人员：{}",roundId,JSON.toJSONString(ruleJobList));
-		applyList = applyList.stream().filter(apply -> !excludeList.contains(apply.getJobNumber())).collect(Collectors.toList()); 
+		//按照周峰要求，去除掉每人只能参加一次的限制，改由按照配置人员来摇号
+		//List<String> excludeList = queryRuleAssignList(batchId,roundId);
+		//log.info("本轮：{}根据配置排除摇号人员：{}",roundId,JSON.toJSONString(excludeList));
+		//applyList = applyList.stream().filter(apply -> !excludeList.contains(apply.getJobNumber())).collect(Collectors.toList()); 
 		return applyList;
 	}
 
@@ -157,7 +158,7 @@ public class LotteryRuleAssignService extends ServiceImpl<LotteryRuleAssignMappe
 		//获取部门下的人员
 		ruleJobList.addAll(employeeService.queryEmployeeListByDept(deptCodeList));
 		deptCodeList.clear();
-		log.info("根据部门人员规则{}获取对应的人员工号：{}",JSON.toJSONString(ruleJobList),JSON.toJSONString(ruleJobList));
+		log.info("根据部门人员规则获取对应的人员工号：{}",JSON.toJSONString(ruleJobList));
 		return ruleJobList;
 	}
 
