@@ -32,6 +32,7 @@ import com.cf.parking.services.integration.ParkInvokeService;
 import com.cf.support.bean.IdWorker;
 import com.cf.support.result.PageResponse;
 import com.cf.support.utils.BeanConvertorUtils;
+import com.cf.support.utils.DingAlarmUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -460,9 +461,11 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 		if(resp != null && ParkingRemoteCodeEnum.RESP_SUCCESS.getState().equals(resp.getResCode()) && resp.getResult() != null &&
 				ParkingRemoteCodeEnum.BUS_CODE.getState().equals(resp.getResult().getCode())) {
 			stateSpace.setState(UserSpaceStateEnum.SUCCESS.getState());
+			stateSpace.setFailReason("");
 		} else {
 			stateSpace.setState(UserSpaceStateEnum.FAIL.getState());
 			stateSpace.setFailReason(resp == null ? "系统异常" : (resp.getResult() == null ? resp.getResMsg() : resp.getResult().getMessage()));
+			DingAlarmUtils.alarmException("调用添加车辆接口失败:"+ JSON.toJSONString(resp));
 		}
 		stateSpace.setUserSpaceId(space.getUserSpaceId());
 		stateSpace.setRetryNum((space.getRetryNum() == null ? 0 : space.getRetryNum()) + 1);
@@ -470,6 +473,8 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 		userSpaceMapper.updateById(stateSpace);
 	}
 
+	
+	
 	/**
 	 * 根据工号查询车位并根据车库和有效期进行分组
 	 * @param jobNum 工号
