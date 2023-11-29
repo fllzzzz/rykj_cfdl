@@ -342,8 +342,8 @@ public class LotteryDealService {
 			parkingSpaceTransferRecordService.saveBatch(transferList);
 		}
 		
-		//把转让人的车位有效期更改为今天
-		userSpaceService.updateEndDate(outSpaceList.get(0).getJobNumber(),new Date());
+		//把转让人的车位有效期更改为当前日期和车位生效日的较大者(就是当月转让下月生效的数据)
+		userSpaceService.updateEndDate(outSpaceList.get(0).getJobNumber(),new Date().compareTo(outSpaceList.get(0).getStartDate()) >= 0 ? new Date() : outSpaceList.get(0).getStartDate() );
 		
 	}
 
