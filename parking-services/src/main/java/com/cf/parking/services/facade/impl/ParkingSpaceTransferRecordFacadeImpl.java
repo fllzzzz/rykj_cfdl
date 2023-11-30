@@ -73,10 +73,12 @@ public class ParkingSpaceTransferRecordFacadeImpl implements ParkingSpaceTransfe
 		Iterator<UserSpacePO> iterator = spaceList.iterator();
 		while(iterator.hasNext()) {
 			UserSpacePO space = iterator.next();
+			/**
 			if (space.getStartDate().compareTo(DateUtil.beginOfDay(new Date())) > 0) {
 				//只有在车位生效之后才能转让
 				throw new BusinessException("您的车位还没到生效日期,无法转让");
-			}
+			} 
+			**/
 			
 			if (space.getEndDate().compareTo(DateUtil.endOfDay(new Date())) <= 0) {
 				//都是当天到期的，无法无法进行转赠
