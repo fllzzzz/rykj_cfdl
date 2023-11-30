@@ -74,4 +74,10 @@ public class UserVerifyPO {
      * 更新时间
      */
     private Date updateTm;
+    
+    
+    /**
+     * 上一次修改的车牌
+     */
+    private String lastPlateNo;
 }

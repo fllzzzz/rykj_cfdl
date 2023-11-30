@@ -22,6 +22,8 @@ import com.cf.parking.services.enums.PictureInfoEnum;
 import com.cf.parking.services.enums.UserVerifyStateEnum;
 import com.cf.parking.services.service.UserProfileService;
 import com.cf.parking.services.service.UserService;
+import com.cf.parking.services.service.UserSpaceService;
+import com.cf.parking.services.utils.AssertUtil;
 import com.cf.parking.services.utils.PageUtils;
 import com.cf.support.bean.IdWorker;
 import com.cf.support.exception.BusinessException;
@@ -72,6 +74,9 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
     
     @Resource
     private UserService userService;
+    
+    @Resource
+    private UserSpaceService userSpaceService;
 
     private static HashMap<Integer,String> stateMap = new HashMap<>();
 
@@ -161,16 +166,20 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Integer audit(UserVerifyOptDTO dto) {
-        UserVerifyPO userVerifyPO = mapper.selectById(dto.getId());
-            //1.审核
+        List<UserVerifyPO> userVerifyList = mapper.selectListByIds(Arrays.asList(dto.getId()));
+        AssertUtil.checkNull(userVerifyList, "数据不存在");
+        UserVerifyPO userVerifyPO = userVerifyList.get(0);
+        //1.审核
             LambdaUpdateWrapper<UserVerifyPO> updateWrapper = new LambdaUpdateWrapper<UserVerifyPO>()
                     .eq(UserVerifyPO::getId, dto.getId())
                     .set(UserVerifyPO::getState, dto.getState())
+                    .set(UserVerifyPO::getLastPlateNo, "")
                     .set(UserVerifyPO::getReason, dto.getReason());
             int result = mapper.update(userVerifyPO,updateWrapper);
             //2.修改用户默认停车场为"装配楼2期5F停车场"
             if (dto.getState() == UserVerifyStateEnum.SUCCESS.getState().intValue()) {
             	userProfileService.setDefaultParkingLotByUserId(userVerifyPO.getUserId());
+            	userSpaceService.changeUserPalteNo(Arrays.asList(userVerifyPO));
             }
             sendNoticeMessage(Arrays.asList(userVerifyPO.getUserId()) ,dto.getState());
             return result;
@@ -185,11 +194,11 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void batchAudit(UserVerifyOptDTO dto) {
+    	//2.1查询用户ids,后续要用到原车牌
+        List<UserVerifyPO> poList = mapper.selectListByIds(dto.getIds());
         //1.批量审核
         mapper.batchAudit(dto.getIds(), dto.getState(), dto.getReason());
         //2.如果是审核通过，为停车场信息为空的用户默认停车场
-        //2.1查询用户ids
-        List<UserVerifyPO> poList = mapper.selectBatchIds(dto.getIds());
         List<Long> userIds = poList.stream().filter(po->!ObjectUtils.isEmpty(po.getUserId())).map(UserVerifyPO::getUserId).collect(Collectors.toList());
         //2.2批量更新
         if (CollectionUtils.isNotEmpty(userIds) && UserVerifyStateEnum.SUCCESS.getState().equals(dto.getState())){
@@ -197,6 +206,7 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
             List<UserProfilePO> userProfilePOList = userProfileService.selectList(userIds);
             List<Long> changeUserIds = userProfilePOList.stream().filter(po -> StringUtils.isBlank(po.getParkingLotRegion())).map(UserProfilePO::getUserId).collect(Collectors.toList());
             userProfileService.batchSetDefaultParkingLotByUserIds(changeUserIds,ParkingConstants.DEFAULT_PARKINGLOT);
+            userSpaceService.changeUserPalteNo(poList);
         }
         sendNoticeMessage(userIds ,dto.getState());
     }
@@ -232,7 +242,12 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
                 throw new BusinessException("车牌号已存在！");
             }
         }
-
+        //原数据是审核通过的并且此次车牌做了修改
+        if (UserVerifyStateEnum.SUCCESS.getState().intValue() == userVerifyPO.getState() && 
+        		!userVerifyPO.getPlateNo().equals(dto.getPlateNo()) ) {
+        	//记录下原车牌
+        	userVerifyPO.setLastPlateNo(userVerifyPO.getPlateNo());
+        }
         //2.修改
         BeanUtils.copyProperties(dto,userVerifyPO);
         userVerifyPO.setState(UserVerifyStateEnum.UNAUDIT.getState());

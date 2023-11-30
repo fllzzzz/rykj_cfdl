@@ -13,12 +13,14 @@
         <result column="driving_license_img" property="drivingLicenseImg"/>
         <result column="state" property="state"/>
         <result column="reason" property="reason"/>
+        <result column="last_plate_no" property="lastPlateNo"/>
         <result column="create_tm" property="createTm"/>
         <result column="update_tm" property="updateTm"/>
     </resultMap>
 
     <delete id="batchAudit">
-        update user_verify set state = #{state},reason = #{reason}
+        update user_verify set state = #{state},reason = #{reason},
+        last_plate_no = ''
         where id in
         <foreach collection="ids" item="id" separator="," open="(" close=")">
             #{id}
@@ -26,11 +28,20 @@
     </delete>
     
     <select id="queryVerifyListByUserIdList" resultMap="userVerifyMap">
-    		select id,user_id,user_name,plate_no,state,reason,create_tm,update_tm 
+    		select id,user_id,user_name,plate_no,state,reason,last_plate_no,create_tm,update_tm 
     		from user_verify  where state = 3 and user_id in
     		<foreach collection="list" item="userId" separator="," open="(" close=")">
             	#{userId}
         	</foreach>
     </select>
+    
+    <select id="selectListByIds" resultMap="userVerifyMap">
+    		select id,user_id,user_name,plate_no,state,reason,last_plate_no,create_tm,update_tm 
+    		from user_verify  where id in
+    		<foreach collection="list" item="id" separator="," open="(" close=")">
+            	#{id}
+        	</foreach>
+    </select>
+    
 </mapper>
 

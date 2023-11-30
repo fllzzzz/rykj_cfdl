@@ -50,7 +50,6 @@ import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
@@ -147,7 +146,7 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 		//AssertUtil.checkTrue(batch.getApplyEndTime().compareTo(new Date()) < 0, "当前还处于申请日期内，不能进行摇号操作");
 
 		//防并发
-		int num = lotteryResultMapper.updateByState(id,LotteryResultStateEnum.UNLOTTERY.getState(),LotteryResultStateEnum.UNCONFIRM.getState());
+		int num = lotteryResultMapper.updateByState(id,LotteryResultStateEnum.UNLOTTERY.getState(),LotteryResultStateEnum.UNPUBLIC.getState());
 		AssertUtil.checkTrue(num == 1, "状态已变更，请刷新重试");
 		
 		//获取停车场信息
@@ -328,7 +327,7 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 		LotteryResultPO lottery = lotteryResultMapper.selectById(id);
 		AssertUtil.checkNull(lottery, "数据不存在");
 		AssertUtil.checkTrue(LotteryResultStateEnum.UNPUBLIC.getState().equals(lottery.getState()),"数据不为待发布状态，不能发布");
-		int num = lotteryResultMapper.updateByState(id,LotteryResultStateEnum.UNPUBLIC.getState(),LotteryResultStateEnum.UNARCHIVED.getState());
+		int num = lotteryResultMapper.updateByState(id,LotteryResultStateEnum.UNPUBLIC.getState(),LotteryResultStateEnum.UNCONFIRM.getState());
 		if (num < 1) {
 			throw new BusinessException("状态已变更，请刷新重试");
 		}
@@ -343,10 +342,7 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 		long unfinshNum = lotteryResultMapper.selectCount(new LambdaQueryWrapper<LotteryResultPO>()
 					.eq(LotteryResultPO::getBatchId, lottery.getBatchId())
 					.in(LotteryResultPO::getState, Arrays.asList( 
-							LotteryResultStateEnum.UNPUBLIC.getState(),
-							LotteryResultStateEnum.CONFIRM_IN_PROCESS.getState(),
-							LotteryResultStateEnum.UNCONFIRM.getState(),
-							LotteryResultStateEnum.UNLOTTERY.getState()))
+							LotteryResultStateEnum.UNPUBLIC.getState()))
 				);
 		//查询中奖数据
 		List<LotteryResultDetailPO> detailList = lotteryResultDetailService.queryDetailListByResultId(id);
@@ -380,7 +376,7 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 			List<String> applyIdList = applyList.stream().map(item -> item.getJobNumber()).collect(Collectors.toList());
 			applyList.clear();
 			//中奖人员
-			List<String> spaceList = userSpaceService.querySpaceListByBatchId(lottery.getBatchId(),UserSpaceTypeEnum.LOTTERY.getState());
+			List<String> spaceList = lotteryResultDetailService.querySpaceListByBatchId(lottery.getBatchId());
 			applyIdList.removeAll(spaceList);
 			spaceList.clear();
 			log.info("未中奖人员工号：{}",JSON.toJSONString(applyIdList));

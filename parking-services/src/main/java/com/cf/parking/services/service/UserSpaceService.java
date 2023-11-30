@@ -1,10 +1,14 @@
 package com.cf.parking.services.service;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import com.cf.parking.facade.bo.LotteryResultDetailBO;
 import com.cf.parking.facade.bo.ParkBaseDetailRespBO;
 import com.cf.parking.facade.bo.ParkBaseRespBO;
+import com.cf.parking.facade.bo.ParkingCarInfoBO;
+import com.cf.parking.facade.bo.ParkingCarQueryRespBO;
+import com.cf.parking.facade.bo.ParkingYardBO;
 import com.cf.parking.services.utils.PageUtils;
 import lombok.extern.slf4j.Slf4j;
 import com.alibaba.fastjson.JSON;
@@ -20,6 +24,8 @@ import com.cf.parking.dao.po.LotteryResultDetailPO;
 import com.cf.parking.dao.po.LotteryResultPO;
 import com.cf.parking.dao.po.UserSpacePO;
 import com.cf.parking.dao.po.UserVerifyPO;
+import com.cf.parking.facade.dto.ParkingCarQueryDTO;
+import com.cf.parking.facade.dto.ParkingDeleteCarDTO;
 import com.cf.parking.facade.dto.UserSpaceDTO;
 import com.cf.parking.facade.dto.UserSpaceFuncTimeDTO;
 import com.cf.parking.facade.dto.UserSpacePageDTO;
@@ -36,6 +42,7 @@ import com.cf.support.utils.DingAlarmUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
@@ -617,6 +624,92 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 				.eq(UserSpacePO::getEndDate, endDate)
 				);
 		
+	}
+	
+	/**
+	 * 更改用户车牌
+	 * @param vefifyList
+	 */
+	public void changeUserPalteNo(List<UserVerifyPO> vefifyList) {
+		List<UserSpacePO> spaceList = null;
+		ParkingCarQueryDTO query = new ParkingCarQueryDTO();
+		//车辆查询响应
+		ParkingCarQueryRespBO<ParkingCarInfoBO<ParkingYardBO>> result = null;
+		
+		//车辆id
+		List<String> carIdList = new ArrayList<>();
+		ParkingDeleteCarDTO deleteDto = new ParkingDeleteCarDTO();
+		
+		for(UserVerifyPO verify : vefifyList) {
+			if (StringUtils.isEmpty(verify.getLastPlateNo())){
+				log.info("未修改车牌，不做操作");
+				//没有旧车牌就不做操作
+				continue;
+			}
+			//查询原车牌是否有车位
+			spaceList = userSpaceMapper.selectList(new LambdaQueryWrapper<UserSpacePO>()
+						.eq(UserSpacePO::getPlateNo, verify.getLastPlateNo())
+					);
+			if (CollectionUtils.isEmpty(spaceList)) {
+				continue;
+			}
+			log.info("车辆信息：{},原车牌车位：{}",JSON.toJSONString(verify),JSON.toJSONString(spaceList));
+			for(UserSpacePO space : spaceList) {
+				if(space.getEndDate().compareTo(DateUtil.beginOfDay(new Date())) <= 0) {
+					//车位即将到期，不做操作
+					log.info("原车位即将到期，不做操作：{}",JSON.toJSONString(space));
+					continue;
+				}
+				
+				if (space.getStartDate().compareTo(DateUtil.beginOfDay(new Date())) > 0 ) {
+					log.info("车位还没开始生效：{}",JSON.toJSONString(space));
+					//车位还没开始生效。如果闸机权限已下发，则删除闸机权限， (删除原车位，添加新车位)---->直接把车牌换掉
+					if(UserSpaceStateEnum.SUCCESS.getState().equals(space.getState())) {
+						//闸机权限已下发
+						query.setCarOwner(space.getName());
+						query.setLicensePlate(space.getPlateNo());
+						result = parkInvokeService.queryCarInfo(query);
+						log.info("查询车辆信息：{},响应:{}",JSON.toJSONString(query),JSON.toJSONString(result) );
+						if (result != null && !CollectionUtils.isEmpty(result.getData())) {
+							carIdList.clear();
+							carIdList = result.getData().stream().map(item -> item.getId()).collect(Collectors.toList());
+							deleteDto.setId(carIdList);
+							ParkBaseRespBO<ParkBaseDetailRespBO> response = parkInvokeService.deleteCarInfo(deleteDto);
+							log.info("删除车辆信息：{},响应:{}",JSON.toJSONString(deleteDto),JSON.toJSONString(response) );
+						}
+					}
+					space.setPlateNo(verify.getPlateNo());
+					space.setState(UserSpaceStateEnum.UNSYNC.getState());
+					space.setScheduleDate("");
+					userSpaceMapper.updateById(space);
+					log.info("直接替换原车牌车位信息：{}",JSON.toJSONString(space));
+				}
+				
+				if (space.getStartDate().compareTo(DateUtil.beginOfDay(new Date())) <= 0 ) {
+					log.info("车位已经生效：{}",JSON.toJSONString(space));
+					//添加新车位
+					UserSpacePO newSpace = new UserSpacePO();
+					BeanUtil.copyProperties(space, newSpace);
+					newSpace.setUserSpaceId(idWorker.nextId())
+							.setState(UserSpaceStateEnum.UNSYNC.getState())
+							.setPlateNo(verify.getPlateNo())
+							.setScheduleDate("")
+							.setFailReason("")
+							.setCreateTm(new Date())
+							.setUpdateTm(new Date())
+							.setStartDate(DateUtils.addDays(new Date(), 1));//从第二天生效		
+					userSpaceMapper.insert(newSpace);
+					log.info("添加新车牌车位信息：{}",JSON.toJSONString(newSpace));
+					//车位已经生效了，把原车位改成今天到期
+					space.setEndDate(new Date())
+							.setState(UserSpaceStateEnum.UNSYNC.getState())
+							.setScheduleDate("");
+					userSpaceMapper.updateById(space);
+					log.info("更新原车牌车位信息：{}",JSON.toJSONString(space));
+				}
+				
+			};
+		}
 	}
 }
 

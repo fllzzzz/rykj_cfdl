@@ -8,6 +8,7 @@ package com.cf.parking.services.enums;
  * @author think
  */
 public enum LotteryResultStateEnum {
+	//顺序已更改为 0 ---》3 ---> 1 --> 2--->4--->5
 
 	UNLOTTERY("0","待摇号"),
 	UNCONFIRM("1","待确认"),

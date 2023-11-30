@@ -270,3 +270,6 @@ alter table lottery_black_list add unique index job_num_idx(job_number,type) ;
 
  alter table  lottery_rule_assign  modify column `code` LONGTEXT DEFAULT null COMMENT '部门编码/人员工号（可多选）';
  alter table  lottery_rule_assign  modify column `name` LONGTEXT DEFAULT null COMMENT '名称（部门或者人员名称）';
+ 
+ 
+alter table user_verify add column last_plate_no  varchar(20)  DEFAULT '' COMMENT '上一次车牌号';

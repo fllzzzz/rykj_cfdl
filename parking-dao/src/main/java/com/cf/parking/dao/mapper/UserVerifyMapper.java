@@ -24,5 +24,12 @@ public interface UserVerifyMapper extends BaseMapper<UserVerifyPO> {
     Integer batchAudit(@Param("ids") List<Long> ids, @Param("state") Integer state, @Param("reason") String reason);
     
     List<UserVerifyPO> queryVerifyListByUserIdList(List<Long> list);
+
+	/**
+	 * 根据id查询
+	 * @param ids
+	 * @return
+	 */
+	List<UserVerifyPO> selectListByIds(List<Long> list);
 }
 
