@@ -386,11 +386,12 @@ public class LotteryDealService {
 		}
 		jobNumList.clear();;
 		List<String> applyJobList = applyList.stream().map(apply -> apply.getJobNumber()).collect(Collectors.toList());
+		log.info("未中签人员工号：{}",applyJobList);	
 		//查询未中签用户是否有车位
 		List<UserSpacePO> existSpaceList = userSpaceService.querySpaceListByJobNum(applyJobList, UserSpaceTypeEnum.LOTTERY.getState());
 		List<UserSpacePO> alloSpaceList = userSpaceService.querySpaceListByJobNum(applyJobList, UserSpaceTypeEnum.SETTING.getState());
 		//查询用户
-		List<UserProfilePO> userList = userProfileService.getProfileListByJobNumList(jobNumList);
+		List<UserProfilePO> userList = userProfileService.getProfileListByJobNumList(applyJobList);
 		List<Long> userIdList = userList.stream().map(user -> user.getUserId()).collect(Collectors.toList());
 		//车牌列表
 		List<UserVerifyPO> vefifyList = userVerifyService.queryVerifyListByUserIdList(userIdList);
