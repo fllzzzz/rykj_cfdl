@@ -63,6 +63,9 @@ public class LotteryDealService {
 	@Resource
 	private UserProfileService userProfileService;
 	
+	@Resource
+	private EmployeeService employeeService;
+	
 	
 	
 	
@@ -384,9 +387,19 @@ public class LotteryDealService {
 			log.info("批次：{}不存在未中签人员",batch.getId());
 			return;
 		}
-		jobNumList.clear();;
+		jobNumList.clear();
 		List<String> applyJobList = applyList.stream().map(apply -> apply.getJobNumber()).collect(Collectors.toList());
 		log.info("未中签人员工号：{}",applyJobList);	
+		//查找离职人员
+		List<String> leavingList = employeeService.queryLeavingEmpListByJobNum(applyJobList);
+		if(!CollectionUtils.isEmpty(leavingList)){
+			log.info("分配停车场时离职人员：{}",leavingList);
+			//过滤掉离职人员
+			applyList = applyList.stream().filter(apply -> !leavingList.contains(apply.getJobNumber())).collect(Collectors.toList());
+			applyJobList.removeAll(leavingList);
+			leavingList.clear();;
+		}
+		
 		//查询未中签用户是否有车位
 		List<UserSpacePO> existSpaceList = userSpaceService.querySpaceListByJobNum(applyJobList, UserSpaceTypeEnum.LOTTERY.getState());
 		List<UserSpacePO> alloSpaceList = userSpaceService.querySpaceListByJobNum(applyJobList, UserSpaceTypeEnum.SETTING.getState());

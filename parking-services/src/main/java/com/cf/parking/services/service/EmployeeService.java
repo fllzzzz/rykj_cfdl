@@ -13,6 +13,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cf.parking.dao.mapper.EmployeePOMapper;
 import com.cf.parking.dao.po.EmployeePO;
+import com.cf.parking.dao.po.LotteryApplyRecordPO;
 
 
 
@@ -71,9 +72,15 @@ public class EmployeeService extends ServiceImpl<EmployeePOMapper, EmployeePO> i
 	}
 
 
-	public EmployeePO queryEmployeeByOpenId(String openId) {
+	/**
+	 * 根据工号和在职状态查员工
+	 * @param jobNumer
+	 * @return
+	 */
+	public EmployeePO queryEmployeeByJobNum(String jobNumer) {
 		return employeePOMapper.selectOne(new LambdaQueryWrapper<EmployeePO>()
-					.eq(EmployeePO::getEmplNo, openId)
+					.eq(EmployeePO::getEmplNo, jobNumer)
+					.eq(EmployeePO::getState, 0)
 				);
 	}
 
@@ -85,6 +92,19 @@ public class EmployeeService extends ServiceImpl<EmployeePOMapper, EmployeePO> i
 	 */
 	public List<EmployeePO> queryAllEmployee(String name) {
 		return employeePOMapper.selectEmployeeList(name);
+	}
+
+
+	/**
+	 * 过滤出离职人员工号
+	 * @param jobNumberList
+	 * @return
+	 */
+	public List<String> queryLeavingEmpListByJobNum(List<String> jobNumberList) {
+		return CollectionUtils.isEmpty(jobNumberList) ? Collections.emptyList() : employeePOMapper.selectList(new LambdaQueryWrapper<EmployeePO>()
+				.in(EmployeePO::getEmplNo, jobNumberList)
+				.eq(EmployeePO::getState, 1)
+			).stream().map(item -> item.getEmplNo()).collect(Collectors.toList());
 	}
 	
 }

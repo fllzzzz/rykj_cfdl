@@ -19,6 +19,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cf.parking.dao.mapper.UserSpaceMapper;
+import com.cf.parking.dao.po.EmployeePO;
 import com.cf.parking.dao.po.LotteryBatchPO;
 import com.cf.parking.dao.po.LotteryResultDetailPO;
 import com.cf.parking.dao.po.LotteryResultPO;
@@ -76,6 +77,9 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
     
     @Resource
 	private ParkingInitService parkingInitService;
+    
+    @Resource
+    private EmployeeService employeeService;
     
     
     /**
@@ -459,6 +463,11 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 			return ;
 		}
 		log.info("同步车位信息：{}",JSON.toJSONString(space));
+		EmployeePO employee = employeeService.queryEmployeeByJobNum(space.getJobNumber());
+		if (employee == null) {
+			log.info("工号：{}在员工表中不存在，跳过分配闸机权限",space.getJobNumber());
+			return ;
+		}
 		UserSpaceDTO dto = new UserSpaceDTO();
 		BeanUtils.copyProperties(space, dto);
 		dto.setParkingLot(StringUtils.join( parkingLotService.queryParentListViaSelf(dto.getParkingLot()),"," ));

@@ -84,7 +84,7 @@ public class InitDataController {
 		userList.forEach(user -> {
 			for (int j = 0 ; j< 2; j++) {
 				
-				EmployeePO employee = employeeService.queryEmployeeByOpenId(user.getOpenId());
+				EmployeePO employee = employeeService.queryEmployeeByJobNum(user.getOpenId());
 				
 				if (employee == null) {
 					continue;
@@ -181,7 +181,7 @@ public class InitDataController {
 		LotteryBatchPO batch = batchService.getById(batchId);
 		List<UserPO> userList =  userService.list();
 		userList.forEach(user -> {
-			EmployeePO employee = employeeService.queryEmployeeByOpenId(user.getOpenId());
+			EmployeePO employee = employeeService.queryEmployeeByJobNum(user.getOpenId());
 			
 			if (employee == null) {
 				return;
