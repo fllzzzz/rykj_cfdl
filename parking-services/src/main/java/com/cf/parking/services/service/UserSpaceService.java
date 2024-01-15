@@ -18,11 +18,13 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.cf.parking.dao.mapper.LotteryBatchMapper;
 import com.cf.parking.dao.mapper.UserSpaceMapper;
 import com.cf.parking.dao.po.EmployeePO;
 import com.cf.parking.dao.po.LotteryBatchPO;
 import com.cf.parking.dao.po.LotteryResultDetailPO;
 import com.cf.parking.dao.po.LotteryResultPO;
+import com.cf.parking.dao.po.UserProfilePO;
 import com.cf.parking.dao.po.UserSpacePO;
 import com.cf.parking.dao.po.UserVerifyPO;
 import com.cf.parking.facade.dto.ParkingCarQueryDTO;
@@ -32,6 +34,7 @@ import com.cf.parking.facade.dto.UserSpaceFuncTimeDTO;
 import com.cf.parking.facade.dto.UserSpacePageDTO;
 import com.cf.parking.facade.dto.UserSpaceValidityDTO;
 import com.cf.parking.services.constant.ParkingConstants;
+import com.cf.parking.services.enums.LotteryBatchStateEnum;
 import com.cf.parking.services.enums.ParkingRemoteCodeEnum;
 import com.cf.parking.services.enums.UserSpaceStateEnum;
 import com.cf.parking.services.enums.UserSpaceTypeEnum;
@@ -68,6 +71,9 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
     private UserSpaceService userSpaceService;
     @Resource
     private UserSpaceMapper userSpaceMapper;
+    
+    @Resource
+    private LotteryBatchMapper lotteryBatchMapper;
 
     @Resource
     private ParkInvokeService parkInvokeService;
@@ -81,6 +87,8 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
     @Resource
     private EmployeeService employeeService;
     
+    @Resource
+    private UserProfileService userProfileService;
     
     /**
      * 获取请求数据，返回数据总大小
@@ -648,11 +656,33 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 		//车辆id
 		List<String> carIdList = new ArrayList<>();
 		ParkingDeleteCarDTO deleteDto = new ParkingDeleteCarDTO();
-		
+		//用户信息
+		UserProfilePO user =  null;
+		//用户摇号车位
+		List<UserSpacePO> userSpaceList = Collections.emptyList();
 		for(UserVerifyPO verify : vefifyList) {
+			user =  userProfileService.getUserProfileByUserId(verify.getUserId());
+			userSpaceList =  userSpaceMapper.selectList(new LambdaQueryWrapper<UserSpacePO>()
+						.eq(UserSpacePO::getType ,UserSpaceTypeEnum.LOTTERY.getState())
+						.eq(UserSpacePO::getJobNumber , user.getJobNumber())
+						.orderByDesc(UserSpacePO::getEndDate)
+					)	;		
+			
 			if (StringUtils.isEmpty(verify.getLastPlateNo())){
-				log.info("未修改车牌，不做操作");
-				//没有旧车牌就不做操作
+				log.info("新增车牌或者是未修改车牌：{}",JSON.toJSONString(verify));
+				if (CollectionUtils.isEmpty(userSpaceList)) {
+					//用户无车位时给车辆开通分配车位
+					addUserSettingSpace(verify,user.getJobNumber());
+				} else {
+					spaceList = userSpaceMapper.selectList(new LambdaQueryWrapper<UserSpacePO>()
+							.eq(UserSpacePO::getPlateNo, verify.getPlateNo())
+						);
+					log.info("新增车牌或者是未修改车牌的车位信息：{}",JSON.toJSONString(spaceList));
+					if (CollectionUtils.isEmpty(spaceList)) {
+						//有车位但是这辆车无车位
+						addUserLotterySpace(verify,userSpaceList);
+					}
+				}
 				continue;
 			}
 			//查询原车牌是否有车位
@@ -660,9 +690,12 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 						.eq(UserSpacePO::getPlateNo, verify.getLastPlateNo())
 					);
 			if (CollectionUtils.isEmpty(spaceList)) {
+				addUserSettingSpace(verify,user.getJobNumber());
 				continue;
 			}
 			log.info("车辆信息：{},原车牌车位：{}",JSON.toJSONString(verify),JSON.toJSONString(spaceList));
+			
+			
 			for(UserSpacePO space : spaceList) {
 				if(space.getEndDate().compareTo(DateUtil.beginOfDay(new Date())) <= 0) {
 					//车位即将到期，不做操作
@@ -719,6 +752,78 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 				
 			};
 		}
+	}
+
+	/**
+	 * 给用户分配摇号车位
+	 * @param verify
+	 * @param userSpaceList
+	 */
+	private void addUserLotterySpace(UserVerifyPO verify, List<UserSpacePO> userSpaceList) {
+		userSpaceList.forEach(space -> {
+			if (space.getEndDate().compareTo(DateUtil.beginOfDay(new Date())) <= 0 ) {
+				//车位过期或明天过期
+				return;
+			}
+			UserSpacePO userspace = new UserSpacePO();
+			BeanUtils.copyProperties(space, userspace);
+			userspace.setUserSpaceId(idWorker.nextId() )
+				.setPlateNo(verify.getPlateNo())
+				.setState(UserSpaceStateEnum.UNSYNC.getState())
+				.setScheduleDate(null);			
+			userSpaceMapper.insert(userspace);
+		
+		});
+	}
+
+
+	/**
+	 * 给用户生成分配车位
+	 * @param verify
+	 */
+	private void addUserSettingSpace(UserVerifyPO verify,String jobNumber) {
+		log.info("给车辆分配车位：{}",JSON.toJSONString(verify));
+		LotteryBatchPO batch = lotteryBatchMapper.selectOne(new LambdaQueryWrapper<LotteryBatchPO>()
+				.eq(LotteryBatchPO::getState,LotteryBatchStateEnum.ALLOCATIONED.getState())
+				.orderByDesc(LotteryBatchPO::getBatchNum)
+				.last(" limit 1 ")
+				);
+		if (batch == null) {
+			log.info("不存在批次信息");
+			return ;
+		}
+		if (batch.getValidEndDate().compareTo(new Date()) <= 0) {
+			return;
+		}
+		
+		//查找分配的车位号
+		UserSpacePO sattled = userSpaceMapper.selectOne(new LambdaQueryWrapper<UserSpacePO>()
+					.eq(UserSpacePO::getBatchId, batch.getId())
+					.eq(UserSpacePO::getType, UserSpaceTypeEnum.SETTING.getState())
+					.orderByDesc(UserSpacePO::getUserSpaceId)
+					.last(" limit 1 ")
+				);
+		if (sattled == null) {
+			return ;
+		}
+		
+		UserSpacePO space = new UserSpacePO()
+				.setCreateTm(new Date())
+				.setBatchNum(batch.getBatchNum())
+				.setEndDate(batch.getValidEndDate())
+				.setJobNumber(jobNumber)
+				.setName(verify.getUserName())
+				.setParkingLot(sattled.getParkingLot())
+				.setPlateNo(verify.getPlateNo())
+				.setScheduleDate(null)
+				.setStartDate(batch.getValidStartDate()	)
+				.setState(UserSpaceStateEnum.UNSYNC.getState())
+				.setType(UserSpaceTypeEnum.SETTING.getState())
+				.setUpdateTm(new Date())
+				.setUserSpaceId(idWorker.nextId())	;
+		
+		userSpaceMapper.insert(space);
+		
 	}
 }
 
