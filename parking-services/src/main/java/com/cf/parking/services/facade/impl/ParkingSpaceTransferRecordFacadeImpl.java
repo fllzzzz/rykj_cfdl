@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import javax.annotation.Resource;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cf.parking.dao.mapper.ParkingSpaceTransferRecordMapper;
 import com.cf.parking.dao.po.*;
@@ -86,7 +87,7 @@ public class ParkingSpaceTransferRecordFacadeImpl implements ParkingSpaceTransfe
 			}
 		}
 		AssertUtil.checkTrue(!CollectionUtils.isEmpty(spaceList), "您的车位为当天到期或已到期，无法进行转赠");
-		
+		log.info("转让人车位信息：{}",JSON.toJSONString(spaceList));
 		UserProfilePO user = userProfileService.selectUserProfileByNameAndJobNumber(null, inJobNum );
 		AssertUtil.checkNull(user, "受让人不存在"); 
 		List<UserVerifyPO> verifyList = userVerifyService.queryVerifyListByUserIdList(Arrays.asList(user.getUserId()));

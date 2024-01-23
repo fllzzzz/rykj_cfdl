@@ -188,7 +188,7 @@ public class LotteryBatchController
     /**
      * 下发钉钉通知
      */
-    @AdminOptLogTitle("通知钉钉用户摇号批次信息")
+    @AdminOptLogTitle("下发钉钉通知")
     @AdminUserAuthentication
     @ApiOperation(value = "下发钉钉通知", notes = "点击通知按钮")
     @PostMapping("/notify")
