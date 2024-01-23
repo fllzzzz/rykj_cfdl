@@ -12,6 +12,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cf.parking.dao.mapper.LotteryApplyRecordMapper;
 import com.cf.parking.dao.po.LotteryApplyRecordPO;
+import com.cf.parking.services.enums.LotteryApplyRecordStateEnum;
 
 
 
@@ -68,6 +69,20 @@ public class LotteryApplyRecordService extends ServiceImpl<LotteryApplyRecordMap
 		return applyRecordMapper.selectCount(new LambdaQueryWrapper<LotteryApplyRecordPO>()
 					.eq(LotteryApplyRecordPO::getBatchId, batchId)
 				);
+	}
+
+
+
+	/**
+	 *  根据工号更新摇号记录状态为未中签
+	 * @param jobNumberList
+	 */
+	public void updateUnLotteryResultByJobNumber(List<String> jobNumberList,Long batchId) {
+		LotteryApplyRecordPO record = new LotteryApplyRecordPO().setResult(LotteryApplyRecordStateEnum.NOTGET.getState()).setParkingLotCode("");
+		applyRecordMapper.update(record, 
+				new LambdaUpdateWrapper<LotteryApplyRecordPO>()
+				.eq(LotteryApplyRecordPO::getBatchId, batchId)
+				.in(LotteryApplyRecordPO::getJobNumber, jobNumberList));
 	}
 
 	

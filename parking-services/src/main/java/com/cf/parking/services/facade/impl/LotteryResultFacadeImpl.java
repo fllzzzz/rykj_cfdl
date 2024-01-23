@@ -342,6 +342,7 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 		long unfinshNum = lotteryResultMapper.selectCount(new LambdaQueryWrapper<LotteryResultPO>()
 					.eq(LotteryResultPO::getBatchId, lottery.getBatchId())
 					.in(LotteryResultPO::getState, Arrays.asList( 
+							LotteryResultStateEnum.UNLOTTERY.getState(),
 							LotteryResultStateEnum.UNPUBLIC.getState()))
 				);
 		//查询中奖数据
@@ -380,6 +381,11 @@ public class LotteryResultFacadeImpl implements LotteryResultFacade
 			applyIdList.removeAll(spaceList);
 			spaceList.clear();
 			log.info("未中奖人员工号：{}",JSON.toJSONString(applyIdList));
+			if(CollectionUtils.isEmpty(applyIdList)){
+				return;
+			}
+			//更新摇号记录状态为未中奖
+			lotteryApplyRecordService.updateUnLotteryResultByJobNumber(applyIdList,batch.getId());
 			//查询未中奖人员信息
 			List<UserProfilePO> profileList = userProfileService.getProfileListByJobNumList(applyIdList);
 			applyIdList.clear();
