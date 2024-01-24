@@ -30,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -154,6 +155,22 @@ public class UserVerifyController extends BaseController {
         }else {
             userVerifyFacade.batchExport(boList,response);
         }
+    }
+    
+    
+    /**
+     * 删除个人车辆信息
+     */
+    @AdminOptLogTitle("admin后台用户删除车辆信息")
+    @AdminUserAuthentication
+    @ApiOperation(value = "admin后台用户删除车辆信息", notes = "删除个人车辆信息")
+    @DeleteMapping("/deleteVerify")
+    public Result<String> deleteVerify(@RequestBody UserVerifyReq param)
+    {
+    	log.info("admin后台用户删除车辆信息:{}", JSON.toJSONString(param));
+        AssertUtil.checkNull(param.getId(),"请选择要删除的记录！");
+        Integer result = userVerifyFacade.deleteById(param.getId());
+        return result > 0 ?  Result.buildSuccessResult() : Result.buildErrorResult("删除失败，请重试！");
     }
 
 
