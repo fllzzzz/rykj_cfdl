@@ -60,4 +60,9 @@ public class UserSpaceBO {
 
     /** 状态（0：未同步；1：同步成功；2：同步失败） */
     private String state;
+    
+    /**
+     * 同步失败原因
+     */
+    private String failReason;
 }
