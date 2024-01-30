@@ -397,7 +397,10 @@ public class UserVerifyFacadeImpl implements UserVerifyFacade {
     @Override
     public UserProfileBO getInfoByPlateNo(String plateNo) {
         //1.查询传入的车牌号是否有用户
-        UserVerifyPO po = mapper.selectOne(new LambdaQueryWrapper<UserVerifyPO>().eq(UserVerifyPO::getPlateNo, plateNo));
+        UserVerifyPO po = mapper.selectOne(new LambdaQueryWrapper<UserVerifyPO>()
+        		.eq(UserVerifyPO::getPlateNo, plateNo)
+        		.last(" limit 1 ")
+        		);
         if (null == po){
             return null;
         }

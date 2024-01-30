@@ -81,6 +81,8 @@ public class LotteryResultDetailService extends ServiceImpl<LotteryResultDetailM
 	public LotteryResultDetailPO selectUserDetailByResultIds(Long userId, List<Long> resultIds) {
 		return mapper.selectOne(new LambdaQueryWrapper<LotteryResultDetailPO>()
 				.in(LotteryResultDetailPO::getResultId,resultIds)
-				.eq(LotteryResultDetailPO::getUserId,userId));
+				.eq(LotteryResultDetailPO::getUserId,userId)
+				.last(" limit 1 ")
+				);
 	}
 }

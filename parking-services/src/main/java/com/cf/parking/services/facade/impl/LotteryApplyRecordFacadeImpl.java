@@ -130,7 +130,9 @@ public class LotteryApplyRecordFacadeImpl implements LotteryApplyRecordFacade
             LotteryApplyRecordPO recordPO = mapper.selectOne(new LambdaQueryWrapper<LotteryApplyRecordPO>()
                     .eq(LotteryApplyRecordPO::getBatchNum, lotteryBatchPO.getBatchNum())
                     .eq(LotteryApplyRecordPO::getUserId,userId)
-                    .eq(LotteryApplyRecordPO::getApplyState, LotteryApplyRecordStateEnum.HAVE_APPLIED.getState()));
+                    .eq(LotteryApplyRecordPO::getApplyState, LotteryApplyRecordStateEnum.HAVE_APPLIED.getState())
+                    .last(" limit 1 ")
+            		);
 
             applyBO.setApplyState(null != recordPO);
         }else {
@@ -142,7 +144,9 @@ public class LotteryApplyRecordFacadeImpl implements LotteryApplyRecordFacade
                 LotteryApplyRecordPO applyRecordPO = mapper.selectOne(new LambdaQueryWrapper<LotteryApplyRecordPO>()
                         .eq(LotteryApplyRecordPO::getBatchId, lotteryBatchPO.getId())
                         .eq(LotteryApplyRecordPO::getUserId, userId)
-                        .eq(LotteryApplyRecordPO::getApplyState,LotteryApplyRecordStateEnum.HAVE_APPLIED.getState()));
+                        .eq(LotteryApplyRecordPO::getApplyState,LotteryApplyRecordStateEnum.HAVE_APPLIED.getState())
+                        .last(" limit 1 ")
+                		);
 
                 if (null == applyRecordPO){
                     applyBO.setResult("您本期未参加摇号报名！");
@@ -195,14 +199,13 @@ public class LotteryApplyRecordFacadeImpl implements LotteryApplyRecordFacade
     	LotteryApplyRecordPO lotteryApplyRecordPO = mapper.selectOne(new LambdaQueryWrapper<LotteryApplyRecordPO>()
                 .eq(LotteryApplyRecordPO::getUserId, userId)
                 .eq(LotteryApplyRecordPO::getBatchId, batchId)
-                .eq(LotteryApplyRecordPO::getApplyState,LotteryApplyRecordStateEnum.CANCEL.getState()));
+                .last(" limit 1 ")     
+                );
 
         //如果之前有，修改状态
         if (null != lotteryApplyRecordPO){
-            lotteryApplyRecordPO.setApplyState(LotteryApplyRecordStateEnum.HAVE_APPLIED.getState());
-            int result = mapper.updateById(lotteryApplyRecordPO);
-            log.info("用户申请摇号：{}",lotteryApplyRecordPO);
-            return result;
+            log.info("用户已申请摇号：{}",lotteryApplyRecordPO);
+            return 1;
         }
         //之前没有的话新增
         //1.查询对应批次摇号信息

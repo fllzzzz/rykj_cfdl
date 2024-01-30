@@ -109,13 +109,12 @@ public class LotteryBatchService extends ServiceImpl<LotteryBatchMapper, Lottery
 
     /**
      * 判断当前时间是否处于报名时间内
-	 * 注：申请截止日期在数据库内存的是00:00:00，但实际在截止日期当天23:59:59仍应可以报名
      * @param applyStartTime
      * @param applyEndTime
      * @return
      */
     public boolean judgeWhetherInApplyTime(Date applyStartTime, Date applyEndTime) {
         Date now = new Date();
-		return now.before(DateUtil.endOfDay(applyEndTime)) && now.after(applyStartTime);
+		return now.before(applyEndTime) && now.after(applyStartTime);
     }
 }
