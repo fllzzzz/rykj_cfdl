@@ -474,6 +474,9 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 		EmployeePO employee = employeeService.queryEmployeeByJobNum(space.getJobNumber());
 		if (employee == null) {
 			log.info("工号：{}在员工表中不存在，跳过分配闸机权限",space.getJobNumber());
+			space.setState(UserSpaceStateEnum.FAIL.getState());
+			space.setFailReason("该员工不存在或已离职,请确认员工信息");
+			userSpaceMapper.updateById(space);
 			return ;
 		}
 		UserSpaceDTO dto = new UserSpaceDTO();

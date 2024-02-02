@@ -7,6 +7,7 @@ import com.cf.parking.api.response.*;
 import com.cf.parking.facade.bo.*;
 import com.cf.parking.facade.dto.*;
 import com.cf.parking.facade.facade.*;
+import com.cf.parking.services.utils.AssertUtil;
 import com.cf.parking.services.utils.PageUtils;
 import com.cf.support.authertication.AdminUserAuthentication;
 import com.cf.support.result.PageResponse;
@@ -117,6 +118,15 @@ public class ParkingSpaceController {
         }
         List<UserSpaceRsp> userSpaceRsps = BeanConvertorUtils.copyList(userSpacePage.getList(), UserSpaceRsp.class);
         return PageUtils.pageResult(userSpacePage, userSpaceRsps);
+    }
+    
+    @AdminOptLogTitle("黑名单设置保存接口")
+    @DeleteMapping("/userSpace/delete")
+    @ApiOperation(value = "根据Id删除车位", notes = "根据Id删除车位")
+    public Result deleteUserSpace(@RequestBody UserSpacePageReq param) {
+    	AssertUtil.checkNull(param.getUserSpaceId(), "车位Id不能为空");
+        userSpaceFacade.deleteUserSpace(param.getUserSpaceId());
+        return Result.buildSuccessResult();
     }
 
     @PostMapping("/scheduleData/get")

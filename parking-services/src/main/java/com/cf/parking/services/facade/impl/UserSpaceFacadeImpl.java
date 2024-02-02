@@ -154,5 +154,10 @@ public class UserSpaceFacadeImpl implements UserSpaceFacade {
 		return result;
 	}
 
+	@Override
+	public void deleteUserSpace(Long userSpaceId) {
+		userSpaceMapper.deleteById(userSpaceId);
+	}
+
 
 }

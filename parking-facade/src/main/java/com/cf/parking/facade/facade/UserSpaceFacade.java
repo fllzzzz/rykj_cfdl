@@ -43,4 +43,10 @@ public interface UserSpaceFacade {
 	 * @return
 	 */
 	List<ParkingSpaceGroupBO> getUserSpaceGroupByParkingLot(String jobNumber, Integer type);
+
+	/**
+	 * 根据车位Id删除车位
+	 * @param userSpaceId
+	 */
+	void deleteUserSpace(Long userSpaceId);
 }

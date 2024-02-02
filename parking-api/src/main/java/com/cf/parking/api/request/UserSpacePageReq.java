@@ -14,6 +14,9 @@ import java.util.Date;
  */
 @Data
 public class UserSpacePageReq extends PageRequest {
+	
+	@ApiModelProperty(value = "车位id")
+	private Long userSpaceId;
 
     @ApiModelProperty(value = "所属车场名（老园区,新园区南门,地下停车场,组装车间1F,组装车间4F停车库）")
     @Pattern(regexp = "^.{0,100}$", message = "车场长度不可超过100")
