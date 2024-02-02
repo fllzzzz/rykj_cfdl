@@ -121,7 +121,7 @@ public class ParkingSpaceController {
     }
     
     @AdminOptLogTitle("黑名单设置保存接口")
-    @DeleteMapping("/userSpace/delete")
+    @PostMapping("/userSpace/delete")
     @ApiOperation(value = "根据Id删除车位", notes = "根据Id删除车位")
     public Result deleteUserSpace(@RequestBody UserSpacePageReq param) {
     	AssertUtil.checkNull(param.getUserSpaceId(), "车位Id不能为空");
