@@ -651,6 +651,7 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 	 * @param vefifyList
 	 */
 	public void changeUserPalteNo(List<UserVerifyPO> vefifyList) {
+		log.info("车牌审核通过：{}",JSON.toJSONString(vefifyList));
 		List<UserSpacePO> spaceList = null;
 		ParkingCarQueryDTO query = new ParkingCarQueryDTO();
 		//车辆查询响应
@@ -662,7 +663,7 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 		//用户信息
 		UserProfilePO user =  null;
 		//用户摇号车位
-		List<UserSpacePO> userSpaceList = Collections.emptyList();
+		List<UserSpacePO> userSpaceList = new ArrayList<>();
 		for(UserVerifyPO verify : vefifyList) {
 			user =  userProfileService.getUserProfileByUserId(verify.getUserId());
 			userSpaceList =  userSpaceMapper.selectList(new LambdaQueryWrapper<UserSpacePO>()
@@ -670,7 +671,7 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 						.eq(UserSpacePO::getJobNumber , user.getJobNumber())
 						.orderByDesc(UserSpacePO::getEndDate)
 					)	;		
-			
+			log.info("根据工号：{}查询摇号车位：{}",user.getJobNumber(),JSON.toJSONString(userSpaceList));;
 			if (StringUtils.isEmpty(verify.getLastPlateNo())){
 				log.info("新增车牌或者是未修改车牌：{}",JSON.toJSONString(verify));
 				if (CollectionUtils.isEmpty(userSpaceList)) {
@@ -680,7 +681,7 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
 					spaceList = userSpaceMapper.selectList(new LambdaQueryWrapper<UserSpacePO>()
 							.eq(UserSpacePO::getPlateNo, verify.getPlateNo())
 						);
-					log.info("新增车牌或者是未修改车牌的车位信息：{}",JSON.toJSONString(spaceList));
+					log.info("根据车牌：{}查询车位信息：{}",verify.getPlateNo(),JSON.toJSONString(spaceList));
 					if (CollectionUtils.isEmpty(spaceList)) {
 						//有车位但是这辆车无车位
 						addUserLotterySpace(verify,userSpaceList);
