@@ -158,6 +158,7 @@ public class UserSpaceService extends ServiceImpl<UserSpaceMapper, UserSpacePO> 
                 .like(!StringUtils.isEmpty(param.getParkingLot()), UserSpacePO::getParkingLot, param.getParkingLot())
                 .eq(!StringUtils.isEmpty(param.getJobNumber()), UserSpacePO::getJobNumber, param.getJobNumber())
                 .eq(!StringUtils.isEmpty(param.getPlateNo()), UserSpacePO::getPlateNo, param.getPlateNo())
+				.eq(!StringUtils.isEmpty(param.getState()), UserSpacePO::getState, param.getState())
                 .le(!ObjectUtils.isEmpty(param.getEndDate()), UserSpacePO::getEndDate, param.getEndDate())
                 .orderByDesc(UserSpacePO::getUpdateTm);
         Page page = new Page().setCurrent(param.getPageNo()).setSize(param.getPageSize());
